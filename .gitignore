@@ -1,8 +1,8 @@
 # Django
 backend/env/
 backend/.env
-backend/*.sqlite3
-backend/*__pycache__
+*.sqlite3
+*__pycache__
 
 # React
 frontend/node_modules/
