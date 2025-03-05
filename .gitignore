@@ -1,7 +1,7 @@
 # Django
 backend/env/
 backend/.env
-*.sqlite3
+backend/mai_prod/db.sqlite3
 backend/mai_prod/mai_prod/__pycache__
 
 # React
