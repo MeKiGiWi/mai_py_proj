@@ -2,7 +2,7 @@
 backend/env/
 backend/.env
 *.sqlite3
-*__pycache__
+backend/mai_prod/mai_prod/__pycache__
 
 # React
 frontend/node_modules/
