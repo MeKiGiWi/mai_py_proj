@@ -47,8 +47,9 @@ export default function Registerform(){
 
                             <label className="text-sm text-gray-600 block p-2">или</label>
 
-                            <button className="btn py-2 flex items-center justify-center w-full gap-2 border border-gray-600
-                            rounded-lg font-semibold text-gray-800">
+                            <button className="btn py-2 flex items-center justify-center w-full gap-2 border border-gray-400
+                            rounded-lg font-semibold text-gray-800 
+                            hover:bg-gray-100 hover:border-gray-500">
                                 <img src="https://www.google.com/favicon.ico" alt="Google" className="w-7 h-7"/>
                                 Войти через Google
                             </button>
@@ -58,7 +59,8 @@ export default function Registerform(){
                                     {"Нет аккаунта? "}
                                 </label>
                                 <button className="font-semibold hover:underline">
-                                    Зарегистрироваться
+                                    Зарегистрироваться       
+                                    {/* Тут сокрее всего нужен тэг a с href */}
                                 </button>
                             </div>
                         </div>
