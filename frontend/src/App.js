@@ -2,12 +2,17 @@ import logo from './logo.svg';
 import './App.css';
 import React, { useEffect } from 'react';
 import axios from 'axios';
-import Registerform from './components/Registerform';
+import LoginPage from './components/LoginPage';
+import { Routes, Route } from 'react-router-dom';
+import RegisterPage from './components/RegisterPage';
+import HomePage from './components/HomePage';
 
 export default function App() {
   return (
-    <div className='App'>
-      <Registerform/>
-    </div>
+    <Routes>
+      <Route path='/' element={<HomePage/>}/>
+      <Route path='/login' element={<LoginPage/>}/> 
+      <Route path='/registration' element={<RegisterPage/>}/>
+    </Routes>
   );
 }
