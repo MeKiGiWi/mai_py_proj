@@ -45,6 +45,22 @@ export default function Registerform(){
                                 Войти
                             </button>
 
+                            <label className="text-sm text-gray-600 block p-2">или</label>
+
+                            <button className="btn py-2 flex items-center justify-center w-full gap-2 border border-gray-600
+                            rounded-lg font-semibold text-gray-800">
+                                <img src="https://www.google.com/favicon.ico" alt="Google" className="w-7 h-7"/>
+                                Войти через Google
+                            </button>
+
+                            <div className="flex-row py-2 w-full text-sm">
+                                <label>
+                                    {"Нет аккаунта? "}
+                                </label>
+                                <button className="font-semibold hover:underline">
+                                    Зарегистрироваться
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </form>
