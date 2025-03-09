@@ -1,14 +1,23 @@
 import { Link } from "react-router";
+import GoogleLoginButton from "../components/GoogleLoginButton";
+import PlanItTag from "../components/PlanItTag";
 
 function LoginPage() {
 
   return (
+    <>
     <main className='min-h-screen justify-center items-center flex text-center bg-base-200'>
+    {/* Logo*/}
+    <Link to={'/'}>
+      <PlanItTag/>
+    </Link>
+    {/* Registration window */}
       <div className='card card-border w-96 bg-base-100 '>
         <div className='card-title'>
           <h1 className='text-neutral w-full text-center text-3xl my-6'>Добро пожаловать!</h1>
         </div>
 
+        {/* Input section */}
         <div className='card-body'>
           <div>
             <label className="input validator">
@@ -35,12 +44,19 @@ function LoginPage() {
             </p>
           </div>
 
-          <button className='btn mx-2 my-2'>
+          {/* Buttons section */}
+          <button className='btn btn-accent mx-2 mt-1'>
             Войти
           </button>
+          <span>или</span>
+          <GoogleLoginButton />
+          <p className="text-base-content text-xs"> Нет аккаунта? <b></b>
+            <Link to='/registration' className="link-hover text-base-content font-semibold text-xs">Зарегистрироваться</Link>
+            </p>          
         </div>
       </div>
     </main>
+    </>
   );
 }
 export default LoginPage;

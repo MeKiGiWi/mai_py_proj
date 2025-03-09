@@ -1,4 +1,5 @@
 import { Link } from "react-router";
+import PlanItTag from "../components/PlanItTag";
 
 export default function LandingPage() {
   return (
@@ -6,10 +7,12 @@ export default function LandingPage() {
       {/* Navbar */}
       <div className="navbar bg-base-100 shadow-lg px-8">
         <div className="flex-1">
-          <h1 className="text-2xl font-bold text-primary">planIT MAI</h1>
+          <Link>
+            <PlanItTag/>
+          </Link>
         </div>
         <div className="flex-none">
-            <Link to={"/login"} className="btn btn-primary">Войти</Link>
+            <Link to={"/login"} className="btn btn-neutral">Войти</Link>
         </div>
       </div>
 
@@ -17,7 +20,7 @@ export default function LandingPage() {
       <div className="hero bg-base-200 flex-grow">
         <div className="hero-content flex-col lg:flex-row-reverse gap-12">
           <img 
-            src="/path-to-your-image.png" // Замените на реальный путь
+            src="/path-to-image.png" // Заменить на реальный путь
             className="max-w-sm rounded-lg shadow-2xl" 
             alt="Расписание"
           />
@@ -29,7 +32,7 @@ export default function LandingPage() {
               Автоматизированная система работы с учебным расписанием 
               Московского авиационного института
             </p>
-            <button className="btn btn-primary btn-lg">Начать использовать</button>
+            <button className="btn btn-accent btn-lg">Начать использовать</button>
           </div>
         </div>
       </div>
@@ -44,7 +47,7 @@ export default function LandingPage() {
             {/* Feature Card 1 */}
             <div className="card bg-base-200 shadow-xl">
               <div className="card-body items-center text-center">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 text-info" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                 </svg>
                 <h3 className="text-xl font-bold mt-4">Экспорт в Google Календарь</h3>
@@ -55,7 +58,7 @@ export default function LandingPage() {
             {/* Feature Card 2 */}
             <div className="card bg-base-200 shadow-xl">
               <div className="card-body items-center text-center">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 text-info" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                 </svg>
                 <h3 className="text-xl font-bold mt-4">Google Таблицы</h3>
@@ -66,7 +69,7 @@ export default function LandingPage() {
             {/* Feature Card 3 */}
             <div className="card bg-base-200 shadow-xl">
               <div className="card-body items-center text-center">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 text-info" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                 </svg>
                 <h3 className="text-xl font-bold mt-4">Ручное редактирование</h3>
@@ -77,7 +80,7 @@ export default function LandingPage() {
             {/* Feature Card 4 */}
             <div className="card bg-base-200 shadow-xl">
               <div className="card-body items-center text-center">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 text-info" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
                 </svg>
                 <h3 className="text-xl font-bold mt-4">Уведомления</h3>
