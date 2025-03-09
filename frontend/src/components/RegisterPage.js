@@ -63,9 +63,7 @@ export default function RegisterPage(){
                                 <label>
                                     {"Уже есть аккаунт? "}
                                 </label>
-                                <button >
-                                </button>
-                                <Link to="/"
+                                <Link to="/login"
                                 className="font-semibold hover:underline text-center">
                                    Войти 
                                 </Link>
