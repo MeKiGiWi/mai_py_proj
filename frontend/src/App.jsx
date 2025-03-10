@@ -3,6 +3,7 @@ import HomePage from './pages/HomePage'
 import LoginPage from './pages/LoginPage'
 import { Route, Routes } from 'react-router'
 import RegistrationPage from './pages/RegistrationPage'
+import TestPage from './pages/TestPage'
 
 function App() {
   return (
