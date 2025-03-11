@@ -1,18 +1,33 @@
 import { Link } from "react-router";
 import GoogleLoginButton from "../components/GoogleLoginButton";
 import PlanItTag from "../components/PlanItTag";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
+import axios from 'axios'
 
 function RegistrationPage() {
   const [password, setPassword] = useState(''); 
   const [confirmPassword, setConfirmPassword] = useState('');
-  // const [passwordMatchError, setPasswordMatchError] = useState('');
-  const inputRef = useRef(null);
+  const [username, setUsername] = useState('');
+  const [error, setError] = useState('');
 
-  const handleSubmit = (e) => {
+  // sending get response to backend
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (password !== confirmPassword) {
-      inputRef.current.setCustomValidity("Пароли должны совпадать") 
+      return;
+    }
+    try {
+      const response = await axios.post('http://127.0.0.1:8000/api/register/', {
+        username,
+        password,
+        confirm_password: confirmPassword
+      });
+      console.log("Статус ответа:", response.status); // Должно быть 201
+      console.log("Данные ответа:", response.data);
+    }
+    catch (err) {
+      setError("Неверный логин пароль");
+      console.err("Полный объект ошибки:", err);
     }
   }
 
@@ -35,7 +50,7 @@ function RegistrationPage() {
             <p className="text-neutral text-left mx-3 mb-1 font-semibold">Придумайте логин</p>
             <label className="input validator">
               <svg className="h-[1em] opacity-50" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><g strokeLinejoin="round" strokeLinecap="round" strokeWidth="2.5" fill="none" stroke="currentColor"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></g></svg>
-              <input type="input" required placeholder="Username" pattern="[A-Za-z][A-Za-z0-9\-]*" minlength="3" maxlength="30" title="Only letters, numbers or dash"/>
+              <input type="input" onChange={(e) => setUsername(e.target.value)} required placeholder="Username" pattern="[A-Za-z][A-Za-z0-9\-]*" minlength="3" maxlength="30" title="Only letters, numbers or dash"/>
             </label>
           </div>
 

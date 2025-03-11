@@ -29,9 +29,24 @@ ALLOWED_HOSTS = []
 
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",  # React-сервер
+    "http://localhost:5173",  # Vite+React-сервер
 ]
 # Application definition
+CORS_ALLOW_METHODS = [
+    'DELETE',
+    'GET',
+    'OPTIONS',
+    'PATCH',
+    'POST',
+    'PUT',
+]
 
+CORS_ALLOW_HEADERS = [
+    'accept',
+    'authorization',
+    'content-type',
+]
+    
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -42,6 +57,7 @@ INSTALLED_APPS = [
     'corsheaders',
     'rest_framework',
     'hello_api',
+    'accounts',
 ]
 
 MIDDLEWARE = [
@@ -81,8 +97,12 @@ WSGI_APPLICATION = 'mai_prod.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'mydb',          # Имя вашей БД
+        'USER': 'myuser',        # Пользователь БД
+        'PASSWORD': 'mypassword',# Пароль
+        'HOST': 'localhost',     # Хост (если БД на другом сервере, укажите его IP)
+        'PORT': '5432',          # Порт PostgreSQL (по умолчанию 5432)
     }
 }
 
@@ -127,3 +147,9 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.SessionAuthentication',
+    ]
+}
