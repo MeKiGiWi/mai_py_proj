@@ -2,7 +2,7 @@ import { Link } from "react-router";
 import GoogleLoginButton from "../components/GoogleLoginButton";
 import PlanItTag from "../components/PlanItTag";
 import axios from "axios";
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router";
 
 function LoginPage() {
@@ -21,11 +21,11 @@ function LoginPage() {
       });
       localStorage.setItem('access_token', response.data.access);
       localStorage.setItem('refresh_token', response.data.refresh);
-      localStorage.setItem('user', JSON.stringify(response.data.user))
-      console.log(localStorage.access);
-      console.log(localStorage.refresh_token, "refresh");
+      // localStorage.setItem('user', JSON.stringify(response.data.user))
+      console.log(localStorage.access_token);
+      console.log(localStorage.refresh_token);
       console.log(localStorage.user);
-      navigate('/main')
+      navigate('/main');
     }
     catch (err) {
       setError("Неверный логин или пароль");
@@ -43,7 +43,7 @@ function LoginPage() {
     {/* Login window */}
       <form 
       className='card card-border w-96 bg-base-100 '
-      onSubmit={handleSubmit}
+      onSubmit={handleSubmit} // might be appended that this auth form
       >
         <div className='card-title'>
           <h1 className='text-neutral w-full text-center text-3xl my-6'>Добро пожаловать!</h1>
@@ -59,14 +59,14 @@ function LoginPage() {
               required 
               placeholder="Username" 
               pattern="[A-Za-z][A-Za-z0-9\-]*" 
-              minlength="3" 
-              maxlength="30" 
+              minLength="3" 
+              maxLength="20" 
               title="Only letters, numbers or dash" 
               onChange={(e) => setUsername(e.target.value)}
               />
             </label>
             <p className="validator-hint hidden">
-              Must be 3 to 30 characters
+              Must be 3 to 20 characters
               <br/>containing only letters, numbers or dash
               <br/>Can only start with letters
             </p> 
@@ -79,7 +79,8 @@ function LoginPage() {
               type="password" 
               required 
               placeholder="Password" 
-              minlength="8" 
+              minLength="8" 
+              maxLength={20}
               pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}" 
               title="Must be more than 8 characters, including number, lowercase letter, uppercase letter" 
               onChange={(e) => setPassword(e.target.value)}
@@ -100,7 +101,7 @@ function LoginPage() {
             >
               Войти 
             </button>
-            <span>или </span>
+            <span>или {password}</span>
             <GoogleLoginButton />
             <p className="text-base-content text-xs"> Нет аккаунта? <b></b>
               <Link to='/registration' className="link-hover text-base-content font-semibold text-xs">Зарегистрироваться</Link>

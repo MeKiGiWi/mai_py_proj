@@ -5,6 +5,7 @@ import { Route, Routes } from 'react-router'
 import RegistrationPage from './pages/RegistrationPage'
 import MainPage from './pages/MainPage'
 import AboutTeamPage from './pages/AboutTeamPage'
+import ProtectedRoute from './components/ProtectedRoute'
 
 function App() {
   return (
@@ -12,7 +13,10 @@ function App() {
       <Route path='/' element={<HomePage/>}/>
       <Route path='/login' element={<LoginPage/>}/>
       <Route path='/registration' element={<RegistrationPage/>}/>
-      <Route path='/main' element={<MainPage/>}/>
+      <Route element={<ProtectedRoute/>}>
+        <Route path='/main' element={<MainPage/>}/>
+      </Route>
+      <Route path="*" element={<p className='text-3xl'>There's nothing here: 404!</p>} />
       <Route path='/aboutteam' element={<AboutTeamPage/>}/>
     </Routes>
   )
