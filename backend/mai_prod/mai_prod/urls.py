@@ -18,9 +18,15 @@ from django.contrib import admin
 from django.urls import path
 from django.urls import include
 from accounts.views import RegisterView
+from rest_framework_simplejwt.views import (
+    TokenRefreshView,
+    TokenObtainPairView,
+)
+
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('api/', include('hello_api.urls')),  # подключите ваше приложение
     path('api/register/', RegisterView.as_view(), name='register'),
+    path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
+    path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
 ]

@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
 from pathlib import Path
+from datetime import timedelta
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -56,7 +57,6 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'corsheaders',
     'rest_framework',
-    'hello_api',
     'accounts',
 ]
 
@@ -98,9 +98,9 @@ WSGI_APPLICATION = 'mai_prod.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'mydb',          # Имя вашей БД
-        'USER': 'myuser',        # Пользователь БД
-        'PASSWORD': 'mypassword',# Пароль
+        'NAME': 'pyproj',          # Имя вашей БД
+        'USER': 'meki',        # Пользователь БД
+        'PASSWORD': 'Daniil17',# Пароль
         'HOST': 'localhost',     # Хост (если БД на другом сервере, укажите его IP)
         'PORT': '5432',          # Порт PostgreSQL (по умолчанию 5432)
     }
@@ -152,4 +152,9 @@ REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework.authentication.SessionAuthentication',
     ]
+}
+
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=60),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
 }

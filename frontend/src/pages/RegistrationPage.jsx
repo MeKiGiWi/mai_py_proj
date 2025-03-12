@@ -27,7 +27,7 @@ function RegistrationPage() {
     }
     catch (err) {
       setError("Неверный логин пароль");
-      console.err("Полный объект ошибки:", err);
+      console.error("Полный объект ошибки:", err);
     }
   }
 
