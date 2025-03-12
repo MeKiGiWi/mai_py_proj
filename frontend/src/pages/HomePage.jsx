@@ -1,5 +1,6 @@
 import { Link } from "react-router";
 import PlanItTag from "../components/PlanItTag";
+import AboutTeamTag from "../components/AboutTeamTag";
 
 export default function LandingPage() {
   return (
@@ -95,8 +96,8 @@ export default function LandingPage() {
       <footer className="footer footer-center p-10 bg-base-300 text-base-content">
         <div>
           <p className="font-bold text-lg">
-            Проект разработан командой <span className="text-primary">23*73</span>
-          </p>
+            Проект разработан командой <AboutTeamTag/>
+          </p>  
           <p>Московский авиационный институт, 2024</p>
         </div>
       </footer>
