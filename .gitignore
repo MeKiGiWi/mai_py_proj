@@ -9,6 +9,6 @@ frontend/.env
 frontend/build/
 backend/mai_prod/accounts/__pycache__/views.cpython-312.pyc
 
-
+.env
 __pycache__/
 *.py[cod]
