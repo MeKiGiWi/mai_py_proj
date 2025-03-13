@@ -2,8 +2,9 @@ import { Link } from "react-router";
 import GoogleLoginButton from "../components/GoogleLoginButton";
 import PlanItTag from "../components/PlanItTag";
 import axios from "axios";
-import { useState, useEffect, useRef, useContext } from "react";
+import { useState, useContext } from "react";
 import { useNavigate } from "react-router";
+import AuthContext from "../components/AuthContext";
 // import AuthContext from "../components/AuthContext";
 
 
@@ -12,6 +13,7 @@ function LoginPage() {
   const [password, setPassword] = useState('');
   const [username, setUsername] = useState('');
   const navigate = useNavigate();
+  const { login } = useContext(AuthContext);
   // const {isAuth} = useContext(AuthContext);
 
   // useEffect(() => {console.log(`isAuth = ${isAuth}`)}, [isAuth])
@@ -29,7 +31,7 @@ function LoginPage() {
       localStorage.setItem('refresh_token', response.data.refresh);
       // localStorage.setItem('user', JSON.stringify(response.data.user))
       // try to login with token
-      // auth.login(response.data.access);
+      login(response.data.access);
 
       navigate('/main');
     }
