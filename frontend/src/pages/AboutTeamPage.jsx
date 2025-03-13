@@ -8,7 +8,7 @@ export default function AboutUsPage(){
       {/* Navbar */}
       <div className="navbar bg-base-100 shadow-lg px-8">
         <div className="flex-1">
-          <Link>
+          <Link to={'/'}>
             <PlanItTag/>
           </Link>
         </div>
