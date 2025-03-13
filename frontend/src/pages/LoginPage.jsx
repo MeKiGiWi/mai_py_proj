@@ -2,14 +2,19 @@ import { Link } from "react-router";
 import GoogleLoginButton from "../components/GoogleLoginButton";
 import PlanItTag from "../components/PlanItTag";
 import axios from "axios";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useContext } from "react";
 import { useNavigate } from "react-router";
+// import AuthContext from "../components/AuthContext";
+
 
 function LoginPage() {
   const [error, setError] = useState('');
   const [password, setPassword] = useState('');
   const [username, setUsername] = useState('');
   const navigate = useNavigate();
+  // const {isAuth} = useContext(AuthContext);
+
+  // useEffect(() => {console.log(`isAuth = ${isAuth}`)}, [isAuth])
 
   // Login validation
   const handleSubmit = async (e) => {
@@ -19,12 +24,13 @@ function LoginPage() {
         username,
         password,
       });
-      localStorage.setItem('access_token', response.data.access);
+      // adding tokens to local storage
+      localStorage.setItem('access_token', response.data.access); 
       localStorage.setItem('refresh_token', response.data.refresh);
       // localStorage.setItem('user', JSON.stringify(response.data.user))
-      console.log(localStorage.access_token);
-      console.log(localStorage.refresh_token);
-      console.log(localStorage.user);
+      // try to login with token
+      // auth.login(response.data.access);
+
       navigate('/main');
     }
     catch (err) {
@@ -60,7 +66,7 @@ function LoginPage() {
               placeholder="Username" 
               pattern="[A-Za-z][A-Za-z0-9\-]*" 
               minLength="3" 
-              maxLength="20" 
+              maxLength="15" 
               title="Only letters, numbers or dash" 
               onChange={(e) => setUsername(e.target.value)}
               />
@@ -80,7 +86,7 @@ function LoginPage() {
               required 
               placeholder="Password" 
               minLength="8" 
-              maxLength={20}
+              maxLength="20"
               pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}" 
               title="Must be more than 8 characters, including number, lowercase letter, uppercase letter" 
               onChange={(e) => setPassword(e.target.value)}

@@ -22,6 +22,7 @@ from rest_framework_simplejwt.views import (
     TokenRefreshView,
     TokenObtainPairView,
 )
+from accounts.views import get_current_user
 
 
 urlpatterns = [
@@ -29,4 +30,5 @@ urlpatterns = [
     path('api/register/', RegisterView.as_view(), name='register'),
     path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+    path('api/auth/me/', get_current_user, name='current_user')
 ]

@@ -2,10 +2,10 @@ import { useContext } from 'react';
 import AuthContext from './AuthContext';
 import { Outlet, Navigate } from 'react-router';
 
-const ProtectedRoute = () => {
+const RepeatLoginProtectedRoute = () => {
   const { isAuth, checkAuth } = useContext(AuthContext);
-  // try to login
-  return isAuth ? <Outlet /> : <Navigate to="/login" replace />;
+  checkAuth();
+  return isAuth ? <Navigate to="/main" replace /> : <Outlet />;
 };
 
-export default ProtectedRoute;
+export default RepeatLoginProtectedRoute;
