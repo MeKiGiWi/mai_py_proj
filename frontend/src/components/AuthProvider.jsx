@@ -51,10 +51,10 @@ const AuthProvider = ({ children }) => {
     setUser(null);
   };
 
-  // Check auth when load 
-  // useEffect(() => {
-  //   if (localStorage.getItem('access_token')) checkAuth();
-  // }, []);
+  // Check auth when load and when access token changed
+  useEffect(() => {
+    checkAuth();
+  }, []);
 
   return (
     <AuthContext.Provider value={{ isAuth, user, login, logout, checkAuth }}>

@@ -1,6 +1,6 @@
 import { Link } from "react-router";
 import PlanItTag from "../components/PlanItTag";
-import AboutUsTag from "../components/AboutTeamTag";
+import AboutUsTag from "../components/AboutUsTag";
 
 export default function AboutUsPage(){
   return (

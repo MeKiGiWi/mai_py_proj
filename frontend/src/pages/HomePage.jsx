@@ -1,21 +1,17 @@
 import { Link } from "react-router";
-import PlanItTag from "../components/PlanItTag";
-import AboutTeamTag from "../components/AboutTeamTag";
+import AboutTeamTag from "../components/AboutUsTag";
+import AuthContext from "../components/AuthContext";
+import { useContext } from "react";
+import NavBar from "../components/NavBar";
 
 export default function LandingPage() {
+  const { isAuth } = useContext(AuthContext);
+  console.log(isAuth);
+
   return (
     <div className="min-h-screen flex flex-col">
       {/* Navbar */}
-      <div className="navbar bg-base-100 shadow-lg px-8">
-        <div className="flex-1">
-          <Link>
-            <PlanItTag/>
-          </Link>
-        </div>
-        <div className="flex-none">
-            <Link to={"/login"} className="btn btn-neutral">Войти</Link>
-        </div>
-      </div>
+      <NavBar/>
 
       {/* Hero Section */}
       <div className="hero bg-base-200 flex-grow">
