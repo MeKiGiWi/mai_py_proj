@@ -16,8 +16,8 @@ export default function NavBar () {
         </Link>
       </div>
       <div className="avatar">
-        <div className="w-24 rounded-full border border-base-300">
-          <p>eto logo <br/> sosite tipo</p>
+        <div className="w-20 rounded-full border border-base-300">
+          <Link to={"/main"}>eto logo <br/> sosite tipo</Link>
         </div>
       </div>
     </div>) : (

@@ -3,8 +3,7 @@ import AuthContext from './AuthContext';
 import { Outlet, Navigate } from 'react-router';
 
 const RepeatLoginProtectedRoute = () => {
-  const { isAuth, checkAuth } = useContext(AuthContext);
-  checkAuth();
+  const { isAuth } = useContext(AuthContext);
   return isAuth ? <Navigate to="/main" replace /> : <Outlet />;
 };
 

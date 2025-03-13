@@ -1,9 +1,7 @@
 import { Link, useNavigate } from "react-router";
-import GoogleLoginButton from "../components/GoogleLoginButton";
 import PlanItTag from "../components/PlanItTag";
 import { useState } from "react";
 import axios from 'axios'
-import AuthContext from "../components/AuthContext";
 
 function RegistrationPage() {
   const [password, setPassword] = useState(''); 
