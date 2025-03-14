@@ -16,7 +16,6 @@ const AuthProvider = ({ children }) => {
       }
       });
       setIsAuth(true);
-      setUser(response.data);
     } catch (err) {
       console.error(err);
       logout();
