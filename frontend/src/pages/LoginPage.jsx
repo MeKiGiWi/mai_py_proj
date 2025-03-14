@@ -31,8 +31,7 @@ function LoginPage() {
       localStorage.setItem('refresh_token', response.data.refresh);
       // localStorage.setItem('user', JSON.stringify(response.data.user))
       // try to login with token
-      // await checkAuth();
-
+      await checkAuth();
       navigate('/main');
     }
     catch (err) {
@@ -109,7 +108,7 @@ function LoginPage() {
             >
               Войти 
             </button>
-            <span>или {password}</span>
+            <span>или </span>
             <GoogleLoginButton />
             <p className="text-base-content text-xs"> Нет аккаунта? <b></b>
               <Link to='/registration' className="link-hover text-base-content font-semibold text-xs">Зарегистрироваться</Link>
