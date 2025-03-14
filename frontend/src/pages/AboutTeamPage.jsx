@@ -1,28 +1,20 @@
 import { Link } from "react-router";
 import PlanItTag from "../components/PlanItTag";
-import AboutUsTag from "../components/AboutUsTag";
+import AboutTeamTag from "../components/AboutTeamTag";
+import NavBar from "../components/NavBar";
 
 export default function AboutUsPage(){
   return (
     <div className="min-h-screen flex flex-col">
       {/* Navbar */}
-      <div className="navbar bg-base-100 shadow-lg px-8">
-        <div className="flex-1">
-          <Link to={'/'}>
-            <PlanItTag/>
-          </Link>
-        </div>
-        <div className="flex-none">
-            <Link to={"/login"} className="btn btn-neutral">Войти</Link>
-        </div>
-      </div>
+      <NavBar/>
 
       {/* Hero Section */}
       <div className="hero bg-base-200 flex-grow">
         <div className="hero-content flex-col lg:flex-row-reverse gap-12">
           <img 
             src="https://img.freepik.com/free-photo/anime-moon-landscape_23-2151645918.jpg"
-            className="max-w-sm rounded-lg shadow-2xl" />
+            className="rounded-lg shadow-2xl" />
           <div className="max-w-2xl">
             <h1 className="text-5xl font-bold mb-6">
               Наша команда
@@ -122,9 +114,9 @@ export default function AboutUsPage(){
       {/* Footer */}
       <footer className="footer footer-center p-10 bg-base-300 text-base-content">
         <div>
-          <p className="font-bold text-lg">
-            Проект разработан командой <AboutUsTag/>
-          </p>  
+            <p className="font-bold text-lg">
+              Проект разработан командой <AboutTeamTag/>
+            </p>  
           <p>Московский авиационный институт, 2024</p>
         </div>
       </footer>

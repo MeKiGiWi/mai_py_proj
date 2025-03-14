@@ -68,7 +68,7 @@ function RegistrationPage() {
               pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}" 
               onChange={(e) => setPassword(e.target.value)}
               value={password}
-              title="Пароль должен быть длиной более 8 символов из которых минимум 1 маленькая 1 заглавная 1 цифра"/>
+              title="Must be more than 8 characters, including number, lowercase letter, uppercase letter"/>
               
             </label>
           </div>
@@ -85,7 +85,7 @@ function RegistrationPage() {
               pattern={password} 
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
-              title="Пароли должны совпадать" />
+              title="Passwords must match" />
             </label>
           </div>
 

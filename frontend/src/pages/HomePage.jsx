@@ -1,5 +1,5 @@
 import { Link } from "react-router";
-import AboutTeamTag from "../components/AboutUsTag";
+import AboutTeamTag from "../components/AboutTeamTag";
 import AuthContext from "../components/AuthContext";
 import { useContext } from "react";
 import NavBar from "../components/NavBar";
@@ -14,22 +14,30 @@ export default function LandingPage() {
       <NavBar/>
 
       {/* Hero Section */}
-      <div className="hero bg-base-200 flex-grow">
-        <div className="hero-content flex-col lg:flex-row-reverse gap-12">
-          <img 
-            src="/path-to-image.png" // Заменить на реальный путь
-            className="max-w-sm rounded-lg shadow-2xl" 
-            alt="Расписание"
-          />
-          <div className="max-w-2xl">
-            <h1 className="text-5xl font-bold mb-6">
-              Умное управление расписанием кафедры
-            </h1>
-            <p className="text-lg mb-8">
+      <div
+        className="hero min-h-screen shadow-lg mb-5"
+        style={{
+          backgroundImage: "url(https://mai.ru/upload/iblock/b5e/z4cgul01mj8mb8rocoqjwzs4j1n1skw3/MAI_4005.jpg)",
+        }}>
+        <div className="hero-overlay"></div>
+        <div className="hero-content text-neutral-content text-center">
+          <div className="max-w-xl">
+            <h1 className="mb-5 text-5xl font-bold text-balanced">Умное управление расписанием кафедры</h1>
+            <p className="mb-5">
               Автоматизированная система работы с учебным расписанием 
               Московского авиационного института
             </p>
-            <button className="btn btn-accent btn-lg">Начать использовать</button>
+              {isAuth ? (
+              <Link to={'/main'}>
+                <button className="btn btn-accent btn-lg">Начать использовать</button>
+              </Link>
+              ): (
+              <Link to={'/login'}>
+                <button className="btn btn-accent btn-lg">Начать использовать</button>
+              </Link>
+              )
+              }
+
           </div>
         </div>
       </div>
