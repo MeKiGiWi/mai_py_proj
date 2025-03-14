@@ -13,7 +13,7 @@ function LoginPage() {
   const [password, setPassword] = useState('');
   const [username, setUsername] = useState('');
   const navigate = useNavigate();
-  const { login } = useContext(AuthContext);
+  const { checkAuth } = useContext(AuthContext);
   // const {isAuth} = useContext(AuthContext);
 
   // useEffect(() => {console.log(`isAuth = ${isAuth}`)}, [isAuth])
@@ -31,7 +31,7 @@ function LoginPage() {
       localStorage.setItem('refresh_token', response.data.refresh);
       // localStorage.setItem('user', JSON.stringify(response.data.user))
       // try to login with token
-      login(response.data.access);
+      // await checkAuth();
 
       navigate('/main');
     }
