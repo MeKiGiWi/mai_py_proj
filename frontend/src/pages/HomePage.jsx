@@ -2,7 +2,7 @@ import { Link } from "react-router";
 import AboutTeamTag from "../components/AboutTeamTag";
 import AuthContext from "../components/AuthContext";
 import { useContext } from "react";
-import NavBar from "../components/NavBar";
+import NavBarForHP from "../components/NavBarForHP";
 
 export default function LandingPage() {
   const { isAuth } = useContext(AuthContext);
@@ -11,7 +11,7 @@ export default function LandingPage() {
   return (
     <div className="min-h-screen flex flex-col">
       {/* Navbar */}
-      <NavBar/>
+      <NavBarForHP/>
 
       {/* Hero Section */}
       <div

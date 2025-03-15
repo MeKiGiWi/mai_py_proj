@@ -62,7 +62,7 @@ export default function NavBar () {
         </button>
       </div>
     </div>) : (
-    <div className="navbar bg-base-100 shadow-lg px-8">
+    <div className="navbar bg-base-100 shadow-lg px-8 h-22">
       <div className="flex-1">
         <Link>
           <PlanItTag/>
