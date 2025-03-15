@@ -3,27 +3,28 @@ import AuthContext from "./AuthContext"
 import { useContext } from "react"
 import PlanItTag from "./PlanItTag";
 
+
 export default function NavBar () {
   const { isAuth, logout } = useContext(AuthContext);
 
   return ( 
     <>
     {isAuth ? (
-    <div className="navbar bg-base-100 shadow-lg px-8">
+    <div className="navbar bg-base-100 shadow-lg px-8 h-22">
       <div className="flex-1">
         <Link to={'/'}>
           <PlanItTag/>
         </Link>
       </div>
       <div className="avatar">
-        <div className="w-20 rounded-full border border-base-300">
+        <div className="w-15 rounded-full border border-base-300">
           <Link 
           to={"/main"}
           className="rounded-full"
           >
           <svg 
           className="absolute pr-4 mt-1 p text-neutral"
-          fill="currentColor" height="65px" width="95px" version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" 
+          fill="currentColor" height="45px" width="75px" version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" 
             viewBox="0 0 512 512" xml:space="preserve">
             <g>
               <g>
@@ -40,12 +41,12 @@ export default function NavBar () {
           </Link>
         </div>
       </div>
-      <div className="ml-3 flex mt-4.5 text-accent">
+      <div className="ml-0.5 flex mt-3 text-accent">
         <button
         onClick={logout}
-        className="btn btn-ghost"
+        className="btn btn-ghost btn-circle w-8 px-1 mx-1 mt-1.5"
         >
-          <svg fill="#000000" height="28px" width="28px" version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" 
+          <svg fill="#000000" height="800px" width="800px" version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" 
             viewBox="0 0 471.2 471.2" xml:space="preserve">
           <g>
             <g>
