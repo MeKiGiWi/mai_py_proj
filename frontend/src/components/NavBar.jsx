@@ -22,7 +22,7 @@ export default function NavBar () {
           className="rounded-full"
           >
           <svg 
-          className="absolute pr-4 mt-1 p text-primary"
+          className="absolute pr-4 mt-1 p text-neutral"
           fill="currentColor" height="65px" width="95px" version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" 
             viewBox="0 0 512 512" xml:space="preserve">
             <g>
