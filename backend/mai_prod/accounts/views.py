@@ -1,7 +1,9 @@
 from django.shortcuts import render
 
 # Create your views here.
-
+import os
+import requests
+from dotenv import load_dotenv
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -16,7 +18,22 @@ from .serializers import UserRegisterSerializer
 
 class RegisterView(APIView):
     def post(self, request):
-        serializer = UserRegisterSerializer(data=request.data)
+        serializer_data = request.data
+        recaptcha_token = serializer_data.pop("recaptcha_token")
+        print(serializer_data)
+        serializer = UserRegisterSerializer(data=serializer_data)
+
+        load_dotenv()
+        verification_url = "https://www.google.com/recaptcha/api/siteverify"
+        response = requests.post(verification_url, {
+            "secret": os.getenv("RECAPTCHA_SECRET_KEY"),
+            "response": recaptcha_token,
+        }, timeout=60000)
+
+        result = response.json()
+        print(result)
+        if not result.get('success'):
+            return Response(result, status=status.HTTP_403_FORBIDDEN)
         if serializer.is_valid():
             serializer.save()
             return Response(

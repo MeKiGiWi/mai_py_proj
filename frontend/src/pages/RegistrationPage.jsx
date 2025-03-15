@@ -1,6 +1,7 @@
-import { Link, useNavigate } from "react-router";
+import { createPath, Link, useNavigate } from "react-router";
 import PlanItTag from "../components/PlanItTag";
 import { useState } from "react";
+import ReCAPTCHA from "react-google-recaptcha";
 import axios from 'axios'
 
 function RegistrationPage() {
@@ -8,19 +9,21 @@ function RegistrationPage() {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [username, setUsername] = useState('');
   const [error, setError] = useState('');
+  const [captchaToken, setCaptchaToken] = useState('');
   const navigate = useNavigate();
 
   // sending post response to backend
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (password !== confirmPassword) {
+    if (password !== confirmPassword || !captchaToken) {
       return;
     }
     try {
       const response = await axios.post('http://127.0.0.1:8000/api/register/', {
         username,
         password,
-        confirm_password: confirmPassword
+        confirm_password: confirmPassword,
+        recaptcha_token: captchaToken,
       });
       console.log("Статус ответа:", response.status); // Должно быть 201
       console.log("Данные ответа:", response.data);
@@ -96,6 +99,10 @@ function RegistrationPage() {
           <p className="text-base-content text-xs"> Уже есть аккаунт? <b></b>
             <Link to='/login' className="link-hover text-base-content font-semibold text-xs">Войти</Link>
             </p>          
+            <ReCAPTCHA
+            sitekey="6LehTfUqAAAAACy_psBXjlvWXwCymnjvz26aLW72"
+            onChange={(e) => setCaptchaToken(e)}
+            />
         </div>
       </form>
     </main>
