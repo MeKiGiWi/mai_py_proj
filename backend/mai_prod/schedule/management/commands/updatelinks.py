@@ -1,9 +1,11 @@
+from urllib.parse import unquote
 from django.core.management import BaseCommand
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-from urllib.parse import unquote
+from schedule.models import GroupLink
+
 
 class Command(BaseCommand):
     help = 'updating schedule'
@@ -32,7 +34,12 @@ class Command(BaseCommand):
                     )
                     links = list(map(lambda x: x.get_attribute('href'), links))
                     for link in links:
-                        print(link, unquote(link), sep='\n')
+                        link = unquote(link)
+                        name = link.split('group=')[1]
+                        GroupLink.objects.create(
+                            title=f'{name}',
+                            url=f'{link}',
+                        )
             
 
         finally: 
