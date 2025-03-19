@@ -1,10 +1,9 @@
 from django.core.management import BaseCommand
 from selenium import webdriver
-from dotenv import load_dotenv
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-
+from urllib.parse import unquote
 
 class Command(BaseCommand):
     help = 'updating schedule'
@@ -33,7 +32,7 @@ class Command(BaseCommand):
                     )
                     links = list(map(lambda x: x.get_attribute('href'), links))
                     for link in links:
-                        print(link)
+                        print(link, unquote(link), sep='\n')
             
 
         finally: 
