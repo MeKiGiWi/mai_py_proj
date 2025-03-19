@@ -61,6 +61,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'accounts',
     'rest_framework_simplejwt.token_blacklist',
+    'schedule',
 ]
 
 MIDDLEWARE = [
