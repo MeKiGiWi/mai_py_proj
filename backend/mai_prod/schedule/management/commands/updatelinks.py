@@ -8,7 +8,7 @@ from schedule.models import GroupLink
 
 
 class Command(BaseCommand):
-    help = 'updating schedule'
+    help = 'updating links'
 
     def handle(self, *args, **options):
         try:
