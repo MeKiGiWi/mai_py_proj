@@ -37,7 +37,7 @@ class Command(BaseCommand):
                         link = unquote(link)
                         name = link.split('group=')[1]
                         GroupLink.objects.create(
-                            title=f'{name}',
+                            group_name=f'{name}',
                             url=f'{link}',
                         )
             

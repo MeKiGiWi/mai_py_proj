@@ -5,5 +5,5 @@ from .models import GroupLink
 
 @admin.register(GroupLink)
 class GroupLinkAdmin(admin.ModelAdmin):
-    list_display = ('title', 'url')
-    search_fields = ('title', 'url')
+    list_display = ('group_name', 'url')
+    search_fields = ('group_name', 'url')

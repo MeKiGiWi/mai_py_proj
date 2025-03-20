@@ -5,8 +5,8 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from schedule.models import GroupLink
-from time import sleep
-
+from schedule.utils.parse_date import parse_date
+from schedule.models import Schedule, GroupLink
 
 
 class Command(BaseCommand):
@@ -17,10 +17,11 @@ class Command(BaseCommand):
             driver = webdriver.Chrome()
             driver.implicitly_wait(2)
             for item in GroupLink.objects.all():
-                title, url = item.title, item.url
+                # title - group name
+                title, url = item.group_name, item.url
                 driver.get(url=f'{url}&week=1')
 
-                for week in range(1, 23):
+                for week in range(1, 24):
                     driver.get(url=f'{url}&week={week}')
                     day_fields = driver.find_elements(
                         'css selector',
@@ -34,9 +35,10 @@ class Command(BaseCommand):
                         )
                         date = date.text.split(',')
                         date = date[1].split()
+
                         day = date[0]
                         month = date[1]
-                        print(day, month)
+
                         subjects = day_field.find_elements(
                             'css selector',
                             'div.mb-4'
@@ -48,7 +50,31 @@ class Command(BaseCommand):
                             ).text
                             subject_name = ' '.join(subject_field.split()[:-1])
                             subject_type = subject_field.split()[-1]
-                            print(subject_name, '      ', subject_type)
+                            info_fields = subject.find_elements(
+                                'css selector',
+                                'li'
+                            )
+                            time = info_fields[0].text
+                            if (len(info_fields) == 3):
+                                teacher = info_fields[1].text
+                                place = info_fields[2].text
+                            else:
+                                teacher = None
+                                place = info_fields[1].text
+                            
+                            start_time = time.split(' - ')[0]
+                            date = parse_date(f'{day} {month} {start_time}')
+                            print(title, week, subject_name, subject_type, teacher, place, date)
+                            Schedule.objects.create(
+                                group_name=GroupLink.objects.get(group_name=title),
+                                week=week,
+                                lesson_name=subject_name,
+                                lesson_type=subject_type,
+                                teacher=teacher,
+                                start_date=date,
+                                place=place,
+                            )
+
 
 
         finally: 
