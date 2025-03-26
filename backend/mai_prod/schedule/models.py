@@ -10,7 +10,7 @@ class GroupLink(models.Model):
         ordering = ['group_name'] 
 
     group_name = models.CharField(
-        'name', 
+        'group_name', 
         max_length=100
     )
 
