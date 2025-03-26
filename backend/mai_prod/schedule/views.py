@@ -43,3 +43,11 @@ class GroupScheduleAPIView(APIView):
 
         serializer = ScheduleSerializer(schedule, many=True)
         return Response(serializer.data)
+
+
+class WeeksRangeAPIView(APIView):
+    def get(self, request: Request):
+        weeks_range = Schedule.objects.values_list('start_date', flat=True).distinct()
+        weeks_range = [week.strftime('%Y-%m-%d') for week in weeks_range]
+        weeks_range.sort()
+        return Response([weeks_range[0], weeks_range[len(weeks_range) - 1]])
