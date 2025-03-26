@@ -178,16 +178,6 @@ export default function SchedulePage() {
               )}
             </ul>
           </div>
-          
-          {/* Cycle start date picker */}
-          <div className="form-control">
-            <input 
-              type="date" 
-              className="input input-bordered" 
-              value={cycleStartDate}
-              onChange={(e) => setCycleStartDate(e.target.value)}
-            />
-          </div>
         </div>
 
         {/* Export button and modal */}
