@@ -1,29 +1,59 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import NavBar from '../components/NavBar';
+import getWeeksRange from '../scripts/GetWeeksRange';
 
+/**
+ * Main schedule page component that displays a weekly schedule with events and notes
+ */
 export default function SchedulePage() {
-  const [activeWeek, setActiveWeek] = useState(1);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selectedCell, setSelectedCell] = useState(null);
-  const [events, setEvents] = useState({});
-  const [notes, setNotes] = useState([]);
-  const [newNote, setNewNote] = useState('');
+  // State management for schedule functionality
+  const [activeWeek, setActiveWeek] = useState(1); // Current active week (1 or 2)
+  const [isModalOpen, setIsModalOpen] = useState(false); // Controls event modal visibility
+  const [selectedCell, setSelectedCell] = useState(null); // Currently selected schedule cell
+  const [events, setEvents] = useState({}); // Stores all schedule events
+  const [notes, setNotes] = useState([]); // List of notes
+  const [newNote, setNewNote] = useState(''); // Text for new note
   const [cycleStartDate, setCycleStartDate] = useState(() => {
     const today = new Date();
     return today.toISOString().split('T')[0];
   });
+  const [weeks, setWeeks] = useState([]); // Available weeks from API
+  const [isLoading, setIsLoading] = useState(true); // Loading state for weeks data
 
+  // Days of the week labels
   const days = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'];
 
-  // generete time slots
+  /**
+   * Fetch available weeks from the API when component mounts
+   */
+  useEffect(() => {
+    const fetchWeeks = async () => {
+      try {
+        const weeksData = await getWeeksRange();
+        setWeeks(weeksData);
+      } catch (error) {
+        console.error('Error fetching weeks:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchWeeks();
+  }, []);
+
+  /**
+   * Generates time slots for the schedule
+   * Creates 90-minute slots with 15-minute breaks
+   * Special handling for lunch break at 12:15
+   */
   const generateTimeSlots = () => {
     const slots = [];
-    let currentStart = 9 * 60; // 9:00 in minutes
-    const endTime = 22 * 60; // 21:00 in minutes
+    let currentStart = 9 * 60; // Start at 9:00
+    const endTime = 22 * 60; // End at 22:00
     
     while (currentStart + 90 <= endTime) {
-      if (currentStart === 12 * 60 + 30 /* 12:30 in minutes*/) {
-        currentStart += 30; // handle big break
+      if (currentStart === 12 * 60 + 30) {
+        currentStart += 30; // Handle long break at 12:15
       }  
       const startHour = Math.floor(currentStart / 60);
       const startMinute = currentStart % 60;
@@ -35,7 +65,7 @@ export default function SchedulePage() {
       const endTime = `${endHour}:${endMinute.toString().padStart(2, '0')}`;
       
       slots.push({ start: startTime, end: endTime });
-      currentStart = end + 15; // Appending 15 minutes break
+      currentStart = end + 15; // Add 15-minute break
     }
     
     return slots;
@@ -43,14 +73,22 @@ export default function SchedulePage() {
 
   const timeSlots = generateTimeSlots();
 
-  // Formating dates
+  /**
+   * Formats date to DD.MM format
+   * @param {Date} date - Date to format
+   * @returns {string} Formatted date string
+   */
   const formatDate = (date) => {
     const day = date.getDate().toString().padStart(2, '0');
     const month = (date.getMonth() + 1).toString().padStart(2, '0');
     return `${day}.${month}`;
   };
 
-  // getting diaposone of days for week 
+  /**
+   * Calculates date range for a specific week
+   * @param {number} weekNumber - Week number (1 or 2)
+   * @returns {string} Formatted date range string
+   */
   const getWeekRange = (weekNumber) => {
     const startDate = new Date(cycleStartDate);
     const weekStart = new Date(startDate.setDate(startDate.getDate() + (weekNumber-1)*7));
@@ -60,16 +98,27 @@ export default function SchedulePage() {
     return `${formatDate(weekStart)} - ${formatDate(weekEnd)}`;
   };
 
+  /**
+   * Handles click on schedule cell
+   * Opens event modal and sets selected cell
+   */
   const handleCellClick = (day, slot) => {
     setSelectedCell({ day, ...slot });
     setIsModalOpen(true);
   };
 
+  /**
+   * Adds new event to the schedule
+   * @param {Object} eventData - Event data including color and title
+   */
   const addEvent = (eventData) => {
     const key = `${activeWeek}-${selectedCell.day}-${selectedCell.start}-${selectedCell.end}`;
     setEvents(prev => ({ ...prev, [key]: eventData }));
   };
 
+  /**
+   * Adds new note to the notes list
+   */
   const addNote = () => {
     if (newNote.trim()) {
       setNotes(prev => [...prev, newNote]);
@@ -81,9 +130,11 @@ export default function SchedulePage() {
     <>
     <NavBar/>
     <div className="flex min-h-screen bg-base-200 p-4 gap-4">
+      {/* Main schedule panel */}
       <div className="flex-1 bg-base-100 rounded-box p-4">
-        {/* Data choose*/}
+        {/* Date and week selection panel */}
         <div className="flex items-center gap-4 mb-4">
+          {/* Week tabs */}
           <div className="tabs tabs-boxed bg-base-200">
             {[1, 2].map(week => (
               <button
@@ -93,10 +144,42 @@ export default function SchedulePage() {
               >
                 Неделя {week} ({getWeekRange(week)})
               </button>
-              // TODO: Пофиксить getWeekRange
             ))}
           </div>
+
+          {/* Weeks range dropdown with scrollable list */}
+          <div className="dropdown dropdown-hover">
+            <div tabIndex={0} role="button" className="btn m-1">
+              Выбрать неделю
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
+              </svg>
+            </div>
+            <ul className="dropdown-content z-[1] menu p-2 shadow bg-base-100 
+            rounded-box w-48 max-h-56 overflow-y-auto overflow-x-hidden no-scrollbar
+             grid grid-cols-1 gap-1">
+              {isLoading ? (
+                <li><span>Загрузка...</span></li>
+              ) : (
+                weeks.map((week, index) => (
+                  <li key={week} className="w-full items-center">
+                    <a onClick={() => {
+                      setActiveWeek(index % 2 + 1);
+                      const date = new Date(week);
+                      if (index % 2 === 1) {
+                        date.setDate(date.getDate() - 7);
+                      }
+                      setCycleStartDate(date);
+                    }}>
+                      {formatDate(new Date(week))} - {formatDate(new Date(new Date(week).setDate(new Date(week).getDate() + 6)))}
+                    </a>
+                  </li>
+                ))
+              )}
+            </ul>
+          </div>
           
+          {/* Cycle start date picker */}
           <div className="form-control">
             <input 
               type="date" 
@@ -107,10 +190,9 @@ export default function SchedulePage() {
           </div>
         </div>
 
-        {/* Dashboard */}
+        {/* Export button and modal */}
         <div className="flex gap-2 my-4">
             <div>
-        {/* button for open modal window*/}
             <button 
                 className="btn btn-accent gap-2"
                 onClick={() => document.getElementById('export_modal').showModal()}
@@ -121,7 +203,7 @@ export default function SchedulePage() {
                 </svg>
             </button>
 
-            {/* modal window */}
+            {/* Export options modal */}
             <dialog id="export_modal" className="modal">
                 <div className="modal-box">
                     <h3 className="font-bold text-lg mb-4">Экспорт расписания</h3>
@@ -135,7 +217,6 @@ export default function SchedulePage() {
                     </div>
                 </div>
                 
-                {/* closing */}
                 <form method="dialog" className="modal-backdrop">
                 <button></button>
                 </form>
@@ -143,12 +224,12 @@ export default function SchedulePage() {
             </div>
         </div>
 
-        {/* Schedule */}
-        <div className="overflow-x-auto">
-          <table className="table table-zebra table-compact w-full">
+        {/* Schedule table */}
+        <div className="">
+          <table className="table table-zebra table-auto w-full">
             <thead>
-              <tr>
-                <th className="bg-base-200">Время</th>
+              <tr className="max-w-15">
+                <th className="bg-base-200 max-w-1">Время</th>
                 {days.map(day => (
                   <th key={day} className="bg-base-200 text-center">{day}</th>
                 ))}
@@ -157,7 +238,7 @@ export default function SchedulePage() {
             <tbody>
               {timeSlots.map(slot => (
                 <tr key={slot.start}>
-                  <td className="bg-base-200 whitespace-nowrap">
+                  <td className="bg-base-200 whitespace-nowrap max-w-15">
                     {slot.start} - {slot.end}
                   </td>
                   {days.map(day => {
@@ -193,7 +274,11 @@ export default function SchedulePage() {
           <div className="input-group">
             <input
               type="text"
-              className="input input-bordered flex-1" value={newNote} onChange={(e) => setNewNote(e.target.value)} placeholder="Новая пометка..." />
+              className="input input-bordered flex-1" 
+              value={newNote} 
+              onChange={(e) => setNewNote(e.target.value)} 
+              placeholder="Новая пометка..." 
+            />
             <button className="btn btn-square" onClick={addNote}>
               +
             </button>
@@ -209,13 +294,12 @@ export default function SchedulePage() {
         </ul>
       </div>
 
-      {/* Modal window of event in schedule */}
+      {/* Event creation/editing modal */}
       <dialog id="event_modal" className="modal">
         <div className="modal-box">
           <h3 className="font-bold text-lg mb-4">
             Событие: {selectedCell?.day} {selectedCell?.start} - {selectedCell?.end}
           </h3>
-           {/*TODO: Заредизайнить*/}
           <div className="form-control mt-6">
             <label className="label">
               <span className="label-text mr-2">Название</span>
@@ -226,6 +310,7 @@ export default function SchedulePage() {
             />
           </div>
 
+          {/* Event color selection */}
           <div className="form-control mt-4">
             <label className="label">
               <span className="label-text mb-2">Цвет метки</span>
@@ -248,7 +333,7 @@ export default function SchedulePage() {
               <button 
                 className="btn btn-primary"
                 onClick={() => {
-                  // TODO: Логика сохранения
+                  // TODO: Save logic
                 }}
               >
                 Сохранить
@@ -257,10 +342,9 @@ export default function SchedulePage() {
           </div>
         </div>
 
-        {/* Background for closing */}
         <form method="dialog" className="modal-backdrop">
           <button onClick={() => document.getElementById('event_modal').close()}>
-            Закрыть Эта типа невидимо 
+            Закрыть
           </button>
         </form>
       </dialog>
