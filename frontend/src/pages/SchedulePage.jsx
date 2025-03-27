@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import NavBar from '../components/NavBar';
 import getWeeksRange from '../scripts/GetWeeksRange';
 import axios from 'axios';
-import { format, addDays, addWeeks } from 'date-fns';
+import { format, addDays, addWeeks, formatISO, parseISO } from 'date-fns';
 
 /**
  * Main schedule page component that displays a weekly schedule with events and notes
@@ -45,6 +45,14 @@ export default function SchedulePage() {
     fetchWeeks();
   }, []);
 
+  useEffect(() => {
+    const fetchEvents = async () => {
+      const eventsData = await axios.get(`http://localhost:8000/api/schedule/by-group/?group=М8О-116БВ-24&date=${format(cycleStartDate, 'yyyy-MM-dd')}`);
+      setEvents(eventsData.data);
+    };
+
+    fetchEvents();
+  }, [cycleStartDate]);
 
   /**
    * Generates time slots for the schedule
@@ -161,11 +169,10 @@ export default function SchedulePage() {
                   <li key={week} className="w-full items-center">
                     <a onClick={() => {
                       setActiveWeek(index % 2 + 1);
-                      const date = addWeeks(new Date(week), -(index % 2));
-                      console.log(week, 'week');
+                      const date = addWeeks(week, -(index % 2));
                       setCycleStartDate(date);
                     }}>
-                      {format(week, 'dd.MM')} - {format(addDays(new Date(week), 6), 'dd.MM')}
+                      {format(week, 'dd.MM')} - {format(addDays(week, 6), 'dd.MM')}
                     </a>
                   </li>
                 ))
@@ -226,8 +233,13 @@ export default function SchedulePage() {
                     {slot.start} - {slot.end}
                   </td>
                   {days.map(day => {
-                    const eventKey = `${activeWeek}-${day}-${slot.start}`;
-                    // console.log(events, eventKey, 'events');
+                    const current_day = addDays(addWeeks(cycleStartDate, activeWeek - 1), days.indexOf(day));
+
+                    const eventKey = `${format(current_day, 'yyyy-MM-dd')}T${slot.start === '9:00' ? '09:00' : slot.start}:00Z`;
+                    const event = events[eventKey];
+                    if (event !== undefined) {
+                      console.log(event[eventKey], eventKey, 'event');
+                    }
                     return (
                       <td
                         key={day}
@@ -237,9 +249,9 @@ export default function SchedulePage() {
                           document.getElementById('event_modal').showModal();
                         }}
                       >
-                        {events[eventKey] && (
+                        {event && (
                           <div className="flex flex-col gap-1 p-1">
-                            <div className="text-sm font-medium">{events[eventKey].lesson_name}</div>
+                            <div className="text-sm font-medium">{event.lesson_name}</div>
                           </div>
                         )}
                       </td>

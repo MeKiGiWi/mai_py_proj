@@ -1,3 +1,4 @@
+from collections import defaultdict
 from django.shortcuts import render
 from rest_framework.views import APIView
 from rest_framework.request import Request
@@ -42,7 +43,12 @@ class GroupScheduleAPIView(APIView):
         )
 
         serializer = ScheduleSerializer(schedule, many=True)
-        return Response(serializer.data)
+        grouped_data = defaultdict(defaultdict)
+        for item in serializer.data:
+            key = item['start_date']
+            for item_key in item:
+                grouped_data[key][item_key] = item[item_key]
+        return Response(grouped_data)
 
 
 class WeeksRangeAPIView(APIView):
