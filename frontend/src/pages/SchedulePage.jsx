@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
 import NavBar from '../components/NavBar';
 import getWeeksRange from '../scripts/GetWeeksRange';
+import axios from 'axios';
+import { format, addDays, addWeeks } from 'date-fns';
 
 /**
  * Main schedule page component that displays a weekly schedule with events and notes
@@ -13,12 +15,9 @@ export default function SchedulePage() {
   const [events, setEvents] = useState({}); // Stores all schedule events
   const [notes, setNotes] = useState([]); // List of notes
   const [newNote, setNewNote] = useState(''); // Text for new note
-  const [cycleStartDate, setCycleStartDate] = useState(() => {
-    const today = new Date();
-    return today.toISOString().split('T')[0];
-  });
   const [weeks, setWeeks] = useState([]); // Available weeks from API
   const [isLoading, setIsLoading] = useState(true); // Loading state for weeks data
+  const [cycleStartDate, setCycleStartDate] = useState(() => {return new Date();});
 
   // Days of the week labels
   const days = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'];
@@ -28,18 +27,24 @@ export default function SchedulePage() {
    */
   useEffect(() => {
     const fetchWeeks = async () => {
-      try {
+      try 
+      {
         const weeksData = await getWeeksRange();
         setWeeks(weeksData);
-      } catch (error) {
+      } 
+      catch (error)
+      {
         console.error('Error fetching weeks:', error);
-      } finally {
+      } 
+      finally 
+      {
         setIsLoading(false);
       }
     };
 
     fetchWeeks();
   }, []);
+
 
   /**
    * Generates time slots for the schedule
@@ -74,28 +79,15 @@ export default function SchedulePage() {
   const timeSlots = generateTimeSlots();
 
   /**
-   * Formats date to DD.MM format
-   * @param {Date} date - Date to format
-   * @returns {string} Formatted date string
-   */
-  const formatDate = (date) => {
-    const day = date.getDate().toString().padStart(2, '0');
-    const month = (date.getMonth() + 1).toString().padStart(2, '0');
-    return `${day}.${month}`;
-  };
-
-  /**
    * Calculates date range for a specific week
    * @param {number} weekNumber - Week number (1 or 2)
    * @returns {string} Formatted date range string
    */
   const getWeekRange = (weekNumber) => {
-    const startDate = new Date(cycleStartDate);
-    const weekStart = new Date(startDate.setDate(startDate.getDate() + (weekNumber-1)*7));
-    const weekEnd = new Date(weekStart);
-    weekEnd.setDate(weekStart.getDate() + 6);
-    
-    return `${formatDate(weekStart)} - ${formatDate(weekEnd)}`;
+    const weekStart = addWeeks(cycleStartDate, weekNumber - 1);
+    const weekEnd = addDays(weekStart, 6);
+
+    return `${format(weekStart, 'dd.MM')} - ${format(weekEnd, 'dd.MM')}`;
   };
 
   /**
@@ -112,7 +104,7 @@ export default function SchedulePage() {
    * @param {Object} eventData - Event data including color and title
    */
   const addEvent = (eventData) => {
-    const key = `${activeWeek}-${selectedCell.day}-${selectedCell.start}-${selectedCell.end}`;
+    const key = `${activeWeek}-${selectedCell.day}-${selectedCell.start}`;
     setEvents(prev => ({ ...prev, [key]: eventData }));
   };
 
@@ -125,6 +117,10 @@ export default function SchedulePage() {
       setNewNote('');
     }
   };
+
+  useEffect(() => {
+    console.log(cycleStartDate, 'cycleStartDate');
+  }, [cycleStartDate]);
 
   return (
     <>
@@ -165,13 +161,11 @@ export default function SchedulePage() {
                   <li key={week} className="w-full items-center">
                     <a onClick={() => {
                       setActiveWeek(index % 2 + 1);
-                      const date = new Date(week);
-                      if (index % 2 === 1) {
-                        date.setDate(date.getDate() - 7);
-                      }
+                      const date = addWeeks(new Date(week), -(index % 2));
+                      console.log(week, 'week');
                       setCycleStartDate(date);
                     }}>
-                      {formatDate(new Date(week))} - {formatDate(new Date(new Date(week).setDate(new Date(week).getDate() + 6)))}
+                      {format(week, 'dd.MM')} - {format(addDays(new Date(week), 6), 'dd.MM')}
                     </a>
                   </li>
                 ))
@@ -232,7 +226,8 @@ export default function SchedulePage() {
                     {slot.start} - {slot.end}
                   </td>
                   {days.map(day => {
-                    const eventKey = `${activeWeek}-${day}-${slot.start}-${slot.end}`;
+                    const eventKey = `${activeWeek}-${day}-${slot.start}`;
+                    // console.log(events, eventKey, 'events');
                     return (
                       <td
                         key={day}
@@ -243,8 +238,8 @@ export default function SchedulePage() {
                         }}
                       >
                         {events[eventKey] && (
-                          <div className={`badge gap-2 ${events[eventKey].color}`}>
-                            {events[eventKey].title}
+                          <div className="flex flex-col gap-1 p-1">
+                            <div className="text-sm font-medium">{events[eventKey].lesson_name}</div>
                           </div>
                         )}
                       </td>

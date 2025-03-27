@@ -8,8 +8,7 @@ class GroupSerializer(serializers.ModelSerializer):
         fields = ['group_name']
 
 class ScheduleSerializer(serializers.ModelSerializer):
-    group_name = GroupSerializer()
-
+    group_name = serializers.CharField(source='group_name.group_name')
     class Meta:
         model = Schedule
         fields = [
