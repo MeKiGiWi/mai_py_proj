@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import NavBar from '../components/NavBar';
 import getWeeksRange from '../scripts/GetWeeksRange';
 import axios from 'axios';
-import { format, addDays, addWeeks, formatISO, parseISO } from 'date-fns';
+import { format, addDays, addWeeks, startOfWeek } from 'date-fns';
 
 /**
  * Main schedule page component that displays a weekly schedule with events and notes
@@ -17,7 +17,11 @@ export default function SchedulePage() {
   const [newNote, setNewNote] = useState(''); // Text for new note
   const [weeks, setWeeks] = useState([]); // Available weeks from API
   const [isLoading, setIsLoading] = useState(true); // Loading state for weeks data
-  const [cycleStartDate, setCycleStartDate] = useState(() => {return new Date();});
+  const [cycleStartDate, setCycleStartDate] = useState(() => {
+    const today = new Date();
+    const start = startOfWeek(today, { weekStartsOn: 1 });
+    return start;
+  });
 
   // Days of the week labels
   const days = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'];
@@ -217,7 +221,7 @@ export default function SchedulePage() {
 
         {/* Schedule table */}
         <div className="">
-          <table className="table table-zebra table-auto w-full">
+          <table className="table table-zebra table-fixed w-full">
             <thead>
               <tr className="max-w-15">
                 <th className="bg-base-200 max-w-1">Время</th>
@@ -229,7 +233,7 @@ export default function SchedulePage() {
             <tbody>
               {timeSlots.map(slot => (
                 <tr key={slot.start}>
-                  <td className="bg-base-200 whitespace-nowrap max-w-15">
+                  <td className="bg-base-200 whitespace-nowrap max-w-15 text-bold">
                     {slot.start} - {slot.end}
                   </td>
                   {days.map(day => {
@@ -243,7 +247,9 @@ export default function SchedulePage() {
                     return (
                       <td
                         key={day}
-                        className="cursor-pointer hover:bg-base-300 transition-colors h-12"
+                        className="cursor-pointer hover:bg-base-300 
+                        w-[200px] min-w-[200px] max-w-[200px]
+                        break-words overflow-hidden p-2 align-top"
                         onClick={() => {
                           handleCellClick(day, slot);
                           document.getElementById('event_modal').showModal();
