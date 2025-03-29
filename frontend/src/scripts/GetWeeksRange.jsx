@@ -3,9 +3,10 @@ import { startOfWeek, addWeeks, parseISO } from 'date-fns';
 
 export default async function getWeeksRange() {
   try {
-    const response = await axios.get('http://localhost:8000/api/weeks-range/');
+    const response = await axios.get('http://localhost:8000/api/metrics/?type=week-range');
     const startDate = parseISO(response.data[0]);
     const endDate = parseISO(response.data[1]);
+    console.log(startDate, endDate);
     
     // Get Monday dates for both start and end dates
     const startMonday = startOfWeek(startDate, { weekStartsOn: 1 });

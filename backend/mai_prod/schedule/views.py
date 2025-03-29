@@ -9,7 +9,7 @@ from django.shortcuts import get_object_or_404
 from schedule.models import GroupLink, Schedule
 from django.utils import timezone
 from .serializers import ScheduleSerializer
-
+from .utils.normalize_fullname import normalize_fullname
 
 # Create your views here.
 
@@ -51,9 +51,25 @@ class GroupScheduleAPIView(APIView):
         return Response(grouped_data)
 
 
-class WeeksRangeAPIView(APIView):
+class MetricsAPIView(APIView):
     def get(self, request: Request):
-        weeks_range = Schedule.objects.values_list('start_date', flat=True).distinct()
-        weeks_range = [week.strftime('%Y-%m-%d') for week in weeks_range]
-        weeks_range.sort()
-        return Response([weeks_range[0], weeks_range[len(weeks_range) - 1]])
+        type = request.query_params.get("type")
+        if not type:
+            return Response(
+                {"error": "Параметр 'type' не передан"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        
+        if type == "group":
+            metrics = GroupLink.objects.values_list('group_name', flat=True).distinct()
+            metrics = sorted(list(metrics))
+        elif type == "teacher":
+            metrics = Schedule.objects.values_list('teacher', flat=True).distinct()
+            metrics = sorted(list({normalize_fullname(x) for x in metrics if x is not None and not any(char.isdigit() for char in x)}))
+        elif type == "place":
+            metrics = Schedule.objects.values_list('place', flat=True).distinct()
+            metrics = sorted(list({x for x in metrics if x is not None and (any(char == '-' for char in x) or x[0] == '-')}))
+        elif type == "week-range":
+            metrics = Schedule.objects.values_list('start_date', flat=True).distinct()
+            metrics = [min(metrics), max(metrics)]
+        return Response(metrics)

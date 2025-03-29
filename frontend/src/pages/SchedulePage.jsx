@@ -16,7 +16,11 @@ export default function SchedulePage() {
   const [notes, setNotes] = useState([]); // List of notes
   const [newNote, setNewNote] = useState(''); // Text for new note
   const [weeks, setWeeks] = useState([]); // Available weeks from API
+  const [teachers, setTeachers] = useState([]);
+  const [places, setPlaces] = useState([]);
+  const [groups, setGroups] = useState([]);
   const [isLoading, setIsLoading] = useState(true); // Loading state for weeks data
+  const [selectedGroup, setSelectedGroup] = useState(null);
   const [cycleStartDate, setCycleStartDate] = useState(() => {
     const today = new Date();
     const start = startOfWeek(today, { weekStartsOn: 1 });
@@ -50,13 +54,50 @@ export default function SchedulePage() {
   }, []);
 
   useEffect(() => {
-    const fetchEvents = async () => {
-      const eventsData = await axios.get(`http://localhost:8000/api/schedule/by-group/?group=М8О-116БВ-24&date=${format(cycleStartDate, 'yyyy-MM-dd')}`);
-      setEvents(eventsData.data);
+    const fetchTeachers = async () => {
+      const teachersData = await axios.get('http://localhost:8000/api/metrics/?type=teacher');
+      setTeachers(teachersData.data);
     };
 
+    fetchTeachers();
+  }, []);
+
+  useEffect(() => {
+    const fetchPlaces = async () => {
+      const placesData = await axios.get('http://localhost:8000/api/metrics/?type=place');
+      setPlaces(placesData.data);
+    };
+
+    fetchPlaces();
+  }, []);
+
+  const fetchGroups = async () => {
+    const groupsData = await axios.get('http://localhost:8000/api/metrics/?type=group');
+    setGroups(groupsData.data);
+    setSelectedGroup(groupsData.data[0]);
+  };
+
+  useEffect(() => {
+    fetchGroups();
+  }, []);
+
+
+  useEffect(() => {
+    const fetchEvents = async () => {
+      if (!selectedGroup) {
+        return;
+      }
+      console.log(selectedGroup, 'selectedGroup');
+      const eventsData = await axios.get('http://localhost:8000/api/schedule/by-group/', {
+        params: {
+          group: selectedGroup,
+          date: format(cycleStartDate, 'yyyy-MM-dd')
+        }
+      });
+      setEvents(eventsData.data);
+    };
     fetchEvents();
-  }, [cycleStartDate]);
+  }, [selectedGroup, cycleStartDate]);
 
   /**
    * Generates time slots for the schedule
@@ -130,10 +171,6 @@ export default function SchedulePage() {
     }
   };
 
-  useEffect(() => {
-    console.log(cycleStartDate, 'cycleStartDate');
-  }, [cycleStartDate]);
-
   return (
     <>
     <NavBar/>
@@ -187,10 +224,6 @@ export default function SchedulePage() {
             </div>
           </div>
 
-              {/* <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 24 24">
-                <path fill="currentColor" d="M3 17v2h6v-2H3zM3 5v2h10V5H3zm10 16v-2h8v-2h-8v-2h-2v6h2zM7 9v2H3v2h4v2h2V9H7zm14 4v-2H11v2h10zm-6-4h2V7h4V5h-4V3h-2v6z"/>
-              </svg> */}
-
           <div className="dropdown">
             <div tabIndex={0} role="button" className="btn btn-square">
               <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 24 24">
@@ -203,9 +236,12 @@ export default function SchedulePage() {
                 <div tabIndex={0} role="button" className="flex justify-between">
                   Группа
                 </div>
-                <ul className="dropdown-content z-[2] menu p-2 shadow bg-base-100 rounded-box w-48 ml-2">
-                  <li><a>Subitem 1</a></li>
-                  <li><a>Subitem 2</a></li>
+                <ul className="dropdown-content z-[2] menu p-2 shadow bg-base-100 
+                rounded-box w-48 ml-2 max-h-56 overflow-y-auto overflow-x-hidden 
+                no-scrollbar grid grid-cols-1 gap-1">
+                  {groups.map(group => (
+                    <li key={group}><a>{group}</a></li>
+                  ))}
                 </ul>
               </li>
 
@@ -213,9 +249,12 @@ export default function SchedulePage() {
                 <div tabIndex={0} role="button" className="flex justify-between">
                   Преподаватель
                 </div>
-                <ul className="dropdown-content z-[2] menu p-2 shadow bg-base-100 rounded-box w-48 ml-2">
-                  <li><a>Subitem 3</a></li>
-                  <li><a>Subitem 4</a></li>
+                <ul className="dropdown-content z-[2] menu p-2 shadow bg-base-100 rounded-box 
+                w-48 ml-2 max-h-56 overflow-y-auto overflow-x-hidden no-scrollbar
+                grid grid-cols-1 gap-1">
+                  {teachers.map(teacher => (
+                    <li key={teacher}><a>{teacher}</a></li>
+                  ))}
                 </ul>
               </li>
 
@@ -223,9 +262,12 @@ export default function SchedulePage() {
                 <div tabIndex={0} role="button" className="flex justify-between">
                   Аудитория
                 </div>
-                <ul className="dropdown-content z-[2] menu p-2 shadow bg-base-100 rounded-box w-48 ml-2">
-                  <li><a>Subitem 5</a></li>
-                  <li><a>Subitem 6</a></li>
+                <ul className="dropdown-content z-[2] menu p-2 shadow bg-base-100 
+                rounded-box w-48 ml-2 max-h-56 overflow-y-auto overflow-x-hidden 
+                no-scrollbar grid grid-cols-1 gap-1">
+                  {places.map(place => (
+                    <li key={place}><a>{place}</a></li>
+                  ))}
                 </ul>
               </li>
             </ul>
@@ -289,9 +331,6 @@ export default function SchedulePage() {
 
                     const eventKey = `${format(current_day, 'yyyy-MM-dd')}T${slot.start === '9:00' ? '09:00' : slot.start}:00Z`;
                     const event = events[eventKey];
-                    if (event !== undefined) {
-                      console.log(event[eventKey], eventKey, 'event');
-                    }
                     return (
                       <td
                         key={day}
