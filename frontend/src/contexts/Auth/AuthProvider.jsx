@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import AuthContext from './AuthContext';
-import api from './api';
+import api from '../../interceptors/api';
 
 
 const AuthProvider = ({ children }) => {

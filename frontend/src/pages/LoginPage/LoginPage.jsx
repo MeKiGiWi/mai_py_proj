@@ -1,11 +1,10 @@
 import { Link } from "react-router";
-import GoogleLoginButton from "../components/GoogleLoginButton";
-import PlanItTag from "../components/PlanItTag";
+import GoogleLoginButton from "./components/GoogleLoginButton";
+import PlanItTag from "../../components/PlanItTag";
 import axios from "axios";
 import { useState, useContext } from "react";
 import { useNavigate } from "react-router";
-import AuthContext from "../components/AuthContext";
-// import AuthContext from "../components/AuthContext";
+import { AuthContext } from "../../contexts/Auth";
 
 
 function LoginPage() {
@@ -32,7 +31,7 @@ function LoginPage() {
       // localStorage.setItem('user', JSON.stringify(response.data.user))
       // try to login with token
       await checkAuth();
-      navigate('/main');
+      navigate('/schedule');
     }
     catch (err) {
       setError("Неверный логин или пароль");

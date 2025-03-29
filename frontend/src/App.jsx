@@ -1,9 +1,9 @@
 import './App.css'
+import { Route, Routes } from 'react-router'
 import HomePage from './pages/HomePage'
 import LoginPage from './pages/LoginPage'
-import { Route, Routes } from 'react-router'
 import RegistrationPage from './pages/RegistrationPage'
-import MainPage from './pages/SchedulePage'
+import SchedulePage from './pages/SchedulePage'
 import AboutTeamPage from './pages/AboutTeamPage'
 import ProtectedRoute from './components/ProtectedRoute'
 import RepeatLoginProtectedRoute from './components/RepeatLoginProtectedRoute'
@@ -20,7 +20,7 @@ function App() {
       </Route>
 
       <Route element={<ProtectedRoute/>}>
-        <Route path='/main' element={<MainPage/>}/>
+        <Route path='/schedule' element={<SchedulePage/>}/>
       </Route>
 
       <Route path="*" element={<p className='text-3xl'>There's nothing here: 404!</p>} />

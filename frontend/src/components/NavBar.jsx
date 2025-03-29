@@ -1,5 +1,5 @@
 import { Link } from "react-router"
-import AuthContext from "./AuthContext"
+import { AuthContext } from "../contexts/Auth"
 import { useContext } from "react"
 import PlanItTag from "./PlanItTag";
 

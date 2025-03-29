@@ -1,9 +1,8 @@
 import { Link } from "react-router";
-import PlanItTag from "../components/PlanItTag";
-import AboutTeamTag from "../components/AboutTeamTag";
-import NavBar from "../components/NavBar";
+import AboutTeamTag from "./components/AboutTeamTag";
+import NavBar from "../../components/NavBar";
 
-export default function AboutUsPage(){
+export default function AboutTeamPage(){
   return (
     <div className="min-h-screen flex flex-col">
       {/* Navbar */}

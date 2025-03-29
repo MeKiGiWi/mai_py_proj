@@ -1,8 +1,8 @@
 import { useState, useEffect, useRef } from "react"
 import { Link } from "react-router"
-import AuthContext from "./AuthContext"
+import AuthContext from "../../../contexts/Auth"
 import { useContext } from "react"
-import PlanItTag from "./PlanItTag"
+import PlanItTag from "../../../components/PlanItTag"
 
 export default function NavBarForHP() {
   const { isAuth, logout } = useContext(AuthContext)
@@ -51,7 +51,7 @@ export default function NavBarForHP() {
           </div>
           <div className="avatar">
             <div className="w-15 rounded-full border border-base-300">
-              <Link to={"/main"} className="rounded-full">
+              <Link to={"/schedule"} className="rounded-full">
                 <svg
                   className="absolute pr-4 mt-1 p text-neutral"
                   fill="currentColor"

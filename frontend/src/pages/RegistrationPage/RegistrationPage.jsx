@@ -1,5 +1,5 @@
-import { createPath, Link, useNavigate } from "react-router";
-import PlanItTag from "../components/PlanItTag";
+import { Link, useNavigate } from "react-router";
+import PlanItTag from "../../components/PlanItTag";
 import { useState } from "react";
 import ReCAPTCHA from "react-google-recaptcha";
 import axios from 'axios'

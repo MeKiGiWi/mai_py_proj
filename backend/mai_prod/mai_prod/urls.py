@@ -16,12 +16,11 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
-from accounts.views import RegisterView
+from accounts.views import RegisterView, get_current_user
 from rest_framework_simplejwt.views import (
     TokenRefreshView,
     TokenObtainPairView,
 )
-from accounts.views import get_current_user
 from schedule.views import ScheduleAPIView, MetricsAPIView
 
 urlpatterns = [

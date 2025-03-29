@@ -1,15 +1,13 @@
 from collections import defaultdict
-from django.shortcuts import render
+from datetime import datetime, timedelta
+from django.shortcuts import render, get_object_or_404
+from django.db.models import Q
 from rest_framework.views import APIView
 from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework import status
-from datetime import datetime, timedelta
-from django.shortcuts import get_object_or_404
 from schedule.models import GroupLink, Schedule
-from django.utils import timezone
 from .serializers import ScheduleSerializer
-from django.db.models import Q
 from .utils.normalize_fullname import normalize_fullname
 
 # Create your views here.

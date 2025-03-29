@@ -1,10 +1,10 @@
 import { Link } from "react-router";
-import AboutTeamTag from "../components/AboutTeamTag";
-import AuthContext from "../components/AuthContext";
+import AboutTeamTag from "../AboutTeamPage/components/AboutTeamTag";
+import AuthContext from "../../contexts/Auth/AuthContext";
 import { useContext } from "react";
-import NavBarForHP from "../components/NavBarForHP";
+import NavBarForHP from "./components/NavBarForHP";
 
-export default function LandingPage() {
+export default function HomePage() {
   const { isAuth } = useContext(AuthContext);
   console.log(isAuth);
 
@@ -28,7 +28,7 @@ export default function LandingPage() {
               Московского авиационного института
             </p>
               {isAuth ? (
-              <Link to={'/main'}>
+              <Link to={'/schedule'}>
                 <button className="btn btn-accent btn-lg">Начать использовать</button>
               </Link>
               ): (
