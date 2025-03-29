@@ -9,19 +9,19 @@ from django.shortcuts import get_object_or_404
 from schedule.models import GroupLink, Schedule
 from django.utils import timezone
 from .serializers import ScheduleSerializer
-
+from django.db.models import Q 
 
 # Create your views here.
 
 
-class GroupScheduleAPIView(APIView):
+class ScheduleAPIView(APIView):
     def get(self, request: Request):
-        group_name = request.query_params.get("group")
-        date_str = request.query_params.get("date")
+        params = request.query_params
+        date_str = params.get("date")
 
-        if not group_name or not date_str:
+        if not date_str:
             return Response(
-                {"error": "Параметры 'group' или 'date' не переданы"},
+                {"error": "Параметр 'date' не передан"},
                 status=status.HTTP_400_BAD_REQUEST,
             )
         
@@ -33,14 +33,32 @@ class GroupScheduleAPIView(APIView):
                 status=status.HTTP_400_BAD_REQUEST,
             )
         
-        group = get_object_or_404(GroupLink, group_name=group_name)
+        required_params = {'group_name', 'teacher', 'place'}
+        if not any(param in params for param in required_params):
+            return Response(
+                {"error": "Должен быть передан хотя бы один параметр помимо 'date'"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        query = Q()
+        
+        if 'group_name' in params:
+            group = get_object_or_404(GroupLink, group_name=params['group_name'])
+            query &= Q(group_name=group)
+        
+        if 'teacher' in params:
+            query &= Q(teacher__iexact=params['teacher'])
+        
+        if 'place' in params:
+            query &= Q(place__iexact=params['place'])
         
         start_date = input_date
         end_date = start_date + timedelta(days=14)
+        
         schedule = Schedule.objects.filter(
-            group_name=group,
-            start_date__date__range=(start_date, end_date)
-        )
+            query,
+            start_date__range=(start_date, end_date)
+        ).order_by('start_date')
 
         serializer = ScheduleSerializer(schedule, many=True)
         grouped_data = defaultdict(defaultdict)

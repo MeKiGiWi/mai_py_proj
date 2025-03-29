@@ -22,7 +22,7 @@ from rest_framework_simplejwt.views import (
     TokenObtainPairView,
 )
 from accounts.views import get_current_user
-from schedule.views import WeeksRangeAPIView, GroupScheduleAPIView
+from schedule.views import WeeksRangeAPIView, ScheduleAPIView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -31,5 +31,5 @@ urlpatterns = [
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     path('api/auth/me/', get_current_user, name='current_user'),
     path('api/weeks-range/', WeeksRangeAPIView.as_view(), name='weeks_range'),
-    path('api/schedule/by-group/', GroupScheduleAPIView.as_view(), name='schedule'),
+    path('api/schedule/', ScheduleAPIView.as_view(), name='schedule'),
 ]
