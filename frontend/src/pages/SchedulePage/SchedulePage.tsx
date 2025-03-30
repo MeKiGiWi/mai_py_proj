@@ -89,7 +89,6 @@ export default function SchedulePage() {
 
   useEffect(() => {
     const fetchEvents = async () => {
-      if (!selectedGroup) return;
 
       try {
         const { data } = await axios.get('http://localhost:8000/api/schedule/', {

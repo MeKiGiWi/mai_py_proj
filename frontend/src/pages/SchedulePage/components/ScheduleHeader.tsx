@@ -8,9 +8,9 @@ type ScheduleHeaderProps = {
   selectedGroup: string | null;
   selectedTeacher: string | null;
   selectedPlace: string | null;
-  setSelectedGroup: (group: string) => void;
-  setSelectedTeacher: (teacher: string) => void;
-  setSelectedPlace: (place: string) => void;
+  setSelectedGroup: (group: string | null) => void;
+  setSelectedTeacher: (teacher: string | null) => void;
+  setSelectedPlace: (place: string | null) => void;
   weeks: Date[];
   isLoading: boolean;
   groups: string[];
@@ -125,7 +125,7 @@ export default function ScheduleHeader({
         <ul className='dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-48'>
           <li className='dropdown dropdown-right'>
             <div tabIndex={0} role='button' className='flex justify-between'>
-              <span className='text-gray-500'>Группа</span>
+              <span>Группа</span>
             </div>
             <ul
               className='dropdown-content z-[2] menu p-2 shadow bg-base-100 
@@ -142,7 +142,7 @@ export default function ScheduleHeader({
 
           <li className='dropdown dropdown-right'>
             <div tabIndex={0} role='button' className='flex justify-between'>
-              <span className='text-gray-500'>Преподаватель</span>
+              <span>Преподаватель</span>
             </div>
             <ul
               className='dropdown-content z-[2] menu p-2 shadow bg-base-100 rounded-box 
@@ -159,7 +159,7 @@ export default function ScheduleHeader({
 
           <li className='dropdown dropdown-right'>
             <div tabIndex={0} role='button' className='flex justify-between'>
-              <span className='text-gray-500'>Аудитория</span>
+              <span>Аудитория</span>
             </div>
             <ul
               className='dropdown-content z-[2] menu p-2 shadow bg-base-100 
