@@ -1,33 +1,74 @@
-import js from '@eslint/js'
-import globals from 'globals'
-import reactHooks from 'eslint-plugin-react-hooks'
-import reactRefresh from 'eslint-plugin-react-refresh'
+import js from '@eslint/js';
+import tsParser from '@typescript-eslint/parser';
+import tsPlugin from '@typescript-eslint/eslint-plugin';
+import reactPlugin from 'eslint-plugin-react';
+import hooksPlugin from 'eslint-plugin-react-hooks';
+import a11yPlugin from 'eslint-plugin-jsx-a11y';
+import importPlugin from 'eslint-plugin-import';
+import prettier from 'eslint-plugin-prettier/recommended';
+import sonarjs from 'eslint-plugin-sonarjs';
 
 export default [
-  { ignores: ['dist'] },
+  js.configs.recommended,
+  prettier,
   {
-    files: ['**/*.{js,jsx}'],
+    plugins: {
+      react: reactPlugin,
+      'react-hooks': hooksPlugin,
+      'jsx-a11y': a11yPlugin,
+      import: importPlugin,
+      '@typescript-eslint': tsPlugin,
+      sonarjs,
+    },
     languageOptions: {
-      ecmaVersion: 2020,
-      globals: globals.browser,
+      parser: tsParser,
       parserOptions: {
+        project: './tsconfig.eslint.json',
+        ecmaFeatures: {
+          jsx: true,
+        },
         ecmaVersion: 'latest',
-        ecmaFeatures: { jsx: true },
         sourceType: 'module',
       },
-    },
-    plugins: {
-      'react-hooks': reactHooks,
-      'react-refresh': reactRefresh,
+      globals: {
+        React: 'readonly',
+        window: 'readonly',
+        document: 'readonly',
+        localStorage: 'readonly',
+        console: 'readonly',
+        google: 'readonly',
+      },
     },
     rules: {
-      ...js.configs.recommended.rules,
-      ...reactHooks.configs.recommended.rules,
-      'no-unused-vars': ['error', { varsIgnorePattern: '^[A-Z_]' }],
-      'react-refresh/only-export-components': [
-        'warn',
-        { allowConstantExport: true },
+      // Основные правила
+      'no-console': ['warn', { allow: ['warn', 'error'] }],
+      'no-debugger': 'error',
+      '@typescript-eslint/no-unused-vars': [
+        'error',
+        {
+          argsIgnorePattern: '^_',
+          varsIgnorePattern: '^_',
+          ignoreRestSiblings: true,
+        },
       ],
+      '@typescript-eslint/no-explicit-any': 'warn',
+      'react/react-in-jsx-scope': 'off',
+      'react/jsx-filename-extension': ['error', { extensions: ['.tsx'] }],
+      'sonarjs/no-identical-functions': 'error',
+      'sonarjs/no-collapsible-if': 'error',
+      'sonarjs/no-duplicate-string': 'error',
+      'sonarjs/no-all-duplicated-branches': 'error',
     },
+    ignores: [
+      'vite.config.ts',
+      'tsconfig.json',
+      'tsconfig.eslint.json',
+      'eslint.config.js',
+      'node_modules',
+      'dist',
+      'build',
+      'public',
+      'types',
+    ],
   },
-]
+];

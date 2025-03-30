@@ -1,11 +1,11 @@
-@import "tailwindcss";
+@import 'tailwindcss';
 @plugin "daisyui";
 
 @plugin "daisyui/theme" {
-  name: "jumpinghouse";
+  name: 'jumpinghouse';
   default: false;
   prefersdark: false;
-  color-scheme: "light";
+  color-scheme: 'light';
   --color-base-100: oklch(98% 0 0);
   --color-base-200: oklch(96% 0.001 286.375);
   --color-base-300: oklch(92% 0.004 286.32);
@@ -37,10 +37,10 @@
 }
 
 @plugin "daisyui/theme" {
-  name: "nord";
+  name: 'nord';
   default: false;
   prefersdark: false;
-  color-scheme: "light";
+  color-scheme: 'light';
   --color-base-100: oklch(95.127% 0.007 260.731);
   --color-base-200: oklch(93.299% 0.01 261.788);
   --color-base-300: oklch(89.925% 0.016 262.749);
@@ -71,12 +71,11 @@
   --noise: 0;
 }
 
-
 @plugin "daisyui/theme" {
-  name: "dracula";
+  name: 'dracula';
   default: false;
   prefersdark: false;
-  color-scheme: "dark";
+  color-scheme: 'dark';
   --color-base-100: oklch(28.822% 0.022 277.508);
   --color-base-200: oklch(26.805% 0.02 277.508);
   --color-base-300: oklch(24.787% 0.019 277.508);

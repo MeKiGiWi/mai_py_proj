@@ -1,0 +1,27 @@
+# Dependencies and build
+/node_modules
+/dist
+/build
+/coverage
+
+# Documentation
+*.md
+*.txt
+
+# Generated files
+*.generated.*
+*.min.*
+*.map
+
+# Backend
+/backend
+
+# Package manager files
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# Config files
+.eslintrc
+.prettierrc
+tsconfig.json
