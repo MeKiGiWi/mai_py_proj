@@ -9,7 +9,6 @@ import ScheduleTable from './components/ScheduleTable';
 import NotesPanel from './components/NotesPanel';
 import EventModal from './components/EventModal';
 import ExportModal from './components/ExportModal';
-import console from 'console';
 
 // Константы для конфигурации
 const WORKDAY_START = 9 * 60; // 9:00 в минутах
@@ -97,6 +96,8 @@ export default function SchedulePage() {
           params: {
             group_name: selectedGroup,
             date: format(cycleStartDate, 'yyyy-MM-dd'),
+            teacher: selectedTeacher,
+            place: selectedPlace,
           },
         });
         setEvents(data);
@@ -106,7 +107,7 @@ export default function SchedulePage() {
     };
 
     fetchEvents();
-  }, [selectedGroup, cycleStartDate]);
+  }, [selectedGroup, cycleStartDate, selectedPlace, selectedTeacher]);
 
   const handleCellClick = (day: string, slot: { start: string; end: string }) => {
     setSelectedCell({ day, ...slot });
@@ -129,6 +130,10 @@ export default function SchedulePage() {
     }
   };
 
+  useEffect(() => {
+    console.log(selectedGroup);
+  }, [selectedGroup]);
+
   return (
     <>
       <NavBar />
@@ -145,12 +150,12 @@ export default function SchedulePage() {
             groups={groups}
             teachers={teachers}
             places={places}
-            setSelectedGroup={setSelectedGroup}
-            setSelectedTeacher={setSelectedTeacher}
-            setSelectedPlace={setSelectedPlace}
             selectedGroup={selectedGroup}
             selectedTeacher={selectedTeacher}
             selectedPlace={selectedPlace}
+            setSelectedGroup={setSelectedGroup}
+            setSelectedTeacher={setSelectedTeacher}
+            setSelectedPlace={setSelectedPlace}
           />
 
           {/* Export button and modal */}

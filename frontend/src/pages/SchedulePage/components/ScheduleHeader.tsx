@@ -1,11 +1,31 @@
 import { format, addWeeks, addDays } from 'date-fns';
 
+type ScheduleHeaderProps = {
+  activeWeek: number;
+  setActiveWeek: (week: number) => void;
+  cycleStartDate: Date;
+  setCycleStartDate: (date: Date) => void;
+  selectedGroup: string | null;
+  selectedTeacher: string | null;
+  selectedPlace: string | null;
+  setSelectedGroup: (group: string) => void;
+  setSelectedTeacher: (teacher: string) => void;
+  setSelectedPlace: (place: string) => void;
+  weeks: Date[];
+  isLoading: boolean;
+  groups: string[];
+  teachers: string[];
+  places: string[];
+};
 
 export default function ScheduleHeader({
   activeWeek,
   setActiveWeek,
   cycleStartDate,
   setCycleStartDate,
+  selectedGroup,
+  selectedTeacher,
+  selectedPlace,
   setSelectedGroup,
   setSelectedTeacher,
   setSelectedPlace,
@@ -14,23 +34,18 @@ export default function ScheduleHeader({
   groups,
   teachers,
   places,
-}: {
-  activeWeek: number;
-  setActiveWeek: (week: number) => void;
-  cycleStartDate: Date;
-  setCycleStartDate: (date: Date) => void;
-  setSelectedGroup: (group: string) => void;
-  setSelectedTeacher: (teacher: string) => void;
-  setSelectedPlace: (place: string) => void;
-  selectedGroup: string | null;
-  selectedTeacher: string | null;
-  selectedPlace: string | null;
-  weeks: Date[];
-  isLoading: boolean;
-  groups: string[];
-  teachers: string[];
-  places: string[];
-}) {
+}: ScheduleHeaderProps) {
+  const handleGroupClick = (group: string) => {
+    setSelectedGroup(group);
+  };
+
+  const handleTeacherClick = (teacher: string) => {
+    setSelectedTeacher(teacher);
+  };
+
+  const handlePlaceClick = (place: string) => {
+    setSelectedPlace(place);
+  };
   const getWeekRange = (weekNumber: number) => {
     const weekStart = addWeeks(cycleStartDate, weekNumber - 1);
     const weekEnd = addDays(weekStart, 6);
@@ -110,7 +125,7 @@ export default function ScheduleHeader({
         <ul className='dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-48'>
           <li className='dropdown dropdown-right'>
             <div tabIndex={0} role='button' className='flex justify-between'>
-              Группа
+              <span className='text-gray-500'>Группа</span>
             </div>
             <ul
               className='dropdown-content z-[2] menu p-2 shadow bg-base-100 
@@ -119,7 +134,7 @@ export default function ScheduleHeader({
             >
               {groups.map((group) => (
                 <li key={group}>
-                  <a onClick={() => setSelectedGroup(group)}>{group}</a>
+                  <button onClick={() => handleGroupClick(group)}>{group}</button>
                 </li>
               ))}
             </ul>
@@ -127,7 +142,7 @@ export default function ScheduleHeader({
 
           <li className='dropdown dropdown-right'>
             <div tabIndex={0} role='button' className='flex justify-between'>
-              Преподаватель
+              <span className='text-gray-500'>Преподаватель</span>
             </div>
             <ul
               className='dropdown-content z-[2] menu p-2 shadow bg-base-100 rounded-box 
@@ -136,7 +151,7 @@ export default function ScheduleHeader({
             >
               {teachers.map((teacher) => (
                 <li key={teacher}>
-                  <a onClick={() => setSelectedTeacher(teacher)}>{teacher}</a>
+                  <button onClick={() => handleTeacherClick(teacher)}>{teacher}</button>
                 </li>
               ))}
             </ul>
@@ -144,7 +159,7 @@ export default function ScheduleHeader({
 
           <li className='dropdown dropdown-right'>
             <div tabIndex={0} role='button' className='flex justify-between'>
-              Аудитория
+              <span className='text-gray-500'>Аудитория</span>
             </div>
             <ul
               className='dropdown-content z-[2] menu p-2 shadow bg-base-100 
@@ -153,12 +168,93 @@ export default function ScheduleHeader({
             >
               {places.map((place) => (
                 <li key={place}>
-                  <a onClick={() => setSelectedPlace(place)}>{place}</a>
+                  <button onClick={() => handlePlaceClick(place)}>{place}</button>
                 </li>
               ))}
             </ul>
           </li>
         </ul>
+      </div>
+      <div className='flex flex-col gap-2'>
+        {selectedGroup && (
+          <div className='flex flex-row gap-2'>
+            <div
+              className='btn btn-square text-gray-500 gap-2'
+              onClick={() => setSelectedGroup(null)}
+            >
+              <svg
+                xmlns='http://www.w3.org/2000/svg'
+                className='h-4 w-4'
+                viewBox='0 0 24 24'
+                fill='none'
+                stroke='currentColor'
+                strokeWidth='2'
+                strokeLinecap='round'
+                strokeLinejoin='round'
+              >
+                <line x1='18' y1='6' x2='6' y2='18'></line>
+                <line x1='6' y1='6' x2='18' y2='18'></line>
+              </svg>
+            </div>
+            <div
+              className='text-gray-500 btn hover:bg-base-200 hover:border-base-300 cursor-default'
+            >
+              {selectedGroup}
+            </div>
+          </div>
+        )}
+        {selectedTeacher && (
+          <div className='flex flex-row gap-2'>
+            <div
+              className='btn btn-square text-gray-500 gap-2'
+              onClick={() => setSelectedTeacher(null)}
+            >
+              <svg
+                xmlns='http://www.w3.org/2000/svg'
+                className='h-4 w-4'
+                viewBox='0 0 24 24'
+                fill='none'
+                stroke='currentColor'
+                strokeWidth='2'
+                strokeLinecap='round'
+                strokeLinejoin='round'
+              >
+                <line x1='18' y1='6' x2='6' y2='18'></line>
+                <line x1='6' y1='6' x2='18' y2='18'></line>
+              </svg>
+            </div>
+            <div
+              className='text-gray-500 btn hover:bg-base-200 hover:border-base-300 cursor-default'
+            >
+              {selectedTeacher}
+            </div>
+          </div>
+        )}
+        {selectedPlace && (
+          <div className='flex flex-row gap-2'>
+            <div
+              className='btn btn-square text-gray-500 gap-2'
+              onClick={() => setSelectedPlace(null)}
+            >
+              <svg
+                xmlns='http://www.w3.org/2000/svg'
+                className='h-4 w-4'
+                viewBox='0 0 24 24'
+                fill='none'
+                stroke='currentColor'
+                strokeWidth='2'
+                strokeLinecap='round'
+                strokeLinejoin='round'
+              >
+                <line x1='18' y1='6' x2='6' y2='18'></line>
+                <line x1='6' y1='6' x2='18' y2='18'></line>
+              </svg>
+            </div>
+            <div className='text-gray-500 btn hover:bg-base-200 hover:border-base-300 cursor-default'>
+              {selectedPlace}
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
