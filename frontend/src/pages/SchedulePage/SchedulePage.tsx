@@ -4,22 +4,25 @@ import getWeeksRange from '../../api/GetWeeksRange';
 import axios from 'axios';
 import { format, startOfWeek } from 'date-fns';
 
-import ScheduleHeader from './components/ScheduleHeader';
+import ScheduleHeader from './components/ScheduleHeader.1';
 import ScheduleTable from './components/ScheduleTable';
 import NotesPanel from './components/NotesPanel';
 import EventModal from './components/EventModal';
 import ExportModal from './components/ExportModal';
+import ExportButton from './components/ExportButton';
 
-// Константы для конфигурации
 const WORKDAY_START = 9 * 60; // 9:00 в минутах
 const WORKDAY_END = 22 * 60; // 22:00 в минутах
 const TIME_SLOT_DURATION = 90; // Длительность слота в минутах
 const BREAK_DURATION = 15; // Длительность перерыва
 
 export default function SchedulePage() {
-  // Состояния
   const [activeWeek, setActiveWeek] = useState(1);
-  const [selectedCell, setSelectedCell] = useState<{ day: string; start: string; end: string } | null>(null);
+  const [selectedCell, setSelectedCell] = useState<{
+    day: string;
+    start: string;
+    end: string;
+  } | null>(null);
   const [events, setEvents] = useState<Record<string, any>>({});
   const [notes, setNotes] = useState<string[]>([]);
   const [newNote, setNewNote] = useState('');
@@ -53,7 +56,6 @@ export default function SchedulePage() {
         setGroups(groupsData.data);
         setSelectedGroup(groupsData.data[0] || null);
       } catch (error) {
-        console.error('Error fetching data:', error);
       } finally {
         setIsLoading(false);
       }
@@ -89,7 +91,6 @@ export default function SchedulePage() {
 
   useEffect(() => {
     const fetchEvents = async () => {
-
       try {
         const { data } = await axios.get('http://localhost:8000/api/schedule/', {
           params: {
@@ -101,7 +102,7 @@ export default function SchedulePage() {
         });
         setEvents(data);
       } catch (error) {
-        console.error('Error fetching events:', error);
+        setEvents({});
       }
     };
 
@@ -137,7 +138,6 @@ export default function SchedulePage() {
     <>
       <NavBar />
       <div className='flex min-h-screen bg-base-200 p-4 gap-4'>
-        {/* Main schedule panel */}
         <div className='flex-1 bg-base-100 rounded-box p-4'>
           <ScheduleHeader
             activeWeek={activeWeek}
@@ -157,25 +157,7 @@ export default function SchedulePage() {
             setSelectedPlace={setSelectedPlace}
           />
 
-          {/* Export button and modal */}
-          <div className='flex gap-2 my-4'>
-            <div>
-              <button
-                className='btn btn-accent gap-2'
-                onClick={() => {
-                  const modal = document.getElementById('export_modal');
-                  if (modal) {
-                    (modal as HTMLDialogElement).showModal();
-                  }
-                }}
-              >
-                Экспорт
-                <svg xmlns='http://www.w3.org/2000/svg' className='h-5 w-5' viewBox='0 0 24 24'>
-                  <path fill='currentColor' d='M19 9h-4V3H9v6H5l7 7l7-7zM5 18v2h14v-2H5z' />
-                </svg>
-              </button>
-            </div>
-          </div>
+          <ExportButton />
 
           <ScheduleTable
             days={days}
@@ -187,7 +169,7 @@ export default function SchedulePage() {
           />
         </div>
 
-        <NotesPanel notes={notes} newNote={newNote} setNewNote={setNewNote} addNote={addNote} />
+        {/* <NotesPanel notes={notes} newNote={newNote} setNewNote={setNewNote} addNote={addNote} /> */}
 
         <EventModal selectedCell={selectedCell} addEvent={addEvent} />
 

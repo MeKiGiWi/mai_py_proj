@@ -1,3 +1,5 @@
+type EventModalProps = {};
+
 export default function EventModal({ selectedCell, addEvent }) {
   return (
     <dialog id='event_modal' className='modal'>

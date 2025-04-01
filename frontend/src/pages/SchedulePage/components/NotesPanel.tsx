@@ -1,4 +1,11 @@
-export default function NotesPanel({ notes, newNote, setNewNote, addNote }) {
+type NotesPanelProps = {
+  notes: string[];
+  newNote: string;
+  setNewNote: (note: string) => void;
+  addNote: () => void;
+};
+
+export default function NotesPanel({ notes, newNote, setNewNote, addNote }: NotesPanelProps) {
   return (
     <div className='w-80 bg-base-100 rounded-box p-4'>
       <h3 className='text-xl font-bold mb-4'>Пометки</h3>

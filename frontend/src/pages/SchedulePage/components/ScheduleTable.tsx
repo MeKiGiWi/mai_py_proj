@@ -17,10 +17,10 @@ export default function ScheduleTable({
 }) {
   return (
     <div className=''>
-      <table className='table table-zebra table-fixed w-full'>
+      <table className='table table-zebra max-w-full w-full'>
         <thead>
-          <tr className='max-w-15'>
-            <th className='bg-base-200 max-w-1'>Время</th>
+          <tr>
+            <th className='bg-base-200 w-20'>Время</th>
             {days.map((day) => (
               <th key={day} className='bg-base-200 text-center'>
                 {day}
@@ -31,7 +31,7 @@ export default function ScheduleTable({
         <tbody>
           {timeSlots.map((slot) => (
             <tr key={slot.start}>
-              <td className='bg-base-200 whitespace-nowrap max-w-15'>
+              <td className='bg-base-200 whitespace-nowrap max-w-1'>
                 {slot.start} - {slot.end}
               </td>
               {days.map((day) => {
@@ -45,8 +45,8 @@ export default function ScheduleTable({
                   <td
                     key={day}
                     className='cursor-pointer hover:bg-base-300 
-                    w-[200px] min-w-[200px] max-w-[200px]
-                    break-words overflow-hidden p-2 align-top'
+                    w-[170px] max-w-[100px]
+                    reak-words overflow-hidden p-2 align-top'
                     onClick={() => onCellClick(day, slot)}
                   >
                     {event && (
