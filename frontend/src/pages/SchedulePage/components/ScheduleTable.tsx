@@ -1,20 +1,25 @@
 import { format, addDays, addWeeks } from 'date-fns';
+import { useMemo } from 'react';
 
 export default function ScheduleTable({
-  days,
   timeSlots,
   events,
   activeWeek,
   cycleStartDate,
   onCellClick,
 }: {
-  days: string[];
   timeSlots: { start: string; end: string }[];
   events: Record<string, any>;
   activeWeek: number;
   cycleStartDate: Date;
   onCellClick: (day: string, slot: { start: string; end: string }) => void;
 }) {
+  const { days } = useMemo(() => {
+    return {
+      days: ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'],
+    };
+  }, []);
+
   const getJSXWeekDays = (days: string[]) => {
     return days.map((day) => (
       <th key={day} className='text-center bg-base-200'>

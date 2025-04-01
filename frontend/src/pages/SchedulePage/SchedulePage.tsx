@@ -38,8 +38,6 @@ export default function SchedulePage() {
     startOfWeek(new Date(), { weekStartsOn: 1 }),
   );
 
-  const days = useMemo(() => ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'], []);
-
   useEffect(() => {
     const fetchInitialData = async () => {
       try {
@@ -160,7 +158,6 @@ export default function SchedulePage() {
           <ExportButton />
 
           <ScheduleTable
-            days={days}
             timeSlots={timeSlots}
             events={events}
             activeWeek={activeWeek}
