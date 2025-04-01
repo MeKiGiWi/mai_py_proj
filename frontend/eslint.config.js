@@ -69,6 +69,7 @@ export default [
       'build',
       'public',
       'types',
+      'tailwind.config.js',
     ],
   },
 ];

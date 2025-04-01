@@ -169,7 +169,7 @@ export default function SchedulePage() {
           />
         </div>
 
-        {/* <NotesPanel notes={notes} newNote={newNote} setNewNote={setNewNote} addNote={addNote} /> */}
+        <NotesPanel notes={notes} newNote={newNote} setNewNote={setNewNote} addNote={addNote} />
 
         <EventModal selectedCell={selectedCell} addEvent={addEvent} />
 

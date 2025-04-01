@@ -15,51 +15,56 @@ export default function ScheduleTable({
   cycleStartDate: Date;
   onCellClick: (day: string, slot: { start: string; end: string }) => void;
 }) {
+  const getJSXWeekDays = (days: string[]) => {
+    return days.map((day) => (
+      <th key={day} className='text-center bg-base-200'>
+        {day}
+      </th>
+    ));
+  };
+
+  const getJSXTableCels = (timeSlots: { start: string; end: string }[]) => {
+    return timeSlots.map((slot) => (
+      <tr key={slot.start}>
+        <td className=' whitespace-nowrap max-w-1 bg-base-200'>
+          {slot.start}
+          <br />
+          {slot.end}
+        </td>
+        {days.map((day) => {
+          const current_day = addDays(addWeeks(cycleStartDate, activeWeek - 1), days.indexOf(day));
+          const eventKey = `${format(current_day, 'yyyy-MM-dd')}T${slot.start === '9:00' ? '09:00' : slot.start}:00Z`;
+          const event = events[eventKey];
+          return (
+            <td
+              key={day}
+              className='cursor-pointer hover:bg-base-300 
+                    w-[170px] max-w-[130px] min-h-21.5 h-21.5
+                    break-words overflow-hidden p-2 align-top'
+              onClick={() => onCellClick(day, slot)}
+            >
+              {event && (
+                <div className='flex flex-col gap-1 p-1'>
+                  <div className='text-sm font-medium line-clamp-3'>{event.lesson_name}</div>
+                </div>
+              )}
+            </td>
+          );
+        })}
+      </tr>
+    ));
+  };
+
   return (
-    <div className=''>
-      <table className='table table-zebra max-w-full w-full'>
-        <thead>
+    <div className='border rounded-box border-base-content/5 bg-base-100'>
+      <table className='table max-w-full w-full overflow-hidden'>
+        <thead className=''>
           <tr>
-            <th className='bg-base-200 w-20'>Время</th>
-            {days.map((day) => (
-              <th key={day} className='bg-base-200 text-center'>
-                {day}
-              </th>
-            ))}
+            <th className='w-20 bg-base-200'>Время</th>
+            {getJSXWeekDays(days)}
           </tr>
         </thead>
-        <tbody>
-          {timeSlots.map((slot) => (
-            <tr key={slot.start}>
-              <td className='bg-base-200 whitespace-nowrap max-w-1'>
-                {slot.start} - {slot.end}
-              </td>
-              {days.map((day) => {
-                const current_day = addDays(
-                  addWeeks(cycleStartDate, activeWeek - 1),
-                  days.indexOf(day),
-                );
-                const eventKey = `${format(current_day, 'yyyy-MM-dd')}T${slot.start === '9:00' ? '09:00' : slot.start}:00Z`;
-                const event = events[eventKey];
-                return (
-                  <td
-                    key={day}
-                    className='cursor-pointer hover:bg-base-300 
-                    w-[170px] max-w-[100px]
-                    reak-words overflow-hidden p-2 align-top'
-                    onClick={() => onCellClick(day, slot)}
-                  >
-                    {event && (
-                      <div className='flex flex-col gap-1 p-1'>
-                        <div className='text-sm font-medium'>{event.lesson_name}</div>
-                      </div>
-                    )}
-                  </td>
-                );
-              })}
-            </tr>
-          ))}
-        </tbody>
+        <tbody>{getJSXTableCels(timeSlots)}</tbody>
       </table>
     </div>
   );
