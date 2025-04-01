@@ -9,6 +9,7 @@ export default function NotesPanel({ notes, newNote, setNewNote, addNote }: Note
   return (
     <div className='w-80 bg-base-100 rounded-box p-4'>
       <h3 className='text-xl font-bold mb-4'>Пометки</h3>
+      <div className='divider'></div>
       <div className='form-control'>
         <div className='input-group'>
           <input
@@ -23,7 +24,6 @@ export default function NotesPanel({ notes, newNote, setNewNote, addNote }: Note
           </button>
         </div>
       </div>
-      <div className='divider'></div>
       <ul className='menu'>
         {notes.map((note, index) => (
           <li key={index} className='hover-bg'>

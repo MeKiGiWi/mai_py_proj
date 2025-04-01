@@ -1,5 +1,6 @@
 import { format, addDays, addWeeks } from 'date-fns';
 import { useMemo } from 'react';
+import { TEvent } from '../SchedulePage';
 
 export default function ScheduleTable({
   timeSlots,
@@ -9,14 +10,14 @@ export default function ScheduleTable({
   onCellClick,
 }: {
   timeSlots: { start: string; end: string }[];
-  events: Record<string, any>;
+  events: Record<string, TEvent>;
   activeWeek: number;
   cycleStartDate: Date;
   onCellClick: (day: string, slot: { start: string; end: string }) => void;
 }) {
   const { days } = useMemo(() => {
     return {
-      days: ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'],
+      days: ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб'],
     };
   }, []);
 
@@ -31,7 +32,7 @@ export default function ScheduleTable({
   const getJSXTableCels = (timeSlots: { start: string; end: string }[]) => {
     return timeSlots.map((slot) => (
       <tr key={slot.start}>
-        <td className=' whitespace-nowrap max-w-1 bg-base-200'>
+        <td className=' whitespace-nowrap max-w-1 bg-base-200 text-large font-semibold text-gray-500'>
           {slot.start}
           <br />
           {slot.end}
@@ -48,9 +49,25 @@ export default function ScheduleTable({
                     break-words overflow-hidden p-2 align-top'
               onClick={() => onCellClick(day, slot)}
             >
-              {event && (
+              {event ? (
                 <div className='flex flex-col gap-1 p-1'>
-                  <div className='text-sm font-medium line-clamp-3'>{event.lesson_name}</div>
+                  <div className='text-sm text-gray-600 line-clamp-3 min-h-[60px] font-semibold'>
+                    {event.lesson_name}
+                  </div>
+                </div>
+              ) : (
+                // container without elements
+                <div className='min-h-[68px] p-1'></div>
+              )}
+              <div className='divider'></div>
+              {event && (
+                <div className='relative w-full h-2 mt-5'>
+                  <div className='text-gray-500 btn btn-xs absolute bottom-0 left-0 hover:bg-base-200 hover:border-base-300 cursor-default'>
+                    {event.place}
+                  </div>
+                  <div className='text-gray-500 btn btn-xs btn-circle absolute bottom-0 right-0 hover:bg-base-200 hover:border-base-300 cursor-default'>
+                    {event.lesson_type}
+                  </div>
                 </div>
               )}
             </td>
