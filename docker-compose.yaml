@@ -1,0 +1,58 @@
+services:
+  frontend:
+    build: ./frontend
+    ports:
+      - "5173:5173"
+    environment:
+      - VITE_API_URL=http://backend:8000/api
+    depends_on:
+      - backend
+    networks:
+      - mai_network
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    working_dir: /app/mai_prod
+    volumes:
+      - ./backend:/app
+    ports:
+      - "8000:8000"
+    environment:
+      - DB_NAME=mydbname
+      - DB_USER=myuser
+      - DB_PASSWORD=mypass
+      - DB_HOST=db
+      - DB_PORT=5432
+    env_file:
+      - backend/.env
+    command: sh -c "python manage.py migrate && python manage.py runserver 0.0.0.0:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - mai_network
+
+  db:
+    image: docker.io/postgres:15-alpine
+    environment:
+      - POSTGRES_USER=myuser
+      - POSTGRES_PASSWORD=mypass
+      - POSTGRES_DB=mydbname
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U myuser -d mydbname"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - mai_network
+
+volumes:
+  postgres_data:
+
+networks:
+  mai_network:
+    name: mai_network
