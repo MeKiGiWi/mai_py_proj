@@ -1,21 +1,19 @@
-# Этап разработки (с горячей перезагрузкой)
-FROM node:18-alpine as dev
-WORKDIR /app
-COPY package*.json ./
-RUN npm install
-COPY . .
-CMD ["npm", "run", "dev"]
+FROM node:20-alpine  
 
-# Этап сборки
-FROM node:18-alpine as build
-WORKDIR /app
-COPY package*.json ./
-RUN npm install
-COPY . .
-RUN npm run build
+# working directory 
+WORKDIR /app/fronted
 
-# Этап продакшена
-FROM nginx:alpine
-COPY --from=build /app/dist /usr/share/nginx/html
-EXPOSE 80
-CMD ["nginx", "-g", "daemon off;"]
+# Changes in package* . json file 
+COPY package*.json ./
+
+# Install Dependencies
+RUN npm install
+
+# Copy all changes on fronted
+COPY . .
+
+# expose the app on port 5173
+EXPOSE 5173
+
+# Start your frontend application
+CMD [ "npm", "run", "dev", "--", "--host", "0.0.0.0"]

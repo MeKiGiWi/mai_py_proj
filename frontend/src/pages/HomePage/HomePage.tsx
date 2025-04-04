@@ -10,7 +10,6 @@ export default function HomePage() {
 
   return (
     <div className='min-h-screen flex flex-col'>
-      {/* Navbar */}
       <NavBarForHP />
 
       {/* Hero Section */}
@@ -25,7 +24,7 @@ export default function HomePage() {
         <div className='hero-content text-neutral-content text-center'>
           <div className='max-w-xl'>
             <h1 className='mb-5 text-5xl font-bold text-balanced'>
-              Умное управление расписанием кафедры
+              Умное управление расписанием кафедрыlasdfjl
             </h1>
             <p className='mb-5'>
               Автоматизированная система работы с учебным расписанием Московского авиационного
