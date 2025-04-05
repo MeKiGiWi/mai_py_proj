@@ -1,7 +1,7 @@
 FROM node:20-alpine  
 
 # working directory 
-WORKDIR /app/fronted
+WORKDIR /app/frontend
 
 # Changes in package* . json file 
 COPY package*.json ./

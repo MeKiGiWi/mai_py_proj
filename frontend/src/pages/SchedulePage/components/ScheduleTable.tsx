@@ -32,7 +32,12 @@ export default function ScheduleTable({
   const getJSXTableCels = (timeSlots: { start: string; end: string }[]) => {
     return timeSlots.map((slot) => (
       <tr key={slot.start}>
-        <td className=' whitespace-nowrap max-w-1 bg-base-200 text-large font-semibold text-gray-500'>
+        <td
+          className={`border-l-0 ${slot.start != '20:00' ? 'border' : 'border-r'}
+          border-base-content/15
+            whitespace-nowrap max-w-1 bg-base-200 
+            text-large font-semibold text-gray-500`}
+        >
           {slot.start}
           <br />
           {slot.end}
@@ -44,9 +49,9 @@ export default function ScheduleTable({
           return (
             <td
               key={day}
-              className='cursor-pointer hover:bg-base-300 
-                    w-[170px] max-w-[130px] min-h-21.5 h-21.5
-                    break-words overflow-hidden p-2 align-top'
+              className={`${slot.start != '20:00' && 'border border-base-content/15'} border-l-0 border-r-0 
+                cursor-pointer hover:bg-base-300 w-[170px] max-w-[130px] 
+                min-h-21.5 h-21.5break-words overflow-hidden p-2 align-top`}
               onClick={() => onCellClick(day, slot)}
             >
               {event ? (
@@ -78,7 +83,7 @@ export default function ScheduleTable({
   };
 
   return (
-    <div className='border rounded-box border-base-content/5 bg-base-100'>
+    <div className='border rounded-box border-base-content/15 bg-base-100'>
       <table className='table max-w-full w-full overflow-hidden'>
         <thead className=''>
           <tr>

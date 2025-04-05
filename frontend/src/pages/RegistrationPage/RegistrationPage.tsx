@@ -18,7 +18,7 @@ function RegistrationPage() {
       return;
     }
     try {
-      const response = await axios.post(`${import.meta.env.VITE_API_URL}/register`, {
+      const response = await axios.post(`${import.meta.env.VITE_API_URL}register/`, {
         username,
         password,
         confirm_password: confirmPassword,
