@@ -19,3 +19,4 @@ frontend/package-lock.json
 frontend/package.json
 
 docker-compose.yaml
+local_dump.dump
