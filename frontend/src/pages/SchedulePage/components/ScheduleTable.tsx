@@ -51,12 +51,12 @@ export default function ScheduleTable({
               key={day}
               className={`${slot.start != '20:00' && 'border border-base-content/15'} border-l-0 border-r-0 
                 cursor-pointer hover:bg-base-300 w-[170px] max-w-[130px] 
-                min-h-21.5 h-21.5break-words overflow-hidden p-2 align-top`}
+                min-h-21.5 h-21.5 break-words overflow-hidden p-2 align-top`}
               onClick={() => onCellClick(day, slot)}
             >
               {event ? (
                 <div className='flex flex-col gap-1 p-1'>
-                  <div className='text-sm text-gray-600 line-clamp-3 min-h-[60px] font-semibold'>
+                  <div className='text-balance text-gray-600 line-clamp-3  min-h-[60px] font-stretch-50% font-medium'>
                     {event.lesson_name}
                   </div>
                 </div>
@@ -64,7 +64,7 @@ export default function ScheduleTable({
                 // container without elements
                 <div className='min-h-[68px] p-1'></div>
               )}
-              <div className='divider'></div>
+              {/* <div className='divider'></div> */}
               {event && (
                 <div className='relative w-full h-2 mt-5'>
                   <div className='text-gray-500 btn btn-xs absolute bottom-0 left-0 hover:bg-base-200 hover:border-base-300 cursor-default'>
