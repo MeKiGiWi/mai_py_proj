@@ -1,4 +1,5 @@
 from django.db import models
+from django.contrib.auth.models import User
 
 # Create your models here.
 
@@ -29,15 +30,8 @@ class AbstractSchedule(models.Model):
     class Meta:
         verbose_name = 'Abstract group schedule'
         verbose_name_plural = 'Abstract groups schedule'
-        ordering = ['group_name']
+        ordering = ['lesson_name']
         abstract = True
-
-
-    group_name = models.ForeignKey(
-        GroupLink,
-        on_delete=models.CASCADE,
-        related_name='lessons'  
-    )
 
     week = models.IntegerField(
         'week',
@@ -77,10 +71,11 @@ class Schedule(AbstractSchedule):
         verbose_name = 'Group schedule'
         verbose_name_plural = 'Groups schedule'
 
-    group_name = models.ForeignKey(
+    group = models.ForeignKey(
         GroupLink,
         on_delete=models.CASCADE,
-        related_name='schedule_lessons'  
+        related_name='lessons',
+        null=True,
     )
 
 
@@ -90,8 +85,41 @@ class UserSchedule(AbstractSchedule):
         verbose_name = 'User schedule'
         verbose_name_plural = 'Users schedule'
 
-    user_name = models.CharField(
-        'username',
-        max_length=100,
+    group = models.ForeignKey(
+        GroupLink,
+        on_delete=models.CASCADE,
+        related_name='user_lessons',
+        null=True,
+    )    
+
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='schedule',
+        null=True,
+    )
+
+
+class Notes(models.Model):
+
+    class Meta:
+        verbose_name = 'Note'
+        verbose_name_plural = 'Notes'
+        ordering = ['user']
+
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='notes',
+    )
+
+    note_content = models.TextField(
+        'note_content',
+        max_length=300,
+        null=True,
+    )
+
+    note_date = models.DateTimeField(
+        'note_date',
         null=True,
     )
