@@ -24,12 +24,13 @@ class GroupLink(models.Model):
         return self.group_name
 
 
-class Schedule(models.Model):
+class AbstractSchedule(models.Model):
 
     class Meta:
-        verbose_name = 'Group schedule'
-        verbose_name_plural = 'Groups schedule'
+        verbose_name = 'Abstract group schedule'
+        verbose_name_plural = 'Abstract groups schedule'
         ordering = ['group_name']
+        abstract = True
 
 
     group_name = models.ForeignKey(
@@ -68,3 +69,10 @@ class Schedule(models.Model):
     start_date = models.DateTimeField(
         'start_date',
     )
+
+
+class Schedule(AbstractSchedule):
+
+    class Meta:
+        verbose_name = 'Group schedule'
+        verbose_name_plural = 'Groups schedule'
