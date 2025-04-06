@@ -2,51 +2,21 @@ import { Link } from 'react-router';
 import { AuthContext } from '../contexts/Auth';
 import { useContext } from 'react';
 import PlanItTag from './PlanItTag';
+import Avatar from './Avatar';
 
 export default function NavBar() {
   const { isAuth, logout } = useContext(AuthContext);
 
   return (
-    <>
+    <div className='navbar bg-base-100 shadow-lg px-8 h-22'>
+      <div className='flex-1'>
+        <Link to='/'>
+          <PlanItTag />
+        </Link>
+      </div>
       {isAuth ? (
-        <div className='navbar bg-base-100 shadow-lg px-8 h-22'>
-          <div className='flex-1'>
-            <Link to='/'>
-              <PlanItTag />
-            </Link>
-          </div>
-          <div className='avatar'>
-            <div className='w-15 rounded-full border border-base-300'>
-              <Link to={'/main'} className='rounded-full'>
-                <svg
-                  className='absolute pr-4 mt-1 p text-neutral'
-                  fill='currentColor'
-                  height='45px'
-                  width='75px'
-                  version='1.1'
-                  id='Layer_1'
-                  xmlns='http://www.w3.org/2000/svg'
-                  xmlnsXlink='http://www.w3.org/1999/xlink'
-                  viewBox='0 0 512 512'
-                  xmlSpace='preserve'
-                >
-                  <g>
-                    <g>
-                      <circle cx='256' cy='114.526' r='114.526' />
-                    </g>
-                  </g>
-                  <g>
-                    <g>
-                      <path
-                        d='M256,256c-111.619,0-202.105,90.487-202.105,202.105c0,29.765,24.13,53.895,53.895,53.895h296.421
-                  c29.765,0,53.895-24.13,53.895-53.895C458.105,346.487,367.619,256,256,256z'
-                      />
-                    </g>
-                  </g>
-                </svg>
-              </Link>
-            </div>
-          </div>
+        <>
+          <Avatar />
           <div className='ml-0.5 flex mt-3 text-accent'>
             <button onClick={logout} className='btn btn-ghost btn-circle w-8 px-1 mx-1 mt-1.5'>
               <svg
@@ -77,21 +47,14 @@ export default function NavBar() {
               </svg>
             </button>
           </div>
-        </div>
+        </>
       ) : (
-        <div className='navbar bg-base-100 shadow-lg px-8 h-22'>
-          <div className='flex-1'>
-            <Link to='/'>
-              <PlanItTag />
-            </Link>
-          </div>
-          <div className='flex-none'>
-            <Link to={'/login'} className='btn btn-neutral'>
-              Войти
-            </Link>
-          </div>
+        <div className='flex-none'>
+          <Link to={'/login'} className='btn btn-neutral'>
+            Войти
+          </Link>
         </div>
       )}
-    </>
+    </div>
   );
 }

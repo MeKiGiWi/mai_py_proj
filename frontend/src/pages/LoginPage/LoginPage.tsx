@@ -23,7 +23,6 @@ function LoginPage() {
       // adding tokens to local storage
       localStorage.setItem('access_token', response.data.access);
       localStorage.setItem('refresh_token', response.data.refresh);
-      // localStorage.setItem('user', JSON.stringify(response.data.user))
       // try to login with token
       await checkAuth();
       navigate('/schedule');
