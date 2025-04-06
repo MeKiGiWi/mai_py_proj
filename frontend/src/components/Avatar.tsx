@@ -2,12 +2,10 @@ import { Link } from 'react-router';
 import { useContext, useEffect, useState } from 'react';
 import AuthContext from '../contexts/Auth/AuthContext';
 
-interface NavbarStyles {
-  top: string;
-  transition: string;
-}
-
-export default function Avatar() {
+type AvatarProps = {
+  panelHidden?: boolean;
+};
+export default function Avatar({ panelHidden }: AvatarProps) {
   const { user, logout } = useContext(AuthContext);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
@@ -21,7 +19,7 @@ export default function Avatar() {
         </div>
       </div>
 
-      {isMenuOpen && (
+      {isMenuOpen && !panelHidden && (
         <div className='absolute right-0 w-fit bg-base-100 rounded-box shadow-lg z-50'>
           <ul className='menu'>
             <li>

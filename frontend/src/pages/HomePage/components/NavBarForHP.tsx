@@ -60,7 +60,7 @@ export default function NavBarForHP(): React.ReactElement {
             </Link>
           </div>
 
-          <Avatar />
+          <Avatar panelHidden={top === -88} />
         </div>
       ) : (
         <div
