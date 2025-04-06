@@ -52,9 +52,9 @@ export default function SchedulePage() {
       try {
         const [weeksData, teachersData, placesData, groupsData] = await Promise.all([
           getWeeksRange(),
-          axios.get('http://localhost:8000/api/metrics/?type=teacher'),
-          axios.get('http://localhost:8000/api/metrics/?type=place'),
-          axios.get('http://localhost:8000/api/metrics/?type=group'),
+          axios.get(`${import.meta.env.VITE_API_URL}metrics/?type=teacher`),
+          axios.get(`${import.meta.env.VITE_API_URL}metrics/?type=place`),
+          axios.get(`${import.meta.env.VITE_API_URL}metrics/?type=group`),
         ]);
 
         setWeeks(weeksData);

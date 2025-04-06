@@ -12,7 +12,7 @@ const App: React.FC = () => {
   return (
     <Routes>
       <Route index element={<HomePage />} />
-      <Route path='/aboutteam' element={<AboutTeamPage />} />
+      <Route path='/about' element={<AboutTeamPage />} />
 
       <Route element={<RepeatLoginProtectedRoute />}>
         <Route path='/login' element={<LoginPage />} />

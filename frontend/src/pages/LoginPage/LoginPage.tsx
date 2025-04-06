@@ -16,14 +16,13 @@ function LoginPage() {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     try {
-      const response = await axios.post('http://127.0.0.1:8000/api/token/', {
+      const response = await axios.post(`${import.meta.env.VITE_API_URL}token/`, {
         username,
         password,
       });
       // adding tokens to local storage
       localStorage.setItem('access_token', response.data.access);
       localStorage.setItem('refresh_token', response.data.refresh);
-      // localStorage.setItem('user', JSON.stringify(response.data.user))
       // try to login with token
       await checkAuth();
       navigate('/schedule');

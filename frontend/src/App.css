@@ -2,10 +2,10 @@
 @plugin "daisyui";
 
 @plugin "daisyui/theme" {
-  name: 'jumpinghouse';
+  name: "jumpinghouse";
   default: false;
   prefersdark: false;
-  color-scheme: 'light';
+  color-scheme: "light";
   --color-base-100: oklch(98% 0 0);
   --color-base-200: oklch(96% 0.001 286.375);
   --color-base-300: oklch(92% 0.004 286.32);
@@ -33,7 +33,7 @@
   --size-field: 0.25rem;
   --border: 1px;
   --depth: 1;
-  --noise: 1;
+  --noise: 0;
 }
 
 @plugin "daisyui/theme" {
