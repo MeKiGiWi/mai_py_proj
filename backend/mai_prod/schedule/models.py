@@ -76,3 +76,22 @@ class Schedule(AbstractSchedule):
     class Meta:
         verbose_name = 'Group schedule'
         verbose_name_plural = 'Groups schedule'
+
+    group_name = models.ForeignKey(
+        GroupLink,
+        on_delete=models.CASCADE,
+        related_name='schedule_lessons'  
+    )
+
+
+class UserSchedule(AbstractSchedule):
+
+    class Meta:
+        verbose_name = 'User schedule'
+        verbose_name_plural = 'Users schedule'
+
+    user_name = models.CharField(
+        'username',
+        max_length=100,
+        null=True,
+    )
