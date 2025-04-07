@@ -6,14 +6,16 @@ from rest_framework.views import APIView
 from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework import status
+from rest_framework.permissions import IsAuthenticated
 from schedule.models import GroupLink, Schedule
 from .serializers import ScheduleSerializer
 from .utils.normalize_fullname import normalize_fullname
 
 # Create your views here.
 
-
 class ScheduleAPIView(APIView):
+    # permission_classes = [IsAuthenticated]
+
     def get(self, request: Request):
         params = request.query_params
         date_str = params.get("date")
@@ -39,25 +41,24 @@ class ScheduleAPIView(APIView):
                 status=status.HTTP_400_BAD_REQUEST
             )
         
-        query = Q()
+        start_date = input_date
+        end_date = start_date + timedelta(days=14)
         
+        query = Q(start_date__range=(start_date, end_date))
+
         if 'group_name' in params:
-            group = get_object_or_404(GroupLink, group_name=params['group_name'])
-            query &= Q(group_name=group)
+            group_id = get_object_or_404(GroupLink, group_name=params['group_name'])
+            query &= Q(group_name_id__exact=group_id)
         
         if 'teacher' in params:
             query &= Q(teacher__iexact=params['teacher'])
         
         if 'place' in params:
             query &= Q(place__iexact=params['place'])
+
         
-        start_date = input_date
-        end_date = start_date + timedelta(days=14)
         
-        schedule = Schedule.objects.filter(
-            query,
-            start_date__range=(start_date, end_date)
-        ).order_by('start_date')
+        schedule = Schedule.objects.filter(query).order_by('start_date')
 
         serializer = ScheduleSerializer(schedule, many=True)
         grouped_data = defaultdict(defaultdict)
