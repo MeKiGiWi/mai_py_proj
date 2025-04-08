@@ -10,20 +10,12 @@ import NotesPanel from './components/NotesPanel';
 import EventModal from './components/EventModal';
 import ExportModal from './components/ExportModal';
 import ExportButton from './components/ExportButton';
+import { TEvent } from './types';
 
 const WORKDAY_START = 9 * 60; // 9:00 в минутах
 const WORKDAY_END = 22 * 60; // 22:00 в минутах
 const TIME_SLOT_DURATION = 90; // Длительность слота в минутах
 const BREAK_DURATION = 15; // Длительность перерыва
-
-export type TEvent = {
-  group_name: string | null;
-  lesson_name: string | null;
-  lesson_type: string | null;
-  teacher: string | null;
-  place: string | null;
-  start_date: string | null;
-};
 
 export default function SchedulePage() {
   const [activeWeek, setActiveWeek] = useState(1);
