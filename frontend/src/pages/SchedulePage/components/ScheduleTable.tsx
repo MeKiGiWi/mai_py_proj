@@ -1,6 +1,6 @@
 import { format, addDays, addWeeks } from 'date-fns';
 import { useMemo } from 'react';
-import { TEvent } from '../SchedulePage';
+import { TEvent } from '../types';
 
 export default function ScheduleTable({
   timeSlots,

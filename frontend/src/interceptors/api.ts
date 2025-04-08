@@ -22,7 +22,6 @@ api.interceptors.response.use(
   async (error: any) => {
     const originalRequest = error.config;
     if (error.response?.status === 403 && !originalRequest._retry) {
-      console.log('poymal BLYAT DERGHI');
       originalRequest._retry = true;
       try {
         const refreshToken = localStorage.getItem('refresh_token');
@@ -39,7 +38,6 @@ api.interceptors.response.use(
       } catch (err) {
         localStorage.removeItem('access_token');
         localStorage.removeItem('refresh_token');
-        // window.location.reload();
       }
     }
 

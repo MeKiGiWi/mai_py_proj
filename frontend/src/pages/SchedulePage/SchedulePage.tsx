@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import NavBar from '../../components/NavBar';
 import getWeeksRange from '../../api/GetWeeksRange';
-import axios from 'axios';
+import api from '@/interceptors/api';
 import { format, startOfWeek } from 'date-fns';
 
 import ScheduleHeader from './components/ScheduleHeader.1';
@@ -44,9 +44,9 @@ export default function SchedulePage() {
       try {
         const [weeksData, teachersData, placesData, groupsData] = await Promise.all([
           getWeeksRange(),
-          axios.get(`${import.meta.env.VITE_API_URL}metrics/?type=teacher`),
-          axios.get(`${import.meta.env.VITE_API_URL}metrics/?type=place`),
-          axios.get(`${import.meta.env.VITE_API_URL}metrics/?type=group`),
+          api.get(`${import.meta.env.VITE_API_URL}metrics/?type=teacher`),
+          api.get(`${import.meta.env.VITE_API_URL}metrics/?type=place`),
+          api.get(`${import.meta.env.VITE_API_URL}metrics/?type=group`),
         ]);
 
         setWeeks(weeksData);
@@ -91,7 +91,7 @@ export default function SchedulePage() {
   useEffect(() => {
     const fetchEvents = async () => {
       try {
-        const { data } = await axios.get('http://localhost:8000/api/schedule/', {
+        const { data } = await api.get('http://localhost:8000/api/schedule/', {
           params: {
             group_name: selectedGroup,
             date: format(cycleStartDate, 'yyyy-MM-dd'),
