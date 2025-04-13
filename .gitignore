@@ -20,3 +20,16 @@ frontend/package-lock.json
 frontend/package.json
 
 local_dump.dump
+
+# Python environment
+.python-version
+.venv/
+uv.lock
+local.dump
+*.dump
+
+# IDE
+.idea/
+*.swp
+*.swo
+pyproject.toml

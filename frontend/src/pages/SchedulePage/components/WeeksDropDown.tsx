@@ -1,10 +1,11 @@
 import { addDays, addWeeks, format } from 'date-fns';
+import { Dispatch, SetStateAction } from 'react';
 
 type WeeksDropDownProps = {
   activeWeek: number;
-  setActiveWeek: React.Dispatch<React.SetStateAction<number>>;
+  setActiveWeek: Dispatch<SetStateAction<number>>;
   cycleStartDate: Date;
-  setCycleStartDate: React.Dispatch<React.SetStateAction<Date>>;
+  setCycleStartDate: Dispatch<SetStateAction<Date>>;
   weeks: Date[];
   isLoading: boolean;
 };

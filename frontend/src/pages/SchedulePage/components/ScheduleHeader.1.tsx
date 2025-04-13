@@ -1,56 +1,29 @@
 import { addWeeks, addDays, format } from 'date-fns';
-import CurrentFilters from './CurrentFilters';
+import Filters from './Filters';
 import FiltersDropdown from './FiltersDropdown';
 import WeeksDropDown from './WeeksDropDown';
+import { TCurrentFilters, TCurrentMetrics } from '../types';
+import { Dispatch, SetStateAction } from 'react';
 
 type ScheduleHeaderProps = {
   activeWeek: number;
-  setActiveWeek: React.Dispatch<React.SetStateAction<number>>;
-  cycleStartDate: Date;
-  setCycleStartDate: React.Dispatch<React.SetStateAction<Date>>;
-  selectedGroup: string | null;
-  selectedTeacher: string | null;
-  selectedPlace: string | null;
-  setSelectedGroup: React.Dispatch<React.SetStateAction<string | null>>;
-  setSelectedTeacher: React.Dispatch<React.SetStateAction<string | null>>;
-  setSelectedPlace: React.Dispatch<React.SetStateAction<string | null>>;
-  weeks: Date[];
+  setActiveWeek: Dispatch<SetStateAction<number>>;
   isLoading: boolean;
-  groups: string[];
-  teachers: string[];
-  places: string[];
+  currentFilters: TCurrentFilters;
+  setCurrentFilters: Dispatch<SetStateAction<TCurrentFilters>>;
+  currentMetrics: TCurrentMetrics;
 };
 
 export default function ScheduleHeader({
   activeWeek,
   setActiveWeek,
-  cycleStartDate,
-  setCycleStartDate,
-  selectedGroup,
-  selectedTeacher,
-  selectedPlace,
-  setSelectedGroup,
-  setSelectedTeacher,
-  setSelectedPlace,
-  weeks,
   isLoading,
-  groups,
-  teachers,
-  places,
+  currentFilters,
+  setCurrentFilters,
+  currentMetrics,
 }: ScheduleHeaderProps) {
-  const handleGroupClick = (group: string) => {
-    setSelectedGroup(group);
-  };
-
-  const handleTeacherClick = (teacher: string) => {
-    setSelectedTeacher(teacher);
-  };
-
-  const handlePlaceClick = (place: string) => {
-    setSelectedPlace(place);
-  };
   const getWeekRange = (weekNumber: number) => {
-    const weekStart = addWeeks(cycleStartDate, weekNumber - 1);
+    const weekStart = addWeeks(currentFilters.cycleStartDate, weekNumber - 1);
     const weekEnd = addDays(weekStart, 6);
     return `${format(weekStart, 'dd.MM')} - ${format(weekEnd, 'dd.MM')}`;
   };
@@ -73,29 +46,28 @@ export default function ScheduleHeader({
       <WeeksDropDown
         activeWeek={activeWeek}
         setActiveWeek={setActiveWeek}
-        cycleStartDate={cycleStartDate}
-        setCycleStartDate={setCycleStartDate}
-        weeks={weeks}
+        cycleStartDate={currentFilters.cycleStartDate}
+        setCycleStartDate={(date) => {
+          if (date instanceof Date) {
+            setCurrentFilters({ ...currentFilters, cycleStartDate: date });
+          } else {
+            setCurrentFilters({
+              ...currentFilters,
+              cycleStartDate: date(currentFilters.cycleStartDate),
+            });
+          }
+        }}
+        weeks={currentMetrics.weeks}
         isLoading={isLoading}
       />
 
       <FiltersDropdown
-        groups={groups}
-        teachers={teachers}
-        places={places}
-        handleGroupClick={handleGroupClick}
-        handleTeacherClick={handleTeacherClick}
-        handlePlaceClick={handlePlaceClick}
+        currentMetrics={currentMetrics}
+        setCurrentFilters={setCurrentFilters}
+        currentFilters={currentFilters}
       />
 
-      <CurrentFilters
-        selectedGroup={selectedGroup}
-        selectedTeacher={selectedTeacher}
-        selectedPlace={selectedPlace}
-        setSelectedGroup={setSelectedGroup}
-        setSelectedTeacher={setSelectedTeacher}
-        setSelectedPlace={setSelectedPlace}
-      />
+      <Filters currentFilters={currentFilters} setCurrentFilters={setCurrentFilters} />
     </div>
   );
 }

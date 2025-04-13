@@ -13,14 +13,14 @@ export type TCell = {
   end: string;
 };
 
-export type TcurrentFilters = {
+export type TCurrentFilters = {
   selectedGroup: string | null;
   selectedTeacher: string | null;
   selectedPlace: string | null;
   cycleStartDate: Date;
 };
 
-export type TcurrentMetrics = {
+export type TCurrentMetrics = {
   teachers: string[];
   places: string[];
   weeks: Date[];

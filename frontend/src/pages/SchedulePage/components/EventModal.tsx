@@ -1,6 +1,11 @@
-type EventModalProps = {};
+import { TCell, TEvent } from '../types';
 
-export default function EventModal({ selectedCell, addEvent }) {
+type EventModalProps = {
+  selectedCell: TCell | null;
+  addEvent: (event: TEvent) => void;
+};
+
+export default function EventModal({ selectedCell, addEvent }: EventModalProps) {
   return (
     <dialog id='event_modal' className='modal'>
       <div className='modal-box'>
@@ -24,7 +29,16 @@ export default function EventModal({ selectedCell, addEvent }) {
               <button
                 key={color}
                 className={`badge ${color} gap-2`}
-                onClick={() => addEvent({ color })}
+                onClick={() =>
+                  addEvent({
+                    group_name: null,
+                    lesson_name: null,
+                    lesson_type: null,
+                    teacher: null,
+                    place: null,
+                    start_date: null,
+                  })
+                }
               >
                 █
               </button>
@@ -47,7 +61,16 @@ export default function EventModal({ selectedCell, addEvent }) {
       </div>
 
       <form method='dialog' className='modal-backdrop'>
-        <button onClick={() => document.getElementById('event_modal').close()}>Закрыть</button>
+        <button
+          onClick={() => {
+            const modal = document.getElementById('event_modal');
+            if (modal instanceof HTMLDialogElement) {
+              modal.close();
+            }
+          }}
+        >
+          Закрыть
+        </button>
       </form>
     </dialog>
   );

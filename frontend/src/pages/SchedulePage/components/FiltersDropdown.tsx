@@ -1,19 +1,16 @@
+import { TCurrentFilters, TCurrentMetrics } from '../types';
+import { Dispatch, SetStateAction } from 'react';
+
 type FiltersDropdownProps = {
-  groups: string[];
-  teachers: string[];
-  places: string[];
-  handleGroupClick: (group: string) => void;
-  handleTeacherClick: (teacher: string) => void;
-  handlePlaceClick: (place: string) => void;
+  currentMetrics: TCurrentMetrics;
+  setCurrentFilters: Dispatch<SetStateAction<TCurrentFilters>>;
+  currentFilters: TCurrentFilters;
 };
 
 export default function FiltersDropdown({
-  groups,
-  teachers,
-  places,
-  handleGroupClick,
-  handleTeacherClick,
-  handlePlaceClick,
+  currentMetrics,
+  setCurrentFilters,
+  currentFilters,
 }: FiltersDropdownProps) {
   return (
     <div className='dropdown relative'>
@@ -36,9 +33,13 @@ export default function FiltersDropdown({
             rounded-box w-48 ml-2 max-h-56 overflow-y-auto overflow-x-hidden 
             no-scrollbar grid grid-cols-1 gap-1'
           >
-            {groups.map((group) => (
+            {currentMetrics.groups.map((group) => (
               <li key={group}>
-                <button onClick={() => handleGroupClick(group)}>{group}</button>
+                <button
+                  onClick={() => setCurrentFilters({ ...currentFilters, selectedGroup: group })}
+                >
+                  {group}
+                </button>
               </li>
             ))}
           </ul>
@@ -53,9 +54,13 @@ export default function FiltersDropdown({
             w-48 ml-2 max-h-56 overflow-y-auto overflow-x-hidden no-scrollbar
             grid grid-cols-1 gap-1'
           >
-            {teachers.map((teacher) => (
+            {currentMetrics.teachers.map((teacher) => (
               <li key={teacher}>
-                <button onClick={() => handleTeacherClick(teacher)}>{teacher}</button>
+                <button
+                  onClick={() => setCurrentFilters({ ...currentFilters, selectedTeacher: teacher })}
+                >
+                  {teacher}
+                </button>
               </li>
             ))}
           </ul>
@@ -70,9 +75,13 @@ export default function FiltersDropdown({
             rounded-box w-48 ml-2 max-h-56 overflow-y-auto overflow-x-hidden 
             no-scrollbar grid grid-cols-1 gap-1'
           >
-            {places.map((place) => (
+            {currentMetrics.places.map((place) => (
               <li key={place}>
-                <button onClick={() => handlePlaceClick(place)}>{place}</button>
+                <button
+                  onClick={() => setCurrentFilters({ ...currentFilters, selectedPlace: place })}
+                >
+                  {place}
+                </button>
               </li>
             ))}
           </ul>
