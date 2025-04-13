@@ -14,7 +14,7 @@ from .utils.normalize_fullname import normalize_fullname
 # Create your views here.
 
 class ScheduleAPIView(APIView):
-    # permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated]
 
     def get(self, request: Request):
         params = request.query_params
