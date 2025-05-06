@@ -1,7 +1,7 @@
 from django.db import models
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-from django.contrib.auth.models import AbstractUser
+from django.contrib.auth.models import User
 # Create your models here.
 
 class GroupLink(models.Model):
@@ -70,3 +70,40 @@ class Schedule(models.Model):
     start_date = models.DateTimeField(
         'start_date',
     )
+
+
+class Notes(models.Model):
+
+    class Meta:
+        verbose_name = 'Note'
+        verbose_name_plural = 'Notes'
+
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='notes',
+    )
+
+    note_content = models.TextField(
+        'note_content',
+        max_length=300,
+        null=True,
+    )
+
+    note_date = models.DateTimeField(
+        'note_date',
+        null=True,
+    )
+
+# class UserSchedule(models.Model):
+
+#     class Meta:
+#         verbose_name = 'User schedule'
+#         verbose_name_plural = 'Users schedule'
+
+#     user = models.ForeignKey(
+#         User,
+#         on_delete=models.CASCADE,
+#         related_name='user_schedule',
+#         null=True,
+#     )
