@@ -108,5 +108,18 @@ class Notes(models.Model):
 class UserSchedule(AbstractSchedule):
 
     class Meta:
-        verbose_name='User schedule'
+        verbose_name = 'User schedule'
         verbose_name_plural = 'Users schedule'
+
+
+class CustomUser(User):
+
+    class Meta:
+        verbose_name = 'Custom user'
+        verbose_name_plural = 'Custom users'
+    
+    user_schedule = models.ForeignKey(
+        UserSchedule,
+        on_delete=models.CASCADE,
+        related_name='owner'
+    )
