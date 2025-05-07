@@ -26,19 +26,13 @@ class GroupLink(models.Model):
         return self.group_name
 
 
-class Schedule(models.Model):
+class AbstractSchedule(models.Model):
 
     class Meta:
         verbose_name = 'Group schedule'
         verbose_name_plural = 'Groups schedule'
         ordering = ['group_name']
-
-
-    group_name = models.ForeignKey(
-        GroupLink,
-        on_delete=models.CASCADE,
-        related_name='lessons'  
-    )
+        abstract = True
 
     week = models.IntegerField(
         'week',
@@ -72,6 +66,21 @@ class Schedule(models.Model):
     )
 
 
+class Schedule(AbstractSchedule):
+
+    class Meta:
+        verbose_name = 'Group schedule'
+        verbose_name_plural = 'Groups schedule'
+        ordering = ['group_name']
+
+
+    group_name = models.ForeignKey(
+        GroupLink,
+        on_delete=models.CASCADE,
+        related_name='lessons'  
+    )
+
+
 class Notes(models.Model):
 
     class Meta:
@@ -94,16 +103,3 @@ class Notes(models.Model):
         'note_date',
         null=True,
     )
-
-# class UserSchedule(models.Model):
-
-#     class Meta:
-#         verbose_name = 'User schedule'
-#         verbose_name_plural = 'Users schedule'
-
-#     user = models.ForeignKey(
-#         User,
-#         on_delete=models.CASCADE,
-#         related_name='user_schedule',
-#         null=True,
-#     )
