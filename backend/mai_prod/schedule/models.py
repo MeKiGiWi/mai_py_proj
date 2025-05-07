@@ -103,3 +103,10 @@ class Notes(models.Model):
         'note_date',
         null=True,
     )
+
+
+class UserSchedule(AbstractSchedule):
+
+    class Meta:
+        verbose_name='User schedule'
+        verbose_name_plural = 'Users schedule'
