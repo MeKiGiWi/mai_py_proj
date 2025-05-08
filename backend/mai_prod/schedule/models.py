@@ -1,7 +1,7 @@
 from django.db import models
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-from django.contrib.auth.models import AbstractUser
+from django.contrib.auth.models import User
 # Create your models here.
 
 class GroupLink(models.Model):
@@ -26,19 +26,11 @@ class GroupLink(models.Model):
         return self.group_name
 
 
-class Schedule(models.Model):
+class AbstractSchedule(models.Model):
 
     class Meta:
-        verbose_name = 'Group schedule'
-        verbose_name_plural = 'Groups schedule'
         ordering = ['group_name']
-
-
-    group_name = models.ForeignKey(
-        GroupLink,
-        on_delete=models.CASCADE,
-        related_name='lessons'  
-    )
+        abstract = True
 
     week = models.IntegerField(
         'week',
@@ -69,4 +61,61 @@ class Schedule(models.Model):
 
     start_date = models.DateTimeField(
         'start_date',
+    )
+
+
+class Schedule(AbstractSchedule):
+
+    class Meta:
+        verbose_name = 'Group schedule'
+        verbose_name_plural = 'Groups schedule'
+        ordering = ['group_name']
+
+
+    group_name = models.ForeignKey(
+        GroupLink,
+        on_delete=models.CASCADE,
+        related_name='lessons'  
+    )
+
+
+class Notes(models.Model):
+
+    class Meta:
+        verbose_name = 'Note'
+        verbose_name_plural = 'Notes'
+
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='notes',
+    )
+
+    note_content = models.TextField(
+        'note_content',
+        max_length=300,
+    )
+
+    note_date = models.DateTimeField(
+        'note_date',
+    )
+
+
+class UserSchedule(AbstractSchedule):
+
+    class Meta:
+        verbose_name = 'User schedule'
+        verbose_name_plural = 'Users schedule'
+        ordering = ['user']
+
+    group_name = models.ForeignKey(
+        GroupLink,
+        on_delete=models.CASCADE,
+        related_name='custom_lessons',
+    )
+
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='schedules',
     )
