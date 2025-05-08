@@ -29,8 +29,6 @@ class GroupLink(models.Model):
 class AbstractSchedule(models.Model):
 
     class Meta:
-        verbose_name = 'Group schedule'
-        verbose_name_plural = 'Groups schedule'
         ordering = ['group_name']
         abstract = True
 
@@ -96,7 +94,6 @@ class Notes(models.Model):
     note_content = models.TextField(
         'note_content',
         max_length=300,
-        null=True,
     )
 
     note_date = models.DateTimeField(
@@ -117,15 +114,8 @@ class UserSchedule(AbstractSchedule):
         related_name='custom_lessons',
     )
 
-
-class CustomUser(User):
-
-    class Meta:
-        verbose_name = 'Custom user'
-        verbose_name_plural = 'Custom users'
-    
-    user_schedule = models.ForeignKey(
-        UserSchedule,
+    user = models.ForeignKey(
+        User,
         on_delete=models.CASCADE,
-        related_name='owner'
+        related_name='owner',
     )
