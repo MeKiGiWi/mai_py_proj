@@ -98,7 +98,6 @@ class Notes(models.Model):
 
     note_date = models.DateTimeField(
         'note_date',
-        null=True,
     )
 
 
@@ -107,6 +106,7 @@ class UserSchedule(AbstractSchedule):
     class Meta:
         verbose_name = 'User schedule'
         verbose_name_plural = 'Users schedule'
+        ordering = ['user']
 
     group_name = models.ForeignKey(
         GroupLink,
@@ -117,5 +117,5 @@ class UserSchedule(AbstractSchedule):
     user = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
-        related_name='owner',
+        related_name='schedules',
     )
