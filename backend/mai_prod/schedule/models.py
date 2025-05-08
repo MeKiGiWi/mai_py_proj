@@ -111,6 +111,12 @@ class UserSchedule(AbstractSchedule):
         verbose_name = 'User schedule'
         verbose_name_plural = 'Users schedule'
 
+    group_name = models.ForeignKey(
+        GroupLink,
+        on_delete=models.CASCADE,
+        related_name='custom_lessons',
+    )
+
 
 class CustomUser(User):
 
