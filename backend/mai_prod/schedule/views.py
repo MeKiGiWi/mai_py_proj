@@ -7,9 +7,13 @@ from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
-from schedule.models import GroupLink, Schedule
+from schedule.models import GroupLink, Schedule, UserSchedule
 from .serializers import ScheduleSerializer
 from .utils.normalize_fullname import normalize_fullname
+from rest_framework.decorators import (
+    api_view,
+    permission_classes,
+)
 
 # Create your views here.
 
@@ -46,27 +50,40 @@ class ScheduleAPIView(APIView):
         
         query = Q(start_date__range=(start_date, end_date))
 
+        # query filter
         if 'group_name' in params:
             group_id = get_object_or_404(GroupLink, group_name=params['group_name'])
             query &= Q(group_name_id__exact=group_id)
-        
+
         if 'teacher' in params:
             query &= Q(teacher__iexact=params['teacher'])
         
         if 'place' in params:
             query &= Q(place__iexact=params['place'])
-
         
-        
-        schedule = Schedule.objects.filter(query).order_by('start_date')
+        grouped_data = defaultdict(dict)
 
+        schedule = Schedule.objects.filter(query).order_by('start_date') # get schedule_data by filter
         serializer = ScheduleSerializer(schedule, many=True)
-        grouped_data = defaultdict(defaultdict)
-        for item in serializer.data:
-            key = item['start_date']
-            for item_key in item:
-                grouped_data[key][item_key] = item[item_key]
-        return Response(grouped_data)
+        for event in serializer.data:
+            event_date = event['start_date']
+            grouped_data[event_date] = event
+
+        user_schedule = UserSchedule.objects.filter(query & Q(user_id=request.user.id)).order_by('start_date') # get userschedule_data by filter
+        if user_schedule.exists():
+            serializer = ScheduleSerializer(user_schedule, many=True)
+            for event in serializer.data:
+                event_date = event['start_date']
+                grouped_data[event_date] = event # if we need to rewrite data
+                # grouped_data[key].update( 
+                #     {key: value for key, value in item.items() if value is not None}
+                # )  # if we need to update data
+
+            sorted_dates = sorted(grouped_data.keys())
+            sorted_events = {event_date: grouped_data[event_date] for event_date in sorted_dates}
+
+
+        return Response(sorted_events)
 
 
 class MetricsAPIView(APIView):
@@ -90,4 +107,6 @@ class MetricsAPIView(APIView):
         elif type == "week-range":
             metrics = Schedule.objects.values_list('start_date', flat=True).distinct()
             metrics = [min(metrics), max(metrics)]
+
+
         return Response(metrics)
