@@ -141,8 +141,8 @@ class NotesAPIView(APIView):
         grouped_data = defaultdict(dict)
 
         notes = Notes.objects.filter(
-            Q(note_date__range=(start_date, end_date)) 
-            & Q(user_id=request.user.id)
+            note_date__range=(start_date, end_date), 
+            user_id=request.user.id
         ).order_by('note_date') 
 
         # get notes in our time period
@@ -157,7 +157,8 @@ class NotesAPIView(APIView):
 
 
     def delete(self, request: Request): # delete note by exact time and user, if exists
-        date_str = request.query_params.get('date')
+        input_date = request.query_params.get('date')
+        date_str = input_date[:input_date.find('T')] + ' ' + input_date[(input_date.find('T') + 1):-1]
 
         # date validation
         if not date_str:
@@ -170,7 +171,7 @@ class NotesAPIView(APIView):
             start_date = datetime.strptime(date_str, '%Y-%m-%d %H:%M:%S')
         except ValueError:
             return Response(
-                {"error": "Неверный формат 'date', требуется 'YYYY-MM-DD HH:MM:SS'"},
+                {"error": "Неверный формат 'date', требуется 'yyyy-mm-ddThh:mm:ssZ'"},
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
@@ -185,7 +186,8 @@ class NotesAPIView(APIView):
 
 
     def put(self, request: Request): # create new note or change old note on exact time
-        date_str = request.data.get('date')
+        input_date = request.data.get('date')
+        date_str = input_date[:input_date.find('T')] + ' ' + input_date[(input_date.find('T') + 1):-1]
 
         # date validation
         if not date_str:
@@ -198,7 +200,7 @@ class NotesAPIView(APIView):
             note_date = datetime.strptime(date_str, '%Y-%m-%d %H:%M:%S')
         except ValueError:
             return Response(
-                {"error": "Неверный формат 'date', требуется 'YYYY-MM-DD HH:MM:SS'"},
+                {"error": "Неверный формат 'date', требуется 'yyyy-mm-ddThh:mm:ss'"},
                 status=status.HTTP_400_BAD_REQUEST,
             )
         
@@ -222,19 +224,14 @@ class NotesAPIView(APIView):
                 status=status.HTTP_200_OK,
             )
         except Notes.DoesNotExist: 
-            try: # create new note on this date
-                note = Notes.objects.create(
-                    user=request.user,
-                    note_date=note_date,
-                    note_content=note_content,
-                )
+            # create new note on this date
+            note = Notes.objects.create(
+                user=request.user,
+                note_date=note_date,
+                note_content=note_content,
+            )
 
-                return Response(
-                    {"message": f"Заметка на {date_str} успешно создана"},
-                    status=status.HTTP_201_CREATED,
-                )
-            except ValidationError:
-                return Response(
-                    {"error": "Неправильный формат заметки"},
-                    status=status.HTTP_400_BAD_REQUEST,
-                )
+            return Response(
+                {"message": f"Заметка на {date_str} успешно создана"},
+                status=status.HTTP_201_CREATED,
+            )
