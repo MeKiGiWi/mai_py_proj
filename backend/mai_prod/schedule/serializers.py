@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Schedule, GroupLink
+from .models import Schedule, GroupLink, Notes
 
 
 class GroupSerializer(serializers.ModelSerializer):
@@ -18,4 +18,12 @@ class ScheduleSerializer(serializers.ModelSerializer):
             'teacher',
             'place',
             'start_date'
+        ]
+
+class NoteSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Notes
+        fields = [
+            'note_date',
+            'note_content',
         ]
