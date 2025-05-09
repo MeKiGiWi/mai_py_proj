@@ -6,6 +6,7 @@ from django.contrib.auth.models import User
 from rest_framework.views import APIView
 from rest_framework.request import Request
 from rest_framework.response import Response
+from django.core.exceptions import ValidationError
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from schedule.models import GroupLink, Schedule, UserSchedule, Notes
@@ -119,6 +120,7 @@ class NotesAPIView(APIView):
     def get(self, request: Request): # get notes by date and user
         date_str = request.query_params.get('date')
 
+        # date validation
         if not date_str:
             return Response(
                 {"error": "Параметр 'date' не передан"},
@@ -133,6 +135,7 @@ class NotesAPIView(APIView):
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
+        # get notes on 2 next weeks after start date
         end_date = start_date + timedelta(days=14)
 
         grouped_data = defaultdict(dict)
@@ -140,8 +143,9 @@ class NotesAPIView(APIView):
         notes = Notes.objects.filter(
             Q(note_date__range=(start_date, end_date)) 
             & Q(user_id=request.user.id)
-        ).order_by('note_date') # get notes on 2 next weeks after start date
+        ).order_by('note_date') 
 
+        # get notes in our time period
         if notes.exists():
             serializer = NoteSerializer(notes, many=True)
             for note in serializer.data:
@@ -149,13 +153,13 @@ class NotesAPIView(APIView):
                 note_content = note['note_content']
                 grouped_data[note_date] = note_content
 
-
         return Response(grouped_data)
 
 
     def delete(self, request: Request): # delete note by exact time and user, if exists
         date_str = request.query_params.get('date')
 
+        # date validation
         if not date_str:
             return Response(
                 {"error": "Параметр 'date' не передан"},
@@ -170,21 +174,67 @@ class NotesAPIView(APIView):
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
+        # delete note if exists
         note = get_object_or_404(Notes, note_date=start_date, user=request.user)
         note.delete()
 
-
         return Response(
             {"message": f"Заметка на {date_str} успешно удалена"},
-            status=status.HTTP_200_OK
+            status=status.HTTP_200_OK,
         )
 
 
-    # def put(self, request: Request):
-    #     pass
+    def put(self, request: Request): # create new note or change old note on exact time
+        date_str = request.data.get('date')
 
-    # def post(self, request: Request):
-    #     pass
+        # date validation
+        if not date_str:
+            return Response(
+                {"error": "Параметр 'date' не передан"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        
+        try:
+            note_date = datetime.strptime(date_str, '%Y-%m-%d %H:%M:%S')
+        except ValueError:
+            return Response(
+                {"error": "Неверный формат 'date', требуется 'YYYY-MM-DD HH:MM:SS'"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        
+        note_content = request.data.get('note_content')
 
-    # def patch(self, request: Request):
-    #     pass
+        # note_content validation
+        if not note_content:
+            return Response(
+                {"error": "Параметр 'note_content' не передан"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+
+        try: # check if note on this date exists
+            note = Notes.objects.get(user=request.user, note_date=note_date)
+            note.note_content = note_content
+            note.save()
+
+            return Response(
+                {"message": f"Заметка на {date_str} успешно обновлена"},
+                status=status.HTTP_200_OK,
+            )
+        except Notes.DoesNotExist: 
+            try: # create new note on this date
+                note = Notes.objects.create(
+                    user=request.user,
+                    note_date=note_date,
+                    note_content=note_content,
+                )
+
+                return Response(
+                    {"message": f"Заметка на {date_str} успешно создана"},
+                    status=status.HTTP_201_CREATED,
+                )
+            except ValidationError:
+                return Response(
+                    {"error": "Неправильный формат заметки"},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
