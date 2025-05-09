@@ -2,13 +2,14 @@ from collections import defaultdict
 from datetime import datetime, timedelta
 from django.shortcuts import render, get_object_or_404
 from django.db.models import Q
+from django.contrib.auth.models import User
 from rest_framework.views import APIView
 from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
-from schedule.models import GroupLink, Schedule, UserSchedule
-from .serializers import ScheduleSerializer
+from schedule.models import GroupLink, Schedule, UserSchedule, Notes
+from .serializers import ScheduleSerializer, NoteSerializer
 from .utils.normalize_fullname import normalize_fullname
 from rest_framework.decorators import (
     api_view,
@@ -110,3 +111,80 @@ class MetricsAPIView(APIView):
 
 
         return Response(metrics)
+
+
+class NotesAPIView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request: Request): # get notes by date and user
+        date_str = request.query_params.get('date')
+
+        if not date_str:
+            return Response(
+                {"error": "Параметр 'date' не передан"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        
+        try:
+            start_date = datetime.strptime(date_str, '%Y-%m-%d').date()
+        except ValueError:
+            return Response(
+                {"error": "Неверный формат 'date', требуется 'YYYY-MM-DD'"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        end_date = start_date + timedelta(days=14)
+
+        grouped_data = defaultdict(dict)
+
+        notes = Notes.objects.filter(
+            Q(note_date__range=(start_date, end_date)) 
+            & Q(user_id=request.user.id)
+        ).order_by('note_date') # get notes on 2 next weeks after start date
+
+        if notes.exists():
+            serializer = NoteSerializer(notes, many=True)
+            for note in serializer.data:
+                note_date = note['note_date']
+                note_content = note['note_content']
+                grouped_data[note_date] = note_content
+
+
+        return Response(grouped_data)
+
+
+    # def delete(self, request: Request): # delete note by exact time and user, if exists
+    #     date_str = request.query_params.get('date')
+
+    #     if not date_str:
+    #         return Response(
+    #             {"error": "Параметр 'date' не передан"},
+    #             status=status.HTTP_400_BAD_REQUEST,
+    #         )
+        
+    #     try:
+    #         start_date = datetime.strptime(date_str, '%Y-%m-%d %H:%M:%S')
+    #     except ValueError:
+    #         return Response(
+    #             {"error": "Неверный формат 'date', требуется 'YYYY-MM-DD HH:MM:SS'"},
+    #             status=status.HTTP_400_BAD_REQUEST,
+    #         )
+
+    #     note = get_object_or_404(Notes, note_date=start_date, user=request.user)
+    #     note.delete()
+
+
+    #     return Response(
+    #         {"message": f"Заметка на {date_str} успешно удалена"},
+    #         status=status.HTTP_200_OK
+    #     )
+
+
+    # def put(self, request: Request):
+    #     pass
+
+    # def post(self, request: Request):
+    #     pass
+
+    # def patch(self, request: Request):
+    #     pass
