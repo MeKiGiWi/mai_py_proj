@@ -157,8 +157,7 @@ class NotesAPIView(APIView):
 
 
     def delete(self, request: Request): # delete note by exact time and user, if exists
-        input_date = request.query_params.get('date')
-        date_str = input_date[:input_date.find('T')] + ' ' + input_date[(input_date.find('T') + 1):-1]
+        date_str = request.query_params.get('date')
 
         # date validation
         if not date_str:
@@ -168,7 +167,7 @@ class NotesAPIView(APIView):
             )
         
         try:
-            start_date = datetime.strptime(date_str, '%Y-%m-%d %H:%M:%S')
+            start_date = datetime.strptime(date_str, '%Y-%m-%dT%H:%M:%SZ')
         except ValueError:
             return Response(
                 {"error": "Неверный формат 'date', требуется 'yyyy-mm-ddThh:mm:ssZ'"},
@@ -186,8 +185,7 @@ class NotesAPIView(APIView):
 
 
     def put(self, request: Request): # create new note or change old note on exact time
-        input_date = request.data.get('date')
-        date_str = input_date[:input_date.find('T')] + ' ' + input_date[(input_date.find('T') + 1):-1]
+        date_str = request.data.get('date')
 
         # date validation
         if not date_str:
@@ -197,10 +195,10 @@ class NotesAPIView(APIView):
             )
         
         try:
-            note_date = datetime.strptime(date_str, '%Y-%m-%d %H:%M:%S')
+            note_date = datetime.strptime(date_str, '%Y-%m-%dT%H:%M:%SZ')
         except ValueError:
             return Response(
-                {"error": "Неверный формат 'date', требуется 'yyyy-mm-ddThh:mm:ss'"},
+                {"error": "Неверный формат 'date', требуется 'yyyy-mm-ddThh:mm:ssZ'"},
                 status=status.HTTP_400_BAD_REQUEST,
             )
         
