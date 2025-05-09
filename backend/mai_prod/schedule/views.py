@@ -153,31 +153,31 @@ class NotesAPIView(APIView):
         return Response(grouped_data)
 
 
-    # def delete(self, request: Request): # delete note by exact time and user, if exists
-    #     date_str = request.query_params.get('date')
+    def delete(self, request: Request): # delete note by exact time and user, if exists
+        date_str = request.query_params.get('date')
 
-    #     if not date_str:
-    #         return Response(
-    #             {"error": "Параметр 'date' не передан"},
-    #             status=status.HTTP_400_BAD_REQUEST,
-    #         )
+        if not date_str:
+            return Response(
+                {"error": "Параметр 'date' не передан"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
         
-    #     try:
-    #         start_date = datetime.strptime(date_str, '%Y-%m-%d %H:%M:%S')
-    #     except ValueError:
-    #         return Response(
-    #             {"error": "Неверный формат 'date', требуется 'YYYY-MM-DD HH:MM:SS'"},
-    #             status=status.HTTP_400_BAD_REQUEST,
-    #         )
+        try:
+            start_date = datetime.strptime(date_str, '%Y-%m-%d %H:%M:%S')
+        except ValueError:
+            return Response(
+                {"error": "Неверный формат 'date', требуется 'YYYY-MM-DD HH:MM:SS'"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
 
-    #     note = get_object_or_404(Notes, note_date=start_date, user=request.user)
-    #     note.delete()
+        note = get_object_or_404(Notes, note_date=start_date, user=request.user)
+        note.delete()
 
 
-    #     return Response(
-    #         {"message": f"Заметка на {date_str} успешно удалена"},
-    #         status=status.HTTP_200_OK
-    #     )
+        return Response(
+            {"message": f"Заметка на {date_str} успешно удалена"},
+            status=status.HTTP_200_OK
+        )
 
 
     # def put(self, request: Request):
