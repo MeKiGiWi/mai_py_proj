@@ -18,8 +18,8 @@ from rest_framework.decorators import (
 # Create your views here.
 
 class ScheduleAPIView(APIView):
+    permission_classes = [IsAuthenticated]
 
-    @permission_classes([IsAuthenticated])
     def get(self, request: Request):
         params = request.query_params
         date_str = params.get("date")
@@ -31,7 +31,7 @@ class ScheduleAPIView(APIView):
             )
         
         try:
-            start_date = datetime.strptime(date_str, '%Y-%m-%d').date()
+            input_date = datetime.strptime(date_str, '%Y-%m-%d').date()
         except ValueError:
             return Response(
                 {"error": "Неверный формат 'date', требуется 'YYYY-MM-DD'"},
@@ -45,46 +45,45 @@ class ScheduleAPIView(APIView):
                 status=status.HTTP_400_BAD_REQUEST
             )
         
+        start_date = input_date
         end_date = start_date + timedelta(days=14)
         
         query = Q(start_date__range=(start_date, end_date))
 
+        # query filter
         if 'group_name' in params:
             group_id = get_object_or_404(GroupLink, group_name=params['group_name'])
             query &= Q(group_name_id__exact=group_id)
-        
+
         if 'teacher' in params:
             query &= Q(teacher__iexact=params['teacher'])
         
         if 'place' in params:
             query &= Q(place__iexact=params['place'])
         
-        schedule = Schedule.objects.filter(query).order_by('start_date')
-        serializer = ScheduleSerializer(schedule, many=True)
         grouped_data = defaultdict(dict)
 
-        for item in serializer.data:
-            key = item['start_date']
-            grouped_data[key] = dict(item)
+        schedule = Schedule.objects.filter(query).order_by('start_date') # get schedule_data by filter
+        serializer = ScheduleSerializer(schedule, many=True)
+        for event in serializer.data:
+            event_date = event['start_date']
+            grouped_data[event_date] = event
 
-
-        user_schedule = UserSchedule.objects.filter(query & Q(user_id=request.user.id)).order_by('start_date')
-
+        user_schedule = UserSchedule.objects.filter(query & Q(user_id=request.user.id)).order_by('start_date') # get userschedule_data by filter
         if user_schedule.exists():
             serializer = ScheduleSerializer(user_schedule, many=True)
-
-            for item in serializer.data:
-                key = item['start_date']
-                grouped_data[key] = dict(item) # if we need to rewrite data
+            for event in serializer.data:
+                event_date = event['start_date']
+                grouped_data[event_date] = event # if we need to rewrite data
                 # grouped_data[key].update( 
                 #     {key: value for key, value in item.items() if value is not None}
                 # )  # if we need to update data
 
-            sorted_keys = sorted(grouped_data.keys())
-            sorted_data = {key: grouped_data[key] for key in sorted_keys}
+            sorted_dates = sorted(grouped_data.keys())
+            sorted_events = {event_date: grouped_data[event_date] for event_date in sorted_dates}
 
 
-        return Response(sorted_data)
+        return Response(sorted_events)
 
 
 class MetricsAPIView(APIView):
