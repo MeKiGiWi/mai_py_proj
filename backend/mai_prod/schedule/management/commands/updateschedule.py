@@ -1,6 +1,7 @@
 from urllib.parse import unquote
 from django.core.management import BaseCommand
 from selenium import webdriver
+from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
@@ -16,6 +17,8 @@ class Command(BaseCommand):
         try:
             driver = webdriver.Chrome()
             driver.implicitly_wait(2)
+            options = Options()
+            options.add_argument('--headless')
             for item in GroupLink.objects.all():
                 # title - group name
                 title, url = item.group_name, item.url
