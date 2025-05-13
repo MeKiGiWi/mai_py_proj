@@ -1,5 +1,6 @@
 import AboutTeamTag from './components/AboutTeamTag';
 import NavBar from '../../components/NavBar';
+import { Link } from 'react-router';
 
 
 // get initials of teammates
@@ -11,12 +12,10 @@ const getInitials = (name: string) => {
 // get random gradient
 const getNameGradient = (name: string) => {
   const gradients = [
-    'bg-gradient-to-r from-blue-600 to-blue-400',
-    'bg-gradient-to-r from-indigo-600 to-blue-500',
-    'bg-gradient-to-r from-blue-700 to-cyan-500',
-    'bg-gradient-to-r from-blue-700 to-blue-400',
     'bg-gradient-to-r from-blue-600 to-cyan-400',
-    'bg-gradient-to-r from-indigo-500 to-blue-400',
+    'bg-gradient-to-r from-indigo-600 to-cyan-400',
+    'bg-gradient-to-r from-blue-700 to-blue-500',
+    'bg-gradient-to-r from-cyan-500 to-blue-400',
     'bg-gradient-to-r from-blue-800 to-cyan-500'
   ];
   const hash = name.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
@@ -26,10 +25,22 @@ const getNameGradient = (name: string) => {
 
 export default function AboutTeamPage() {
   const members = [
-    { name: 'Показеев Даниил', role: 'Fullstack Developer' },
-    { name: 'Шитов Артём', role: 'Fullstack Developer' },
-    { name: 'Гуськов Алексей', role: 'Backend Developer' },
-    { name: 'Иванов Иван', role: 'Backend Developer' }
+    { 
+      name: 'Показеев Даниил', role: 'Fullstack Developer',
+      github: 'https://github.com/MeKiGiWi', telegram: 'https://t.me/mekigiwi_god'
+    },
+    { 
+      name: 'Шитов Артём', role: 'Fullstack Developer',
+      github: 'https://github.com/lookingforexit', telegram: 'https://t.me/p7r0k1n3s' 
+    },
+    { 
+      name: 'Гуськов Алексей', role: 'Backend Developer',
+      github: 'https://github.com/thebestprincess', telegram: 'https://t.me/the_best_pr1ncess'
+    },
+    { 
+      name: 'Иванов Иван', role: 'Backend Developer',
+      github: 'https://github.com/WhySoBor1ng', telegram: 'https://t.me/whysobor1ng'
+    }
   ];
 
   return (
@@ -72,8 +83,12 @@ export default function AboutTeamPage() {
                   <h2 className="card-title text-lg md:text-xl lg:text-2xl">{member.name}</h2>
                   <p className="text-sm md:text-base">{member.role}</p>
                   <div className="card-actions justify-center gap-2 mt-4">
-                    <button className="btn btn-info btn-xs md:btn-sm">Telegram</button>
-                    <button className="btn btn-neutral btn-xs md:btn-sm">GitHub</button>
+                    <Link to={member.telegram}>
+                      <button className="btn btn-info btn-xs md:btn-sm">Telegram</button>
+                    </Link>
+                    <Link to={member.github}>
+                      <button className="btn btn-neutral btn-xs md:btn-sm">GitHub</button>
+                    </Link>
                   </div>
                 </div>
               </div>
