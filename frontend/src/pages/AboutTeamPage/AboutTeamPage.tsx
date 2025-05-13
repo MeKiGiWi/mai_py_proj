@@ -65,7 +65,7 @@ export default function AboutTeamPage() {
             className='w-full max-w-4xl h-96 rounded-[1.2rem] shadow-2xl object-cover'
             alt='Наша команда'
           />
-          <div className='max-w-2xl lg:max-w-5xl'>
+          <div className='max-w-2xl lg:max-w-4xl'>
             <h1 className='text-5xl font-bold mb-6'>Наша команда</h1>
             <p className='text-lg mb-8'>
               За всеми нашими крутыми инновациями стоят люди, каждый из которых — эксперт в своем
