@@ -89,6 +89,8 @@ class ScheduleAPIView(APIView):
 
 
 class MetricsAPIView(APIView):
+    permission_classes = [IsAuthenticated]
+    
     def get(self, request: Request):
         type = request.query_params.get("type")
         if not type:
