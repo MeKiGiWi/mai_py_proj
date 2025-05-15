@@ -1,21 +1,22 @@
 import { Link, useNavigate } from 'react-router';
 import PlanItTag from '../../components/PlanItTag';
+import { LoadingIcon } from '../../components/LoadingIcon';
 import { useState } from 'react';
 import ReCAPTCHA from 'react-google-recaptcha';
 import axios from 'axios';
 
 function RegistrationPage() {
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<{
+    username: string;
+    password: string;
+    confirmPassword: string;
+  }>({
     username: '',
     password: '',
     confirmPassword: ''
   });
-  const [errors, setErrors] = useState({
-    username: '',
-    password: '',
-    confirmPassword: '',
-    general: ''
-  });
+
+  const [generalError, setGeneralError] = useState('');
   const [captchaToken, setCaptchaToken] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
@@ -33,8 +34,8 @@ function RegistrationPage() {
         fill="none"
         stroke="currentColor"
       >
-        <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path>
-        <circle cx="12" cy="7" r="4"></circle>
+        <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" />
+        <circle cx="12" cy="7" r="4" />
       </g>
     </svg>
   );
@@ -52,74 +53,32 @@ function RegistrationPage() {
         fill="none"
         stroke="currentColor"
       >
-        <path d="M2.586 17.414A2 2 0 0 0 2 18.828V21a1 1 0 0 0 1 1h3a1 1 0 0 0 1-1v-1a1 1 0 0 1 1-1h1a1 1 0 0 0 1-1v-1a1 1 0 0 1 1-1h.172a2 2 0 0 0 1.414-.586l.814-.814a6.5 6.5 0 1 0-4-4z"></path>
-        <circle cx="16.5" cy="7.5" r=".5" fill="currentColor"></circle>
+        <path d="M2.586 17.414A2 2 0 0 0 2 18.828V21a1 1 0 0 0 1 1h3a1 1 0 0 0 1-1v-1a1 1 0 0 1 1-1h1a1 1 0 0 0 1-1v-1a1 1 0 0 1 1-1h.172a2 2 0 0 0 1.414-.586l.814-.814a6.5 6.5 0 1 0-4-4z" />
+        <circle cx="16.5" cy="7.5" r=".5" fill="currentColor" />
       </g>
     </svg>
   );
 
-  const SpinnerIcon = () => (
-    <svg 
-      className="animate-spin h-6 w-6 text-white" 
-      xmlns="http://www.w3.org/2000/svg" 
-      fill="none" 
-      viewBox="0 0 24 24"
-    >
-      <circle 
-        className="opacity-25" 
-        cx="12" 
-        cy="12" 
-        r="10" 
-        stroke="currentColor" 
-        strokeWidth="4"
-      />
-      <path 
-        className="opacity-75" 
-        fill="currentColor" 
-        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-      />
-    </svg>
-  );
-
-  const validateForm = () => {
-    const newErrors = { username: '', password: '', confirmPassword: '', general: '' };
-    let isValid = true;
-
-    // Валидация username
-    if (!formData.username.match(/^[A-Za-z][A-Za-z0-9\-]*$/)) {
-      newErrors.username = 'Только буквы, цифры или дефис';
-      isValid = false;
-    } else if (formData.username.length < 3) {
-      newErrors.username = 'Минимум 3 символа';
-      isValid = false;
-    } else if (formData.username.length > 15) {
-      newErrors.username = 'Максимум 15 символов';
-      isValid = false;
-    }
-
-    // Валидация пароля
-    if (!formData.password.match(/(?=.*\d)(?=.*[a-z])(?=.*[A-Z])/)) {
-      newErrors.password = 'Цифра, строчная и заглавная буква';
-      isValid = false;
-    } else if (formData.password.length < 8) {
-      newErrors.password = 'Минимум 8 символов';
-      isValid = false;
-    }
-
-    // Подтверждение пароля
-    if (formData.password !== formData.confirmPassword) {
-      newErrors.confirmPassword = 'Пароли не совпадают';
-      isValid = false;
-    }
-
-    setErrors(newErrors);
-    return isValid;
-  };
-
   // sending post response to backend
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!validateForm() || !captchaToken) return;
+
+    const form = e.currentTarget as HTMLFormElement;
+    
+    if (!form.checkValidity()) {
+      form.reportValidity();
+      return;
+    }
+
+    if (!captchaToken) {
+      setGeneralError('Пожалуйста, пройдите проверку reCAPTCHA');
+      return;
+    }
+
+    if (formData.password !== formData.confirmPassword) {
+      setGeneralError('Пароли не совпадают');
+      return;
+    }
 
     setIsLoading(true);
     try {
@@ -137,7 +96,7 @@ function RegistrationPage() {
       }
     } catch (err) {
       console.error('Полный объект ошибки:', err);
-      setErrors(prev => ({...prev, general: 'Ошибка регистрации'}));
+      setGeneralError(err.response?.data?.message || 'Ошибка при регистрации');
     } finally {
       setIsLoading(false);
     }
@@ -161,17 +120,16 @@ function RegistrationPage() {
                 <UserIcon />
                 <input
                   type="text"
-                  className="grow"
-                  placeholder="Username"
+                  name="username"
+                  placeholder="Введите логин"
+                  className="w-full"
+                  pattern="^[A-Za-z][A-Za-z0-9\-]{2,14}$"
+                  title="Латиница, цифры и дефис. Начинается с буквы. 3-15 символов."
+                  required
                   value={formData.username}
                   onChange={(e) => setFormData({...formData, username: e.target.value})}
                 />
               </label>
-              {errors.username && (
-                <div className="text-error text-sm text-left ml-3 mt-1">
-                  {errors.username}
-                </div>
-              )}
             </div>
 
             {/* Поле password */}
@@ -181,17 +139,16 @@ function RegistrationPage() {
                 <PasswordIcon />
                 <input
                   type="password"
-                  className="grow"
-                  placeholder="Password"
+                  name="password"
+                  placeholder="Введите пароль"
+                  className="w-full"
+                  pattern="^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}$"
+                  title="Минимум 8 символов: одна цифра, строчная и заглавная буква"
+                  required
                   value={formData.password}
                   onChange={(e) => setFormData({...formData, password: e.target.value})}
                 />
               </label>
-              {errors.password && (
-                <div className="text-error text-sm text-left ml-3 mt-1">
-                  {errors.password}
-                </div>
-              )}
             </div>
 
             {/* Подтверждение пароля */}
@@ -200,45 +157,49 @@ function RegistrationPage() {
                 <PasswordIcon />
                 <input
                   type="password"
-                  className="grow"
-                  placeholder="Confirm Password"
+                  name="confirmPassword"
+                  placeholder="Повторите пароль"
+                  className="w-full"
+                  pattern="^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}$"
+                  title="Пароли должны совпадать"
+                  required
                   value={formData.confirmPassword}
                   onChange={(e) => setFormData({...formData, confirmPassword: e.target.value})}
                 />
               </label>
-              {errors.confirmPassword && (
-                <div className="text-error text-sm text-left ml-3 mt-1">
-                  {errors.confirmPassword}
-                </div>
-              )}
             </div>
             
             <div className="w-full flex justify-center my-4">
-              <ReCAPTCHA
-                sitekey="6LehTfUqAAAAACy_psBXjlvWXwCymnjvz26aLW72"
-                onChange={(token) => setCaptchaToken(token || '')}
-              />
+            <ReCAPTCHA
+              sitekey="6LehTfUqAAAAACy_psBXjlvWXwCymnjvz26aLW72"
+              onChange={(e) => setCaptchaToken(e || '')}
+            />
             </div>
 
+            {/* Кнопка отправки */}
             <button 
               type="submit" 
               className="btn btn-accent w-full h-12 flex items-center justify-center"
               disabled={isLoading}
             >
               {isLoading ? (
-                <SpinnerIcon />
+                <LoadingIcon />
               ) : (
-                'Войти'
+                'Зарегистрироваться'
               )}
             </button>
             
-            {errors.general && (
-              <div className="alert alert-error justify-center text-center">
-                {errors.general}
+            {/* Общие ошибки */}
+            {generalError && (
+              <div className="alert alert-error mt-4">
+                <svg xmlns="http://www.w3.org/2000/svg" className="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <span>{generalError}</span>
               </div>
             )}
 
-            <p className="text-sm mt-4">
+            <p className="text-sm">
               Уже есть аккаунт? {' '}
               <Link to="/login" className="link link-accent">
                 Войти
