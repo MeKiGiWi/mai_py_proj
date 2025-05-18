@@ -81,14 +81,14 @@ class ScheduleAPIView(APIView):
                 #     {key: value for key, value in item.items() if value is not None}
                 # )  # if we need to update data
 
-            sorted_dates = sorted(grouped_data.keys())
-            sorted_events = {event_date: grouped_data[event_date] for event_date in sorted_dates}
+            grouped_data = dict(sorted(grouped_data.items()))
 
-
-        return Response(sorted_events)
+        return Response(grouped_data)
 
 
 class MetricsAPIView(APIView):
+    permission_classes = [IsAuthenticated]
+    
     def get(self, request: Request):
         type = request.query_params.get("type")
         if not type:
