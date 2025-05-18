@@ -84,8 +84,7 @@ class ScheduleAPIView(APIView):
             sorted_dates = sorted(grouped_data.keys())
             sorted_events = {event_date: grouped_data[event_date] for event_date in sorted_dates}
 
-
-        return Response(sorted_events)
+        return Response(grouped_data)
 
 
 class MetricsAPIView(APIView):
