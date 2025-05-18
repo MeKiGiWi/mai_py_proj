@@ -10,7 +10,7 @@ import EventModal from './components/EventModal';
 import ExportModal from './components/ExportModal';
 import ExportButton from './components/ExportButton';
 
-import api from '@/interceptors/api';
+import api from '../../interceptors/api';
 
 const WORKDAY_START = 9 * 60; // 9:00 в минутах
 const WORKDAY_END = 22 * 60; // 22:00 в минутах
@@ -53,9 +53,9 @@ export default function SchedulePage() {
       try {
         const [weeksData, teachersData, placesData, groupsData] = await Promise.all([
           getWeeksRange(),
-          api.get(`${import.meta.env.VITE_API_URL}metrics/?type=teacher`),
-          api.get(`${import.meta.env.VITE_API_URL}metrics/?type=place`),
-          api.get(`${import.meta.env.VITE_API_URL}metrics/?type=group`),
+          api.get('metrics/', { params: { type: 'teacher' } }),
+          api.get('metrics/', { params: { type: 'place' } }),
+          api.get('metrics/', { params: { type: 'group' } }),
         ]);
 
         setWeeks(weeksData);
