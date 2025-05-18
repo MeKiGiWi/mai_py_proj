@@ -81,9 +81,6 @@ class ScheduleAPIView(APIView):
                 #     {key: value for key, value in item.items() if value is not None}
                 # )  # if we need to update data
 
-            sorted_dates = sorted(grouped_data.keys())
-            sorted_events = {event_date: grouped_data[event_date] for event_date in sorted_dates}
-
         return Response(grouped_data)
 
 
