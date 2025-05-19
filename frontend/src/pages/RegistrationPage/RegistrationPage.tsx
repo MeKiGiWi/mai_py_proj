@@ -86,7 +86,7 @@ function RegistrationPage() {
             {/* Поле username */}
             <div>
               <p className="text-left mx-3 mb-1 font-semibold">Придумайте логин</p>
-              <label className="input input-bordered flex items-center gap-2">
+              <label className="input input-bordered flex w-full items-center gap-2 has-[:autofill]:bg-base-100">
                 <UserIcon />
                 <input
                   type="text"
@@ -105,7 +105,7 @@ function RegistrationPage() {
             {/* Поле password */}
             <div>
               <p className="text-left mx-3 mb-1 font-semibold">Придумайте пароль</p>
-              <label className="input input-bordered flex items-center gap-2">
+              <label className="input input-bordered flex w-full items-center gap-2 has-[:autofill]:bg-base-100">
                 <PasswordIcon />
                 <input
                   type="password"
@@ -123,7 +123,7 @@ function RegistrationPage() {
 
             {/* Подтверждение пароля */}
             <div>
-              <label className="input input-bordered flex items-center gap-2">
+            <label className="input input-bordered flex w-full items-center gap-2 has-[:autofill]:bg-base-100">
                 <PasswordIcon />
                 <input
                   type="password"

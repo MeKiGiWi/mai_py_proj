@@ -70,7 +70,7 @@ function LoginPage() {
             {/* Поле username */}
             <div>
               <p className="text-left mx-3 mb-1 font-semibold">Логин</p>
-              <label className="input input-bordered flex items-center gap-2">
+              <label className="input input-bordered flex  w-full items-center gap-2 has-[:autofill]:bg-base-100">
                 <UserIcon />
                 <input
                   type="text"
@@ -89,7 +89,7 @@ function LoginPage() {
             {/* Поле password */}
             <div>
               <p className="text-left mx-3 mb-1 font-semibold">Пароль</p>
-              <label className="input input-bordered flex items-center gap-2">
+              <label className="input input-bordered flex w-full items-center gap-2 has-[:autofill]:bg-base-100">
                 <PasswordIcon />
                 <input
                   type="password"
