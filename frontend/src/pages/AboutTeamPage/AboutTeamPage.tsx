@@ -41,7 +41,7 @@ export default function AboutTeamPage() {
     },
     {
       name: 'Гуськов Алексей',
-      role: 'Backend Developer',
+      role: 'Frontend Developer',
       github: 'https://github.com/thebestprincess',
       telegram: 'https://t.me/the_best_pr1ncess',
     },
