@@ -4,7 +4,7 @@ backend/.env
 backend/mai_prod/db.sqlite3
 
 # React
-frontend/node_modules/
+**/node_modules/
 frontend/.env
 frontend/build/
 backend/mai_prod/accounts/__pycache__/views.cpython-312.pyc
@@ -14,7 +14,7 @@ backend/mai_prod/accounts/__pycache__/views.cpython-312.pyc
 __pycache__/
 *.py[cod]
 *.pyc
-frontend/package.json
 
 local_dump.dump
 **/package-lock.json
+./package-lock.json
