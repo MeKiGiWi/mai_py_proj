@@ -3,9 +3,11 @@ import PlanItTag from '../../components/PlanItTag';
 import { LoadingIcon } from '../../components/LoadingIcon';
 import { UserIcon } from '../LoginPage/components/UserIcon';
 import { PasswordIcon } from '../LoginPage/components/PasswordIcon';
+import { handleErrorValidator } from '../LoginPage/components/ErrorValidator';
 import { useState } from 'react';
 import ReCAPTCHA from 'react-google-recaptcha';
 import axios from 'axios';
+
 
 function RegistrationPage() {
   const [formData, setFormData] = useState<{
@@ -59,14 +61,7 @@ function RegistrationPage() {
         navigate('/login');
       }
     } catch (err) {
-      if (axios.isAxiosError(err)) {
-        const message = err.response?.data?.message;
-        setGeneralError(message || 'Неверные учетные данные');
-      } else if (err instanceof Error) {
-        setGeneralError(err.message);
-      } else {
-        setGeneralError('Неверные учетные данные');
-      }
+      setGeneralError(handleErrorValidator(err, {}));
     } finally {
       setIsLoading(false);
     }

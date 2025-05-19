@@ -4,9 +4,11 @@ import { PasswordIcon } from './components/PasswordIcon'
 import { UserIcon } from './components/UserIcon'
 import PlanItTag from '../../components/PlanItTag';
 import { LoadingIcon } from '../../components/LoadingIcon';
+import { handleErrorValidator } from './components/ErrorValidator';
 import { useState, useContext } from 'react';
 import axios from 'axios';
 import { AuthContext } from '../../contexts/Auth';
+
 
 function LoginPage() {
   const [formData, setFormData] = useState<{
@@ -41,14 +43,7 @@ function LoginPage() {
       await checkAuth();
       navigate('/schedule');
     } catch (err) {
-      if (axios.isAxiosError(err)) {
-        const message = err.response?.data?.message;
-        setGeneralError(message || 'Неверные учетные данные');
-      } else if (err instanceof Error) {
-        setGeneralError(err.message);
-      } else {
-        setGeneralError('Неверные учетные данные');
-      }
+      setGeneralError(handleErrorValidator(err, {}));
     } finally {
       setIsLoading(false);
     }
