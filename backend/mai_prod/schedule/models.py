@@ -28,9 +28,7 @@ class GroupLink(models.Model):
 class AbstractSchedule(models.Model):
 
     class Meta:
-        verbose_name = 'Abstract group schedule'
-        verbose_name_plural = 'Abstract groups schedule'
-        ordering = ['lesson_name']
+        ordering = ['group_name']
         abstract = True
 
     week = models.IntegerField(
@@ -70,33 +68,13 @@ class Schedule(AbstractSchedule):
     class Meta:
         verbose_name = 'Group schedule'
         verbose_name_plural = 'Groups schedule'
+        ordering = ['group_name']
 
-    group = models.ForeignKey(
+
+    group_name = models.ForeignKey(
         GroupLink,
         on_delete=models.CASCADE,
-        related_name='lessons',
-        null=True,
-    )
-
-
-class UserSchedule(AbstractSchedule):
-
-    class Meta:
-        verbose_name = 'User schedule'
-        verbose_name_plural = 'Users schedule'
-
-    group = models.ForeignKey(
-        GroupLink,
-        on_delete=models.CASCADE,
-        related_name='user_lessons',
-        null=True,
-    )    
-
-    user = models.ForeignKey(
-        User,
-        on_delete=models.CASCADE,
-        related_name='schedule',
-        null=True,
+        related_name='lessons'  
     )
 
 
@@ -105,7 +83,6 @@ class Notes(models.Model):
     class Meta:
         verbose_name = 'Note'
         verbose_name_plural = 'Notes'
-        ordering = ['user']
 
     user = models.ForeignKey(
         User,
@@ -116,10 +93,28 @@ class Notes(models.Model):
     note_content = models.TextField(
         'note_content',
         max_length=300,
-        null=True,
     )
 
     note_date = models.DateTimeField(
         'note_date',
-        null=True,
+    )
+
+
+class UserSchedule(AbstractSchedule):
+
+    class Meta:
+        verbose_name = 'User schedule'
+        verbose_name_plural = 'Users schedule'
+        ordering = ['user']
+
+    group_name = models.ForeignKey(
+        GroupLink,
+        on_delete=models.CASCADE,
+        related_name='custom_lessons',
+    )
+
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='schedules',
     )

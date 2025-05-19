@@ -13,7 +13,8 @@ backend/mai_prod/accounts/__pycache__/views.cpython-312.pyc
 .env
 __pycache__/
 *.py[cod]
-frontend/package-lock.json
+*.pyc
 frontend/package.json
-frontend/package-lock.json
-frontend/package.json
+
+local_dump.dump
+**/package-lock.json

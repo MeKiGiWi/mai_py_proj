@@ -3,6 +3,7 @@ import { Link } from 'react-router';
 import { useContext } from 'react';
 import { AuthContext } from '../../../contexts/Auth';
 import PlanItTag from '../../../components/PlanItTag';
+import Avatar from '../../../components/Avatar';
 
 interface NavbarStyles {
   top: string;
@@ -10,9 +11,11 @@ interface NavbarStyles {
 }
 
 export default function NavBarForHP(): React.ReactElement {
-  const { isAuth, logout } = useContext(AuthContext);
+  const { isAuth, logout, user } = useContext(AuthContext);
   const [top, setTop] = useState<number>(0);
   const prevScrollY = useRef<number>(0);
+  const lastVisiblePosition = useRef<number>(0);
+  const scrollThreshold = 100;
 
   useEffect(() => {
     const handleScroll = (): void => {
@@ -20,8 +23,10 @@ export default function NavBarForHP(): React.ReactElement {
 
       if (currentScrollY > prevScrollY.current && currentScrollY > 50) {
         setTop(-88); // Hide navbar while scrolling down
-      } else {
-        setTop(0); // Show navbar while scrolling up
+        lastVisiblePosition.current = currentScrollY;
+      } else if (lastVisiblePosition.current - currentScrollY > scrollThreshold) {
+        setTop(0); // Show navbar only after scrolling up more than threshold
+        lastVisiblePosition.current = currentScrollY;
       }
 
       prevScrollY.current = currentScrollY;
@@ -54,28 +59,8 @@ export default function NavBarForHP(): React.ReactElement {
               <PlanItTag />
             </Link>
           </div>
-          <div className='avatar'>
-            <div className='w-15 rounded-full border border-base-300'>
-              <Link to={'/schedule'} className='rounded-full'>
-                <svg
-                  className='absolute pr-4 mt-1 p text-neutral'
-                  fill='currentColor'
-                  height='45px'
-                  width='75px'
-                  viewBox='0 0 512 512'
-                >
-                  {/* Иконка профиля */}
-                </svg>
-              </Link>
-            </div>
-          </div>
-          <div className='ml-0.5 flex mt-3 text-accent'>
-            <button onClick={logout} className='btn btn-ghost btn-circle w-8 px-1 mx-1 mt-1.5'>
-              <svg fill='currentColor' height='800px' width='800px' viewBox='0 0 471.2 471.2'>
-                {/* Иконка выхода */}
-              </svg>
-            </button>
-          </div>
+
+          <Avatar panelHidden={top === -88} />
         </div>
       ) : (
         <div

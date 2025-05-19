@@ -1,9 +1,9 @@
-import axios from 'axios';
+import api from '../interceptors/api';
 import { startOfWeek, addWeeks, parseISO } from 'date-fns';
 
 export default async function getWeeksRange(): Promise<Date[]> {
   try {
-    const response = await axios.get('http://localhost:8000/api/metrics/?type=week-range');
+    const response = await api.get('metrics/?type=week-range');
     const startDate = parseISO(response.data[0]);
     const endDate = parseISO(response.data[1]);
 

@@ -32,7 +32,12 @@ export default function ScheduleTable({
   const getJSXTableCels = (timeSlots: { start: string; end: string }[]) => {
     return timeSlots.map((slot) => (
       <tr key={slot.start}>
-        <td className=' whitespace-nowrap max-w-1 bg-base-200 text-large font-semibold text-gray-500'>
+        <td
+          className={`border-l-0 ${slot.start != '20:00' ? 'border' : 'border-r'}
+          border-base-content/15
+            whitespace-nowrap max-w-1 bg-base-200 
+            text-large font-semibold text-gray-500`}
+        >
           {slot.start}
           <br />
           {slot.end}
@@ -44,14 +49,14 @@ export default function ScheduleTable({
           return (
             <td
               key={day}
-              className='cursor-pointer hover:bg-base-300 
-                    w-[170px] max-w-[130px] min-h-21.5 h-21.5
-                    break-words overflow-hidden p-2 align-top'
+              className={`${slot.start != '20:00' && 'border border-base-content/15'} border-l-0 border-r-0 
+                cursor-pointer hover:bg-base-300 w-[170px] max-w-[130px] 
+                min-h-21.5 h-21.5 break-words overflow-hidden p-2 align-top`}
               onClick={() => onCellClick(day, slot)}
             >
               {event ? (
                 <div className='flex flex-col gap-1 p-1'>
-                  <div className='text-sm text-gray-600 line-clamp-3 min-h-[60px] font-semibold'>
+                  <div className='text-balance text-gray-600 line-clamp-3  min-h-[60px] font-stretch-50% font-medium'>
                     {event.lesson_name}
                   </div>
                 </div>
@@ -59,7 +64,7 @@ export default function ScheduleTable({
                 // container without elements
                 <div className='min-h-[68px] p-1'></div>
               )}
-              <div className='divider'></div>
+              {/* <div className='divider'></div> */}
               {event && (
                 <div className='relative w-full h-2 mt-5'>
                   <div className='text-gray-500 btn btn-xs absolute bottom-0 left-0 hover:bg-base-200 hover:border-base-300 cursor-default'>
@@ -78,7 +83,7 @@ export default function ScheduleTable({
   };
 
   return (
-    <div className='border rounded-box border-base-content/5 bg-base-100'>
+    <div className='border rounded-box border-base-content/15 bg-base-100'>
       <table className='table max-w-full w-full overflow-hidden'>
         <thead className=''>
           <tr>

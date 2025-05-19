@@ -2,18 +2,26 @@ from collections import defaultdict
 from datetime import datetime, timedelta
 from django.shortcuts import render, get_object_or_404
 from django.db.models import Q
+from django.contrib.auth.models import User
 from rest_framework.views import APIView
 from rest_framework.request import Request
 from rest_framework.response import Response
+from django.core.exceptions import ValidationError
 from rest_framework import status
-from schedule.models import GroupLink, Schedule
-from .serializers import ScheduleSerializer
+from rest_framework.permissions import IsAuthenticated
+from schedule.models import GroupLink, Schedule, UserSchedule, Notes
+from .serializers import ScheduleSerializer, NoteSerializer
 from .utils.normalize_fullname import normalize_fullname
+from rest_framework.decorators import (
+    api_view,
+    permission_classes,
+)
 
 # Create your views here.
 
-
 class ScheduleAPIView(APIView):
+    permission_classes = [IsAuthenticated]
+
     def get(self, request: Request):
         params = request.query_params
         date_str = params.get("date")
@@ -39,36 +47,48 @@ class ScheduleAPIView(APIView):
                 status=status.HTTP_400_BAD_REQUEST
             )
         
-        query = Q()
+        start_date = input_date
+        end_date = start_date + timedelta(days=14)
         
+        query = Q(start_date__range=(start_date, end_date))
+
+        # query filter
         if 'group_name' in params:
-            group = get_object_or_404(GroupLink, group_name=params['group_name'])
-            query &= Q(group_name=group)
-        
+            group_id = get_object_or_404(GroupLink, group_name=params['group_name'])
+            query &= Q(group_name_id__exact=group_id)
+
         if 'teacher' in params:
             query &= Q(teacher__iexact=params['teacher'])
         
         if 'place' in params:
             query &= Q(place__iexact=params['place'])
         
-        start_date = input_date
-        end_date = start_date + timedelta(days=14)
-        
-        schedule = Schedule.objects.filter(
-            query,
-            start_date__range=(start_date, end_date)
-        ).order_by('start_date')
+        grouped_data = defaultdict(dict)
 
+        schedule = Schedule.objects.filter(query).order_by('start_date') # get schedule_data by filter
         serializer = ScheduleSerializer(schedule, many=True)
-        grouped_data = defaultdict(defaultdict)
-        for item in serializer.data:
-            key = item['start_date']
-            for item_key in item:
-                grouped_data[key][item_key] = item[item_key]
+        for event in serializer.data:
+            event_date = event['start_date']
+            grouped_data[event_date] = event
+
+        user_schedule = UserSchedule.objects.filter(query & Q(user_id=request.user.id)).order_by('start_date') # get userschedule_data by filter
+        if user_schedule.exists():
+            serializer = ScheduleSerializer(user_schedule, many=True)
+            for event in serializer.data:
+                event_date = event['start_date']
+                grouped_data[event_date] = event # if we need to rewrite data
+                # grouped_data[key].update( 
+                #     {key: value for key, value in item.items() if value is not None}
+                # )  # if we need to update data
+
+            grouped_data = dict(sorted(grouped_data.items()))
+
         return Response(grouped_data)
 
 
 class MetricsAPIView(APIView):
+    permission_classes = [IsAuthenticated]
+    
     def get(self, request: Request):
         type = request.query_params.get("type")
         if not type:
@@ -89,4 +109,127 @@ class MetricsAPIView(APIView):
         elif type == "week-range":
             metrics = Schedule.objects.values_list('start_date', flat=True).distinct()
             metrics = [min(metrics), max(metrics)]
+
+
         return Response(metrics)
+
+
+class NotesAPIView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request: Request): # get notes by date and user
+        date_str = request.query_params.get('date')
+
+        # date validation
+        if not date_str:
+            return Response(
+                {"error": "Параметр 'date' не передан"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        
+        try:
+            start_date = datetime.strptime(date_str, '%Y-%m-%d').date()
+        except ValueError:
+            return Response(
+                {"error": "Неверный формат 'date', требуется 'YYYY-MM-DD'"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        # get notes on 2 next weeks after start date
+        end_date = start_date + timedelta(days=14)
+
+        grouped_data = defaultdict(dict)
+
+        notes = Notes.objects.filter(
+            note_date__range=(start_date, end_date), 
+            user_id=request.user.id
+        ).order_by('note_date') 
+
+        # get notes in our time period
+        if notes.exists():
+            serializer = NoteSerializer(notes, many=True)
+            for note in serializer.data:
+                note_date = note['note_date']
+                note_content = note['note_content']
+                grouped_data[note_date] = note_content
+
+        return Response(grouped_data)
+
+
+    def delete(self, request: Request): # delete note by exact time and user, if exists
+        date_str = request.query_params.get('date')
+
+        # date validation
+        if not date_str:
+            return Response(
+                {"error": "Параметр 'date' не передан"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        
+        try:
+            start_date = datetime.strptime(date_str, '%Y-%m-%dT%H:%M:%SZ')
+        except ValueError:
+            return Response(
+                {"error": "Неверный формат 'date', требуется 'yyyy-mm-ddThh:mm:ssZ'"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        # delete note if exists
+        note = get_object_or_404(Notes, note_date=start_date, user=request.user)
+        note.delete()
+
+        return Response(
+            {"message": f"Заметка на {date_str} успешно удалена"},
+            status=status.HTTP_200_OK,
+        )
+
+
+    def put(self, request: Request): # create new note or change old note on exact time
+        date_str = request.data.get('date')
+
+        # date validation
+        if not date_str:
+            return Response(
+                {"error": "Параметр 'date' не передан"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        
+        try:
+            note_date = datetime.strptime(date_str, '%Y-%m-%dT%H:%M:%SZ')
+        except ValueError:
+            return Response(
+                {"error": "Неверный формат 'date', требуется 'yyyy-mm-ddThh:mm:ssZ'"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        
+        note_content = request.data.get('note_content')
+
+        # note_content validation
+        if not note_content:
+            return Response(
+                {"error": "Параметр 'note_content' не передан"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+
+        try: # check if note on this date exists
+            note = Notes.objects.get(user=request.user, note_date=note_date)
+            note.note_content = note_content
+            note.save()
+
+            return Response(
+                {"message": f"Заметка на {date_str} успешно обновлена"},
+                status=status.HTTP_200_OK,
+            )
+        except Notes.DoesNotExist: 
+            # create new note on this date
+            note = Notes.objects.create(
+                user=request.user,
+                note_date=note_date,
+                note_content=note_content,
+            )
+
+            return Response(
+                {"message": f"Заметка на {date_str} успешно создана"},
+                status=status.HTTP_201_CREATED,
+            )

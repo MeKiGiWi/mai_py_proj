@@ -1,0 +1,72 @@
+services:
+  frontend:
+    build: ./frontend
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./frontend:/app/frontend
+      - /app/frontend/node_modules
+    environment:
+      VITE_API_URL: http://localhost:8000/api/
+    depends_on:
+      - backend
+    networks:
+      - mai_network
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    working_dir: /app/mai_prod
+    volumes:
+      - ./backend:/app
+    ports:
+      - "8000:8000"
+    environment:
+      DB_NAME: ${DB_NAME}
+      DB_USER: ${ADMIN_NAME}
+      DB_PASSWORD: ${ADMIN_PASSWORD}
+      DB_HOST: db
+      DB_PORT: 5432
+      RECAPTCHA_SECRET_KEY: ${RECAPTCHA_SECRET_KEY}
+    command: sh -c "python manage.py migrate && python manage.py runserver 0.0.0.0:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - mai_network
+
+  db:
+    image: docker.io/postgres:17-alpine
+    environment:
+      POSTGRES_USER: ${ADMIN_NAME}
+      POSTGRES_PASSWORD: ${ADMIN_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $ADMIN_NAME -d $POSTGRES_DB"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - mai_network
+  pgadmin4:
+    image: docker.io/elestio/pgadmin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${ADMIN_EMAIL}
+      PGADMIN_DEFAULT_PASSWORD: ${ADMIN_PASSWORD}
+      PGADMIN_LISTEN_PORT: 8080
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./servers.json:/pgadmin4/servers.json
+    networks:
+      - mai_network
+
+volumes:
+  postgres_data:
+
+networks:
+  mai_network:
+    name: mai_network
