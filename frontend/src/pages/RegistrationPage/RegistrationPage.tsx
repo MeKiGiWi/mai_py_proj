@@ -8,13 +8,14 @@ import { useState } from 'react';
 import ReCAPTCHA from 'react-google-recaptcha';
 import axios from 'axios';
 
+type formType = {
+  username: string;
+  password: string;
+  confirmPassword: string;
+}
 
 function RegistrationPage() {
-  const [formData, setFormData] = useState<{
-    username: string;
-    password: string;
-    confirmPassword: string;
-  }>({
+  const [formData, setFormData] = useState<formType>({
     username: '',
     password: '',
     confirmPassword: ''

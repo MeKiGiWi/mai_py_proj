@@ -9,12 +9,13 @@ import { useState, useContext } from 'react';
 import axios from 'axios';
 import { AuthContext } from '../../contexts/Auth';
 
+type formType = {
+  username: string;
+  password: string;
+}
 
 function LoginPage() {
-  const [formData, setFormData] = useState<{
-    username: string;
-    password: string;
-  }>({
+  const [formData, setFormData] = useState<formType>({
     username: '',
     password: ''
   });
