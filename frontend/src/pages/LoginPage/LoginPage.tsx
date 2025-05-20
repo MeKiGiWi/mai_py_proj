@@ -44,7 +44,7 @@ function LoginPage() {
       await checkAuth();
       navigate('/schedule');
     } catch (err) {
-      setGeneralError(handleErrorValidator(err, {}));
+      setGeneralError(handleErrorValidator(err));
     } finally {
       setIsLoading(false);
     }

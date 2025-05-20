@@ -1,15 +1,9 @@
 import axios from 'axios';
 
-type ErrorHandlingConfig = {
-  defaultMessage?: string;
-};
-
 export const handleErrorValidator = (
-  error: unknown, 
-  config: ErrorHandlingConfig = {}
+  error: unknown,
+  defaultMessage: string = 'Неверные учетные данные'
 ): string => {
-  const { defaultMessage = 'Неверные учетные данные' } = config;
-
   if (axios.isAxiosError(error)) {
     return error.response?.data?.message || defaultMessage;
   }

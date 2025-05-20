@@ -62,7 +62,7 @@ function RegistrationPage() {
         navigate('/login');
       }
     } catch (err) {
-      setGeneralError(handleErrorValidator(err, {}));
+      setGeneralError(handleErrorValidator(err));
     } finally {
       setIsLoading(false);
     }
