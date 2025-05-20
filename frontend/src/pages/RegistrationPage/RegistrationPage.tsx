@@ -1,63 +1,30 @@
 import { Link, useNavigate } from 'react-router';
 import PlanItTag from '../../components/PlanItTag';
 import { LoadingIcon } from '../../components/LoadingIcon';
+import { UserIcon } from '../LoginPage/components/UserIcon';
+import { PasswordIcon } from '../LoginPage/components/PasswordIcon';
+import { handleErrorValidator } from '../LoginPage/components/ErrorValidator';
 import { useState } from 'react';
 import ReCAPTCHA from 'react-google-recaptcha';
 import axios from 'axios';
 
+type formType = {
+  username: string;
+  password: string;
+  confirmPassword: string;
+}
+
 function RegistrationPage() {
-  const [formData, setFormData] = useState<{
-    username: string;
-    password: string;
-    confirmPassword: string;
-  }>({
+  const [formData, setFormData] = useState<formType>({
     username: '',
     password: '',
     confirmPassword: ''
   });
 
-  const [generalError, setGeneralError] = useState('');
-  const [captchaToken, setCaptchaToken] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
+  const [generalError, setGeneralError] = useState<string>('');
+  const [captchaToken, setCaptchaToken] = useState<string>('');
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const navigate = useNavigate();
-
-  const UserIcon = () => (
-    <svg
-      className="h-[1em] opacity-50"
-      xmlns="http://www.w3.org/2000/svg"
-      viewBox="0 0 24 24"
-    >
-      <g
-        strokeLinejoin="round"
-        strokeLinecap="round"
-        strokeWidth="2.5"
-        fill="none"
-        stroke="currentColor"
-      >
-        <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" />
-        <circle cx="12" cy="7" r="4" />
-      </g>
-    </svg>
-  );
-
-  const PasswordIcon = () => (
-    <svg
-      className="h-[1em] opacity-50"
-      xmlns="http://www.w3.org/2000/svg"
-      viewBox="0 0 24 24"
-    >
-      <g
-        strokeLinejoin="round"
-        strokeLinecap="round"
-        strokeWidth="2.5"
-        fill="none"
-        stroke="currentColor"
-      >
-        <path d="M2.586 17.414A2 2 0 0 0 2 18.828V21a1 1 0 0 0 1 1h3a1 1 0 0 0 1-1v-1a1 1 0 0 1 1-1h1a1 1 0 0 0 1-1v-1a1 1 0 0 1 1-1h.172a2 2 0 0 0 1.414-.586l.814-.814a6.5 6.5 0 1 0-4-4z" />
-        <circle cx="16.5" cy="7.5" r=".5" fill="currentColor" />
-      </g>
-    </svg>
-  );
 
   // sending post response to backend
   const handleSubmit = async (e: React.FormEvent) => {
@@ -95,8 +62,7 @@ function RegistrationPage() {
         navigate('/login');
       }
     } catch (err) {
-      console.error('Полный объект ошибки:', err);
-      setGeneralError(err.response?.data?.message || 'Ошибка при регистрации');
+      setGeneralError(handleErrorValidator(err));
     } finally {
       setIsLoading(false);
     }
@@ -116,7 +82,7 @@ function RegistrationPage() {
             {/* Поле username */}
             <div>
               <p className="text-left mx-3 mb-1 font-semibold">Придумайте логин</p>
-              <label className="input input-bordered flex items-center gap-2">
+              <label className="input input-bordered flex w-full items-center gap-2 has-[:autofill]:bg-base-100">
                 <UserIcon />
                 <input
                   type="text"
@@ -135,7 +101,7 @@ function RegistrationPage() {
             {/* Поле password */}
             <div>
               <p className="text-left mx-3 mb-1 font-semibold">Придумайте пароль</p>
-              <label className="input input-bordered flex items-center gap-2">
+              <label className="input input-bordered flex w-full items-center gap-2 has-[:autofill]:bg-base-100">
                 <PasswordIcon />
                 <input
                   type="password"
@@ -153,7 +119,7 @@ function RegistrationPage() {
 
             {/* Подтверждение пароля */}
             <div>
-              <label className="input input-bordered flex items-center gap-2">
+            <label className="input input-bordered flex w-full items-center gap-2 has-[:autofill]:bg-base-100">
                 <PasswordIcon />
                 <input
                   type="password"
