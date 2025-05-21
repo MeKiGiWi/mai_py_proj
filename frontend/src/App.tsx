@@ -4,8 +4,6 @@ import { lazy, Suspense } from 'react';
 import HomePage from './pages/HomePage';
 import LoginPage from './pages/LoginPage';
 import RegistrationPage from './pages/RegistrationPage';
-// import SchedulePage from './pages/SchedulePage';
-// import AboutTeamPage from './pages/AboutTeamPage';
 import ProtectedRoute from './components/ProtectedRoute';
 import RepeatLoginProtectedRoute from './components/RepeatLoginProtectedRoute';
 
