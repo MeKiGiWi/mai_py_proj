@@ -1,15 +1,14 @@
-export default function ExportButton() {
+type ExportButtonProps = {
+  onClick: () => void;
+};
+
+export default function ExportButton({ onClick }: ExportButtonProps) {
   return (
     <div className='flex gap-2 my-4'>
       <div>
         <button
           className='btn btn-accent gap-2'
-          onClick={() => {
-            const modal = document.getElementById('export_modal');
-            if (modal) {
-              (modal as HTMLDialogElement).showModal();
-            }
-          }}
+          onClick={onClick}
         >
           Экспорт
           <svg xmlns='http://www.w3.org/2000/svg' className='h-5 w-5' viewBox='0 0 24 24'>

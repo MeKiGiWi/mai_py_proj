@@ -1,22 +1,31 @@
 import { addDays, addWeeks, format } from 'date-fns';
+import type { TCurrentFilters, TCurrentMetrics } from '../types';
 
 type WeeksDropDownProps = {
   activeWeek: number;
-  setActiveWeek: React.Dispatch<React.SetStateAction<number>>;
-  cycleStartDate: Date;
-  setCycleStartDate: React.Dispatch<React.SetStateAction<Date>>;
-  weeks: Date[];
+  currentFilters: TCurrentFilters;
+  currentMetrics: TCurrentMetrics;
   isLoading: boolean;
+  setActiveWeek: React.Dispatch<React.SetStateAction<number>>;
+  onDateChange: (newDate: Date) => void;
 };
 
 export default function WeeksDropDown({
   activeWeek,
-  setActiveWeek,
-  cycleStartDate,
-  setCycleStartDate,
-  weeks,
+  currentFilters,
+  currentMetrics,
   isLoading,
+  setActiveWeek,
+  onDateChange,
 }: WeeksDropDownProps) {
+  const handleWeekSelect = (week: Date, index: number) => {
+    const newActiveWeek = (index % 2) + 1;
+    const calculatedDate = addWeeks(week, -(index % 2));
+    
+    setActiveWeek(newActiveWeek);
+    onDateChange(calculatedDate);
+  };
+
   return (
     <div className='dropdown dropdown-hover'>
       <div tabIndex={0} role='button' className='btn m-1'>
@@ -40,24 +49,26 @@ export default function WeeksDropDown({
         grid grid-cols-1 gap-1'
       >
         {isLoading ? (
-          <li>
-            <span>Загрузка...</span>
-          </li>
-        ) : (
-          weeks.map((week, index) => (
-            <li key={week.toISOString()} className='w-full items-center'>
-              <a
-                onClick={() => {
-                  setActiveWeek((index % 2) + 1);
-                  const date = addWeeks(week, -(index % 2));
-                  setCycleStartDate(date);
-                }}
-              >
+          <li><span>Загрузка...</span></li>
+        ) : currentMetrics.weeks?.map((week, index) => (
+          <li key={week.toISOString()}>
+            <button 
+              className={`${
+                currentFilters.cycleStartDate.getTime() === week.getTime() 
+                ? 'bg-base-200 font-semibold' 
+                : ''
+              } hover:bg-base-200 p-2 rounded text-left`}
+              onClick={() => handleWeekSelect(week, index)}
+            >
+              <span className='text-sm'>
                 {format(week, 'dd.MM')} - {format(addDays(week, 6), 'dd.MM')}
-              </a>
-            </li>
-          ))
-        )}
+              </span>
+              <div className='text-xs text-gray-500 mt-1'>
+                Неделя {(index % 2) + 1}
+              </div>
+            </button>
+          </li>
+        ))}
       </ul>
     </div>
   );
