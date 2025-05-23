@@ -1,8 +1,37 @@
 from django.db import models
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-from django.contrib.auth.models import User
+from django.contrib.auth.models import AbstractUser, User
+
 # Create your models here.
+
+class CustomUser(AbstractUser):
+    
+    class Meta:
+        verbose_name = 'Custom user'
+        verbose_name_plural = 'Custom users'
+
+    groups = models.ManyToManyField(
+        'auth.Group',
+        verbose_name='groups',
+        blank=True,
+        related_name="customuser_set",
+        related_query_name="customuser",
+    )
+
+    user_permissions = models.ManyToManyField(
+        'auth.Permission',
+        verbose_name='user permissions',
+        blank=True,
+        related_name="customuser_set",
+        related_query_name="customuser",
+    )    
+
+    credentials = models.JSONField(
+        'credentials',
+        null=True,
+    )
+
 
 class GroupLink(models.Model):
 
@@ -13,7 +42,7 @@ class GroupLink(models.Model):
 
     group_name = models.CharField(
         'group_name', 
-        max_length=100
+        max_length=100,
     )
 
     url = models.URLField(
@@ -75,7 +104,7 @@ class Schedule(AbstractSchedule):
     group_name = models.ForeignKey(
         GroupLink,
         on_delete=models.CASCADE,
-        related_name='lessons'  
+        related_name='lessons', 
     )
 
 
