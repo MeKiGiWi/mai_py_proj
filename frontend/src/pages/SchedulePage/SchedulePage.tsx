@@ -47,6 +47,7 @@ export default function SchedulePage() {
   const [cycleStartDate, setCycleStartDate] = useState(() =>
     startOfWeek(new Date(), { weekStartsOn: 1 }),
   );
+  const [isExportModalOpen, setIsExportModalOpen] = useState(false);
 
   useEffect(() => {
     const fetchInitialData = async () => {
@@ -139,8 +140,8 @@ export default function SchedulePage() {
   };
 
   useEffect(() => {
-    console.log(selectedGroup);
-  }, [selectedGroup]);
+    console.log(isExportModalOpen);
+  }, [isExportModalOpen]);
 
   return (
     <>
@@ -165,7 +166,8 @@ export default function SchedulePage() {
             setSelectedPlace={setSelectedPlace}
           />
 
-          <ExportButton />
+          <ExportButton onClick={() => setIsExportModalOpen(true)} />
+          <ExportModal open={isExportModalOpen} onClose={() => setIsExportModalOpen(false)} />
 
           <ScheduleTable
             timeSlots={timeSlots}
@@ -180,7 +182,7 @@ export default function SchedulePage() {
 
         <EventModal selectedCell={selectedCell} addEvent={addEvent} />
 
-        <ExportModal />
+
       </div>
     </>
   );
