@@ -1,19 +1,21 @@
+import type { TCurrentMetrics } from '../types';
+
 type FiltersDropdownProps = {
-  groups: string[];
-  teachers: string[];
-  places: string[];
-  handleGroupClick: (group: string) => void;
-  handleTeacherClick: (teacher: string) => void;
-  handlePlaceClick: (place: string) => void;
+  filters: Pick<TCurrentMetrics, 'groups' | 'teachers' | 'places'>;
+  onSelect: {
+    group: (group: string) => void;
+    teacher: (teacher: string) => void;
+    place: (place: string) => void;
+  };
 };
 
 export default function FiltersDropdown({
-  groups,
-  teachers,
-  places,
-  handleGroupClick,
-  handleTeacherClick,
-  handlePlaceClick,
+  filters: { groups, teachers, places },
+  onSelect: { 
+    group: handleGroupClick, 
+    teacher: handleTeacherClick, 
+    place: handlePlaceClick 
+  }
 }: FiltersDropdownProps) {
   return (
     <div className='dropdown relative'>
@@ -27,6 +29,7 @@ export default function FiltersDropdown({
       </div>
 
       <ul className='dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-48'>
+        {/* Группы */}
         <li className='dropdown dropdown-right'>
           <div tabIndex={0} role='button' className='flex justify-between'>
             <span>Группа</span>
@@ -44,6 +47,7 @@ export default function FiltersDropdown({
           </ul>
         </li>
 
+        {/* Преподаватели */}
         <li className='dropdown dropdown-right'>
           <div tabIndex={0} role='button' className='flex justify-between'>
             <span>Преподаватель</span>
@@ -61,6 +65,7 @@ export default function FiltersDropdown({
           </ul>
         </li>
 
+        {/* Аудитории */}
         <li className='dropdown dropdown-right'>
           <div tabIndex={0} role='button' className='flex justify-between'>
             <span>Аудитория</span>

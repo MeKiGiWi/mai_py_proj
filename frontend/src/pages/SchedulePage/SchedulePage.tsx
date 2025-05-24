@@ -9,6 +9,7 @@ import NotesPanel from './components/NotesPanel';
 import EventModal from './components/EventModal';
 import ExportModal from './components/ExportModal';
 import ExportButton from './components/ExportButton';
+import type { TEvent, TCell, TCurrentFilters, TCurrentMetrics, TNotesState } from './types';
 
 import api from '../../interceptors/api';
 
@@ -17,53 +18,54 @@ const WORKDAY_END = 22 * 60; // 22:00 в минутах
 const TIME_SLOT_DURATION = 90; // Длительность слота в минутах
 const BREAK_DURATION = 15; // Длительность перерыва
 
-export type TEvent = {
-  group_name: string | null;
-  lesson_name: string | null;
-  lesson_type: string | null;
-  teacher: string | null;
-  place: string | null;
-  start_date: string | null;
-};
-
 export default function SchedulePage() {
-  const [activeWeek, setActiveWeek] = useState(1);
-  const [selectedCell, setSelectedCell] = useState<{
-    day: string;
-    start: string;
-    end: string;
-  } | null>(null);
+  const [currentFilters, setCurrentFilters] = useState<TCurrentFilters>({
+    activeWeek: 1,
+    selectedGroup: null,
+    selectedTeacher: null,
+    selectedPlace: null,
+    cycleStartDate: startOfWeek(new Date(), { weekStartsOn: 1 }),
+  });
+
+  const [currentMetrics, setCurrentMetrics] = useState<TCurrentMetrics>({
+    weeks: [],
+    teachers: [],
+    places: [],
+    groups: [],
+  });
+
+  const [notesState, setNotesState] = useState<TNotesState>({
+    list: [],
+    newNote: '',
+  });
+
+  const [selectedCell, setSelectedCell] = useState<TCell | null>(null);
   const [events, setEvents] = useState<Record<string, TEvent>>({});
-  const [notes, setNotes] = useState<string[]>([]);
-  const [newNote, setNewNote] = useState('');
-  const [weeks, setWeeks] = useState<Date[]>([]);
-  const [teachers, setTeachers] = useState<string[]>([]);
-  const [places, setPlaces] = useState<string[]>([]);
-  const [groups, setGroups] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [selectedGroup, setSelectedGroup] = useState<string | null>(null);
-  const [selectedTeacher, setSelectedTeacher] = useState<string | null>(null);
-  const [selectedPlace, setSelectedPlace] = useState<string | null>(null);
-  const [cycleStartDate, setCycleStartDate] = useState(() =>
-    startOfWeek(new Date(), { weekStartsOn: 1 }),
-  );
 
   useEffect(() => {
     const fetchInitialData = async () => {
       try {
         const [weeksData, teachersData, placesData, groupsData] = await Promise.all([
           getWeeksRange(),
-          api.get('metrics/', { params: { type: 'teacher' } }),
-          api.get('metrics/', { params: { type: 'place' } }),
-          api.get('metrics/', { params: { type: 'group' } }),
+          api.get('metrics/?type=teacher'),
+          api.get('metrics/?type=place'),
+          api.get('metrics/?type=group'),
         ]);
 
-        setWeeks(weeksData);
-        setTeachers(teachersData.data);
-        setPlaces(placesData.data);
-        setGroups(groupsData.data);
-        setSelectedGroup(groupsData.data[0] || null);
+        setCurrentMetrics({
+          weeks: weeksData,
+          teachers: teachersData.data,
+          places: placesData.data,
+          groups: groupsData.data,
+        });
+
+        setCurrentFilters(prev => ({
+          ...prev,
+          selectedGroup: groupsData.data[0] || null,
+        }));
       } catch (error) {
+        console.error('Error fetching initial data:', error);
       } finally {
         setIsLoading(false);
       }
@@ -95,17 +97,17 @@ export default function SchedulePage() {
     }
 
     return slots;
-  }, []);
+  }, [formatTime]);
 
   useEffect(() => {
     const fetchEvents = async () => {
       try {
         const { data } = await api.get('schedule/', {
           params: {
-            group_name: selectedGroup,
-            date: format(cycleStartDate, 'yyyy-MM-dd'),
-            teacher: selectedTeacher,
-            place: selectedPlace,
+            group_name: currentFilters.selectedGroup,
+            date: format(currentFilters.cycleStartDate, 'yyyy-MM-dd'),
+            teacher: currentFilters.selectedTeacher,
+            place: currentFilters.selectedPlace,
           },
         });
         setEvents(data);
@@ -115,32 +117,32 @@ export default function SchedulePage() {
     };
 
     fetchEvents();
-  }, [selectedGroup, cycleStartDate, selectedPlace, selectedTeacher]);
+  }, [currentFilters]);
 
   const handleCellClick = (day: string, slot: { start: string; end: string }) => {
     setSelectedCell({ day, ...slot });
-    if (document.getElementById('event_modal')) {
-      (document.getElementById('event_modal') as HTMLDialogElement)?.showModal();
-    }
+    (document.getElementById('event_modal') as HTMLDialogElement)?.showModal();
   };
 
-  const addEvent = (eventData: any) => {
-    if (selectedCell) {
-      const key = `${activeWeek}-${selectedCell.day}-${selectedCell.start}`;
-      setEvents((prev) => ({ ...prev, [key]: eventData }));
-    }
+  const addEvent = (cell: TCell, eventData: Omit<TEvent, "start_date">) => {
+    const key = `${currentFilters.activeWeek}-${cell.day}-${cell.start}`;
+    setEvents(prev => ({
+      ...prev,
+      [key]: {
+        ...eventData,
+        start_date: new Date().toISOString()
+      }
+    }));
   };
 
   const addNote = () => {
-    if (newNote.trim()) {
-      setNotes((prev: string[]) => [...prev, newNote]);
-      setNewNote('');
+    if (notesState.newNote.trim()) {
+      setNotesState(prev => ({
+        list: [...prev.list, prev.newNote],
+        newNote: '',
+      }));
     }
   };
-
-  useEffect(() => {
-    console.log(selectedGroup);
-  }, [selectedGroup]);
 
   return (
     <>
@@ -148,37 +150,37 @@ export default function SchedulePage() {
       <div className='flex min-h-screen bg-base-200 p-4 gap-4'>
         <div className='flex-1 bg-base-100 rounded-box p-4'>
           <ScheduleHeader
-            activeWeek={activeWeek}
-            setActiveWeek={setActiveWeek}
-            cycleStartDate={cycleStartDate}
-            setCycleStartDate={setCycleStartDate}
-            weeks={weeks}
+            currentFilters={currentFilters}
+            currentMetrics={currentMetrics}
             isLoading={isLoading}
-            groups={groups}
-            teachers={teachers}
-            places={places}
-            selectedGroup={selectedGroup}
-            selectedTeacher={selectedTeacher}
-            selectedPlace={selectedPlace}
-            setSelectedGroup={setSelectedGroup}
-            setSelectedTeacher={setSelectedTeacher}
-            setSelectedPlace={setSelectedPlace}
+            setCurrentFilters={setCurrentFilters}
           />
 
           <ExportButton />
 
           <ScheduleTable
-            timeSlots={timeSlots}
-            events={events}
-            activeWeek={activeWeek}
-            cycleStartDate={cycleStartDate}
+            scheduleData={{
+              timeSlots: timeSlots,
+              events: events
+            }}
+            filters={{
+              activeWeek: currentFilters.activeWeek, // Передаем activeWeek
+              cycleStartDate: currentFilters.cycleStartDate
+            }}
             onCellClick={handleCellClick}
           />
         </div>
 
-        <NotesPanel notes={notes} newNote={newNote} setNewNote={setNewNote} addNote={addNote} />
+        <NotesPanel
+          notesState={notesState}
+          setNotesState={setNotesState}
+          addNote={addNote}
+        />
 
-        <EventModal selectedCell={selectedCell} addEvent={addEvent} />
+        <EventModal 
+          selectedCell={selectedCell} 
+          addEvent={addEvent}
+        />
 
         <ExportModal />
       </div>

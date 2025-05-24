@@ -1,12 +1,18 @@
-type EventModalProps = {};
+import type { TCell, TEvent } from '../types';
 
-export default function EventModal({ selectedCell, addEvent }) {
+type EventModalProps = {
+  selectedCell: TCell | null;
+  addEvent: (cell: TCell, event: Omit<TEvent, 'start_date'> & { color: string }) => void;
+};
+
+export default function EventModal({ selectedCell, addEvent }: EventModalProps) {
   return (
     <dialog id='event_modal' className='modal'>
       <div className='modal-box'>
         <h3 className='font-bold text-lg mb-4'>
           Событие: {selectedCell?.day} {selectedCell?.start} - {selectedCell?.end}
         </h3>
+        
         <div className='form-control mt-6'>
           <label className='label'>
             <span className='label-text mr-2'>Название</span>
@@ -24,7 +30,18 @@ export default function EventModal({ selectedCell, addEvent }) {
               <button
                 key={color}
                 className={`badge ${color} gap-2`}
-                onClick={() => addEvent({ color })}
+                onClick={() => {
+                  if (selectedCell) {
+                    addEvent(selectedCell, {
+                      color,
+                      group_name: null,
+                      lesson_name: null,
+                      lesson_type: null,
+                      teacher: null,
+                      place: null
+                    });
+                  }
+                }}
               >
                 █
               </button>
@@ -47,7 +64,9 @@ export default function EventModal({ selectedCell, addEvent }) {
       </div>
 
       <form method='dialog' className='modal-backdrop'>
-        <button onClick={() => document.getElementById('event_modal').close()}>Закрыть</button>
+        <button onClick={() => (document.getElementById('event_modal') as HTMLDialogElement)?.close()}>
+          Закрыть
+        </button>
       </form>
     </dialog>
   );

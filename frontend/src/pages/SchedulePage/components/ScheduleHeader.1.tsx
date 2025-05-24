@@ -2,53 +2,31 @@ import { addWeeks, addDays, format } from 'date-fns';
 import CurrentFilters from './CurrentFilters';
 import FiltersDropdown from './FiltersDropdown';
 import WeeksDropDown from './WeeksDropDown';
+import type { TCurrentFilters, TCurrentMetrics } from '../types';
 
 type ScheduleHeaderProps = {
-  activeWeek: number;
-  setActiveWeek: React.Dispatch<React.SetStateAction<number>>;
-  cycleStartDate: Date;
-  setCycleStartDate: React.Dispatch<React.SetStateAction<Date>>;
-  selectedGroup: string | null;
-  selectedTeacher: string | null;
-  selectedPlace: string | null;
-  setSelectedGroup: React.Dispatch<React.SetStateAction<string | null>>;
-  setSelectedTeacher: React.Dispatch<React.SetStateAction<string | null>>;
-  setSelectedPlace: React.Dispatch<React.SetStateAction<string | null>>;
-  weeks: Date[];
+  currentFilters: TCurrentFilters;
+  currentMetrics: TCurrentMetrics;
   isLoading: boolean;
-  groups: string[];
-  teachers: string[];
-  places: string[];
+  setCurrentFilters: React.Dispatch<React.SetStateAction<TCurrentFilters>>;
 };
 
 export default function ScheduleHeader({
-  activeWeek,
-  setActiveWeek,
-  cycleStartDate,
-  setCycleStartDate,
-  selectedGroup,
-  selectedTeacher,
-  selectedPlace,
-  setSelectedGroup,
-  setSelectedTeacher,
-  setSelectedPlace,
-  weeks,
+  currentFilters,
+  currentMetrics,
   isLoading,
-  groups,
-  teachers,
-  places,
+  setCurrentFilters,
 }: ScheduleHeaderProps) {
-  const handleGroupClick = (group: string) => {
-    setSelectedGroup(group);
+  const { activeWeek, cycleStartDate, selectedGroup, selectedTeacher, selectedPlace } = currentFilters;
+  const { weeks, groups, teachers, places } = currentMetrics;
+
+  const handleFiltersUpdate = (update: Partial<TCurrentFilters>) => {
+    setCurrentFilters(prev => ({
+      ...prev,
+      ...update
+    }));
   };
 
-  const handleTeacherClick = (teacher: string) => {
-    setSelectedTeacher(teacher);
-  };
-
-  const handlePlaceClick = (place: string) => {
-    setSelectedPlace(place);
-  };
   const getWeekRange = (weekNumber: number) => {
     const weekStart = addWeeks(cycleStartDate, weekNumber - 1);
     const weekEnd = addDays(weekStart, 6);
@@ -57,13 +35,12 @@ export default function ScheduleHeader({
 
   return (
     <div className='flex items-center gap-4 mb-4 relative'>
-      {/* Week tabs */}
       <div className='tabs tabs-boxed bg-base-200'>
         {[1, 2].map((week) => (
           <button
             key={week}
             className={`tab tab-lg ${activeWeek === week ? 'tab-active' : ''}`}
-            onClick={() => setActiveWeek(week)}
+            onClick={() => handleFiltersUpdate({ activeWeek: week })}
           >
             Неделя {week} ({getWeekRange(week)})
           </button>
@@ -71,30 +48,28 @@ export default function ScheduleHeader({
       </div>
 
       <WeeksDropDown
-        activeWeek={activeWeek}
-        setActiveWeek={setActiveWeek}
-        cycleStartDate={cycleStartDate}
-        setCycleStartDate={setCycleStartDate}
-        weeks={weeks}
-        isLoading={isLoading}
+        weekData={{
+          weeks: weeks,
+          isLoading: isLoading
+        }}
+        onWeekChange={{
+          setActiveWeek: (week) => handleFiltersUpdate({ activeWeek: week }),
+          setCycleStartDate: (date) => handleFiltersUpdate({ cycleStartDate: date })
+        }}
       />
 
       <FiltersDropdown
-        groups={groups}
-        teachers={teachers}
-        places={places}
-        handleGroupClick={handleGroupClick}
-        handleTeacherClick={handleTeacherClick}
-        handlePlaceClick={handlePlaceClick}
+        filters={{ groups, teachers, places }}
+        onSelect={{
+          group: (group) => handleFiltersUpdate({ selectedGroup: group }),
+          teacher: (teacher) => handleFiltersUpdate({ selectedTeacher: teacher }),
+          place: (place) => handleFiltersUpdate({ selectedPlace: place })
+        }}
       />
 
       <CurrentFilters
-        selectedGroup={selectedGroup}
-        selectedTeacher={selectedTeacher}
-        selectedPlace={selectedPlace}
-        setSelectedGroup={setSelectedGroup}
-        setSelectedTeacher={setSelectedTeacher}
-        setSelectedPlace={setSelectedPlace}
+        currentFilters={{ selectedGroup, selectedTeacher, selectedPlace }}
+        setCurrentFilters={handleFiltersUpdate}
       />
     </div>
   );
