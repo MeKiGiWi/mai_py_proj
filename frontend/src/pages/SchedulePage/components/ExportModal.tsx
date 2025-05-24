@@ -3,10 +3,10 @@ import GoogleIcon from '@/components/GoogleIcon';
 
 export default function ExportModal({
   open,
-  onClose
+  onClose,
 }: {
   open: boolean;
-  onClose: () => void
+  onClose: () => void;
 }) {
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
@@ -20,19 +20,21 @@ export default function ExportModal({
       const dateString = date.toLocaleDateString('ru-RU', {
         day: 'numeric',
         month: 'long',
-        weekday: 'short'
+        weekday: 'short',
       });
       options.push(
         <option key={i} value={date.toISOString()}>
           {dateString}
-        </option>
+        </option>,
       );
     }
     return options;
   };
 
   const handleExport = (type: 'calendar' | 'sheets') => {
-    console.log(`Экспорт в Google ${type === 'calendar' ? 'Календарь' : 'Таблицы'}`);
+    console.log(
+      `Экспорт в Google ${type === 'calendar' ? 'Календарь' : 'Таблицы'}`,
+    );
     onClose();
   };
 
@@ -41,7 +43,7 @@ export default function ExportModal({
   return (
     <div className="modal modal-open">
       <div
-        className="modal-box w-11/12 max-w-5xl relative"
+        className="modal-box w-2xl max-w-5xl relative"
         onClick={(e) => e.stopPropagation()}
       >
         <h3 className="font-bold text-lg mb-4">Экспорт расписания</h3>
@@ -91,10 +93,7 @@ export default function ExportModal({
         </div>
       </div>
 
-      <div
-        className="modal-backdrop"
-        onClick={onClose}
-      />
+      <div className="modal-backdrop" onClick={onClose} />
     </div>
   );
 }

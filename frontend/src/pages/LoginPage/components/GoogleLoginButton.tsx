@@ -36,7 +36,7 @@ export default function GoogleLoginButton() {
   return (
     <button
       onClick={handleGoogleLogin}
-      className='btn btn-outline w-full gap-2 btn-neutral flex justify-center items-center mt-1 mb-1'
+      className="btn btn-outline w-full gap-2 btn-neutral flex justify-center items-center mt-1 mb-1"
     >
       <GoogleIcon />
       Войти через Google

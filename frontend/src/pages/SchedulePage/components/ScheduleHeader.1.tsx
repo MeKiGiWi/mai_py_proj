@@ -2,6 +2,7 @@ import { addWeeks, addDays, format } from 'date-fns';
 import CurrentFilters from './CurrentFilters';
 import FiltersDropdown from './FiltersDropdown';
 import WeeksDropDown from './WeeksDropDown';
+import { title } from 'process';
 
 type ScheduleHeaderProps = {
   activeWeek: number;
@@ -38,17 +39,17 @@ export default function ScheduleHeader({
   teachers,
   places,
 }: ScheduleHeaderProps) {
-  const handleGroupClick = (group: string) => {
-    setSelectedGroup(group);
-  };
-
-  const handleTeacherClick = (teacher: string) => {
-    setSelectedTeacher(teacher);
-  };
-
-  const handlePlaceClick = (place: string) => {
-    setSelectedPlace(place);
-  };
+  const handleFilterkClick = (title: string, item: string) => {
+    if (title === 'Группа') {
+      setSelectedGroup(item);
+    }
+    if (title === 'Преподаватель') {
+      setSelectedTeacher(item);
+    }
+    if (title === 'Аудитория') {
+      setSelectedPlace(item);
+    }
+  }
   const getWeekRange = (weekNumber: number) => {
     const weekStart = addWeeks(cycleStartDate, weekNumber - 1);
     const weekEnd = addDays(weekStart, 6);
@@ -56,9 +57,9 @@ export default function ScheduleHeader({
   };
 
   return (
-    <div className='flex items-center gap-4 mb-4 relative'>
+    <div className="flex items-center gap-4 mb-4 relative">
       {/* Week tabs */}
-      <div className='tabs tabs-boxed bg-base-200'>
+      <div className="tabs tabs-boxed bg-base-200">
         {[1, 2].map((week) => (
           <button
             key={week}
@@ -83,9 +84,7 @@ export default function ScheduleHeader({
         groups={groups}
         teachers={teachers}
         places={places}
-        handleGroupClick={handleGroupClick}
-        handleTeacherClick={handleTeacherClick}
-        handlePlaceClick={handlePlaceClick}
+        handleFilterClick={handleFilterkClick}
       />
 
       <CurrentFilters

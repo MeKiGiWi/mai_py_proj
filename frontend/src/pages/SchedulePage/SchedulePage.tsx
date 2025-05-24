@@ -52,12 +52,13 @@ export default function SchedulePage() {
   useEffect(() => {
     const fetchInitialData = async () => {
       try {
-        const [weeksData, teachersData, placesData, groupsData] = await Promise.all([
-          getWeeksRange(),
-          api.get('metrics/', { params: { type: 'teacher' } }),
-          api.get('metrics/', { params: { type: 'place' } }),
-          api.get('metrics/', { params: { type: 'group' } }),
-        ]);
+        const [weeksData, teachersData, placesData, groupsData] =
+          await Promise.all([
+            getWeeksRange(),
+            api.get('metrics/', { params: { type: 'teacher' } }),
+            api.get('metrics/', { params: { type: 'place' } }),
+            api.get('metrics/', { params: { type: 'group' } }),
+          ]);
 
         setWeeks(weeksData);
         setTeachers(teachersData.data);
@@ -118,10 +119,15 @@ export default function SchedulePage() {
     fetchEvents();
   }, [selectedGroup, cycleStartDate, selectedPlace, selectedTeacher]);
 
-  const handleCellClick = (day: string, slot: { start: string; end: string }) => {
+  const handleCellClick = (
+    day: string,
+    slot: { start: string; end: string },
+  ) => {
     setSelectedCell({ day, ...slot });
     if (document.getElementById('event_modal')) {
-      (document.getElementById('event_modal') as HTMLDialogElement)?.showModal();
+      (
+        document.getElementById('event_modal') as HTMLDialogElement
+      )?.showModal();
     }
   };
 
@@ -146,8 +152,8 @@ export default function SchedulePage() {
   return (
     <>
       <NavBar />
-      <div className='flex min-h-screen bg-base-200 p-4 gap-4'>
-        <div className='flex-1 bg-base-100 rounded-box p-4'>
+      <div className="flex min-h-screen bg-base-200 p-4 gap-4">
+        <div className="flex-1 bg-base-100 rounded-box p-4">
           <ScheduleHeader
             activeWeek={activeWeek}
             setActiveWeek={setActiveWeek}
@@ -167,7 +173,10 @@ export default function SchedulePage() {
           />
 
           <ExportButton onClick={() => setIsExportModalOpen(true)} />
-          <ExportModal open={isExportModalOpen} onClose={() => setIsExportModalOpen(false)} />
+          <ExportModal
+            open={isExportModalOpen}
+            onClose={() => setIsExportModalOpen(false)}
+          />
 
           <ScheduleTable
             timeSlots={timeSlots}
@@ -178,11 +187,14 @@ export default function SchedulePage() {
           />
         </div>
 
-        <NotesPanel notes={notes} newNote={newNote} setNewNote={setNewNote} addNote={addNote} />
+        <NotesPanel
+          notes={notes}
+          newNote={newNote}
+          setNewNote={setNewNote}
+          addNote={addNote}
+        />
 
         <EventModal selectedCell={selectedCell} addEvent={addEvent} />
-
-
       </div>
     </>
   );
