@@ -1,19 +1,20 @@
-import type { TNotesState } from '../types';
+// NotesPanel.tsx
+type TNotesState = {
+  list: string[];
+  newNote: string;
+};
 
 type NotesPanelProps = {
   notesState: TNotesState;
   setNotesState: React.Dispatch<React.SetStateAction<TNotesState>>;
+  addNote: () => void;
 };
 
-export default function NotesPanel({ notesState, setNotesState }: NotesPanelProps) {
-  const handleAddNote = () => {
-    if (notesState.newNote.trim()) {
-      setNotesState(prev => ({
-        list: [...prev.list, prev.newNote],
-        newNote: ''
-      }));
-    }
-  };
+export default function NotesPanel({ 
+  notesState: { list, newNote }, 
+  setNotesState, 
+  addNote 
+}: NotesPanelProps) {
   return (
     <div className='w-80 bg-base-100 rounded-box p-4'>
       <h3 className='text-xl font-bold mb-4'>Пометки</h3>
@@ -23,35 +24,22 @@ export default function NotesPanel({ notesState, setNotesState }: NotesPanelProp
           <input
             type='text'
             className='input input-bordered flex-1'
-            value={notesState.newNote}
-            onChange={(e) => setNotesState(prev => ({ ...prev, newNote: e.target.value }))}
+            value={newNote}
+            onChange={(e) => setNotesState(prev => ({
+              ...prev,
+              newNote: e.target.value
+            }))}
             placeholder='Новая пометка...'
-            onKeyPress={(e) => e.key === 'Enter' && handleAddNote()}
           />
-          <button 
-            className='btn btn-square' 
-            onClick={handleAddNote}
-            disabled={!notesState.newNote.trim()}
-          >
+          <button className='btn btn-square' onClick={addNote}>
             +
           </button>
         </div>
       </div>
       <ul className='menu'>
-        {notesState.list.map((note, index) => (
+        {list.map((note, index) => (
           <li key={index} className='hover-bg'>
-            <div className='py-2 flex justify-between items-center'>
-              <span>{note}</span>
-              <button 
-                className='btn btn-xs btn-circle btn-ghost'
-                onClick={() => setNotesState(prev => ({
-                  ...prev,
-                  list: prev.list.filter((_, i) => i !== index)
-                }))}
-              >
-                ×
-              </button>
-            </div>
+            <a className='py-2'>{note}</a>
           </li>
         ))}
       </ul>

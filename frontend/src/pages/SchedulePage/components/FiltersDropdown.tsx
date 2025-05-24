@@ -1,21 +1,22 @@
-import type { TCurrentMetrics, TCurrentFilters } from '../types';
+import type { TCurrentMetrics } from '../types';
 
 type FiltersDropdownProps = {
-  currentMetrics: TCurrentMetrics;
-  setCurrentFilters: React.Dispatch<React.SetStateAction<TCurrentFilters>>;
+  filters: Pick<TCurrentMetrics, 'groups' | 'teachers' | 'places'>;
+  onSelect: {
+    group: (group: string) => void;
+    teacher: (teacher: string) => void;
+    place: (place: string) => void;
+  };
 };
 
 export default function FiltersDropdown({
-  currentMetrics,
-  setCurrentFilters,
+  filters: { groups, teachers, places },
+  onSelect: { 
+    group: handleGroupClick, 
+    teacher: handleTeacherClick, 
+    place: handlePlaceClick 
+  }
 }: FiltersDropdownProps) {
-  const handleFilterSelect = (type: keyof TCurrentFilters, value: string) => {
-    setCurrentFilters(prev => ({
-      ...prev,
-      [type]: value
-    }));
-  };
-
   return (
     <div className='dropdown relative'>
       <div tabIndex={0} role='button' className='btn btn-square'>
@@ -28,46 +29,55 @@ export default function FiltersDropdown({
       </div>
 
       <ul className='dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-48'>
+        {/* Группы */}
         <li className='dropdown dropdown-right'>
           <div tabIndex={0} role='button' className='flex justify-between'>
             <span>Группа</span>
           </div>
-          <ul className='dropdown-content...'>
-            {currentMetrics.groups.map((group) => (
+          <ul
+            className='dropdown-content z-[2] menu p-2 shadow bg-base-100 
+            rounded-box w-48 ml-2 max-h-56 overflow-y-auto overflow-x-hidden 
+            no-scrollbar grid grid-cols-1 gap-1'
+          >
+            {groups.map((group) => (
               <li key={group}>
-                <button onClick={() => handleFilterSelect('selectedGroup', group)}>
-                  {group}
-                </button>
+                <button onClick={() => handleGroupClick(group)}>{group}</button>
               </li>
             ))}
           </ul>
         </li>
 
+        {/* Преподаватели */}
         <li className='dropdown dropdown-right'>
           <div tabIndex={0} role='button' className='flex justify-between'>
             <span>Преподаватель</span>
           </div>
-          <ul className='dropdown-content...'>
-            {currentMetrics.teachers.map((teacher) => (
+          <ul
+            className='dropdown-content z-[2] menu p-2 shadow bg-base-100 rounded-box 
+            w-48 ml-2 max-h-56 overflow-y-auto overflow-x-hidden no-scrollbar
+            grid grid-cols-1 gap-1'
+          >
+            {teachers.map((teacher) => (
               <li key={teacher}>
-                <button onClick={() => handleFilterSelect('selectedTeacher', teacher)}>
-                  {teacher}
-                </button>
+                <button onClick={() => handleTeacherClick(teacher)}>{teacher}</button>
               </li>
             ))}
           </ul>
         </li>
 
+        {/* Аудитории */}
         <li className='dropdown dropdown-right'>
           <div tabIndex={0} role='button' className='flex justify-between'>
             <span>Аудитория</span>
           </div>
-          <ul className='dropdown-content...'>
-            {currentMetrics.places.map((place) => (
+          <ul
+            className='dropdown-content z-[2] menu p-2 shadow bg-base-100 
+            rounded-box w-48 ml-2 max-h-56 overflow-y-auto overflow-x-hidden 
+            no-scrollbar grid grid-cols-1 gap-1'
+          >
+            {places.map((place) => (
               <li key={place}>
-                <button onClick={() => handleFilterSelect('selectedPlace', place)}>
-                  {place}
-                </button>
+                <button onClick={() => handlePlaceClick(place)}>{place}</button>
               </li>
             ))}
           </ul>

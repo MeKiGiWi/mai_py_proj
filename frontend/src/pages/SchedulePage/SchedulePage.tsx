@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import NavBar from '../../components/NavBar';
 import getWeeksRange from '../../api/GetWeeksRange';
 import { format, startOfWeek } from 'date-fns';
@@ -19,42 +19,46 @@ const TIME_SLOT_DURATION = 90; // Длительность слота в мин�
 const BREAK_DURATION = 15; // Длительность перерыва
 
 export default function SchedulePage() {
-  const modalRef = useRef<HTMLDialogElement>(null);
-  const [activeWeek, setActiveWeek] = useState(1);
-  const [selectedCell, setSelectedCell] = useState<TCell | null>(null);
-  const [events, setEvents] = useState<Map<TCell, TEvent>>(new Map());
-  const [notesState, setNotesState] = useState<TNotesState>({ list: [], newNote: '' });
-  const [currentMetrics, setCurrentMetrics] = useState<TCurrentMetrics>({
-    weeks: [],
-    teachers: [],
-    places: [],
-    groups: [],
-  });
-  const [isLoading, setIsLoading] = useState(true);
   const [currentFilters, setCurrentFilters] = useState<TCurrentFilters>({
+    activeWeek: 1,
     selectedGroup: null,
     selectedTeacher: null,
     selectedPlace: null,
     cycleStartDate: startOfWeek(new Date(), { weekStartsOn: 1 }),
   });
 
+  const [currentMetrics, setCurrentMetrics] = useState<TCurrentMetrics>({
+    weeks: [],
+    teachers: [],
+    places: [],
+    groups: [],
+  });
+
+  const [notesState, setNotesState] = useState<TNotesState>({
+    list: [],
+    newNote: '',
+  });
+
+  const [selectedCell, setSelectedCell] = useState<TCell | null>(null);
+  const [events, setEvents] = useState<Record<string, TEvent>>({});
+  const [isLoading, setIsLoading] = useState(true);
+
   useEffect(() => {
     const fetchInitialData = async () => {
       try {
         const [weeksData, teachersData, placesData, groupsData] = await Promise.all([
           getWeeksRange(),
-          api.get('metrics/', { params: { type: 'teacher' } }),
-          api.get('metrics/', { params: { type: 'place' } }),
-          api.get('metrics/', { params: { type: 'group' } }),
+          api.get('metrics/?type=teacher'),
+          api.get('metrics/?type=place'),
+          api.get('metrics/?type=group'),
         ]);
 
-        setCurrentMetrics(prev => ({
-          ...prev,
+        setCurrentMetrics({
           weeks: weeksData,
           teachers: teachersData.data,
           places: placesData.data,
           groups: groupsData.data,
-        }));
+        });
 
         setCurrentFilters(prev => ({
           ...prev,
@@ -93,7 +97,7 @@ export default function SchedulePage() {
     }
 
     return slots;
-  }, []);
+  }, [formatTime]);
 
   useEffect(() => {
     const fetchEvents = async () => {
@@ -108,23 +112,35 @@ export default function SchedulePage() {
         });
         setEvents(data);
       } catch (error) {
-        setEvents(new Map());
+        setEvents({});
       }
     };
 
     fetchEvents();
-  }, [
-    currentFilters.selectedGroup,
-    currentFilters.cycleStartDate,
-    currentFilters.selectedPlace,
-    currentFilters.selectedTeacher,
-  ]);
-
+  }, [currentFilters]);
 
   const handleCellClick = (day: string, slot: { start: string; end: string }) => {
     setSelectedCell({ day, ...slot });
-    if (document.getElementById('event_modal')) {
-      (document.getElementById('event_modal') as HTMLDialogElement)?.showModal();
+    (document.getElementById('event_modal') as HTMLDialogElement)?.showModal();
+  };
+
+  const addEvent = (cell: TCell, eventData: Omit<TEvent, "start_date">) => {
+    const key = `${currentFilters.activeWeek}-${cell.day}-${cell.start}`;
+    setEvents(prev => ({
+      ...prev,
+      [key]: {
+        ...eventData,
+        start_date: new Date().toISOString()
+      }
+    }));
+  };
+
+  const addNote = () => {
+    if (notesState.newNote.trim()) {
+      setNotesState(prev => ({
+        list: [...prev.list, prev.newNote],
+        newNote: '',
+      }));
     }
   };
 
@@ -134,49 +150,39 @@ export default function SchedulePage() {
       <div className='flex min-h-screen bg-base-200 p-4 gap-4'>
         <div className='flex-1 bg-base-100 rounded-box p-4'>
           <ScheduleHeader
-            activeWeek={activeWeek}
-            currentMetrics={currentMetrics}
             currentFilters={currentFilters}
+            currentMetrics={currentMetrics}
             isLoading={isLoading}
-            setActiveWeek={setActiveWeek}
             setCurrentFilters={setCurrentFilters}
           />
 
-          <ExportButton onClick={() => modalRef.current?.showModal()} />
+          <ExportButton />
 
           <ScheduleTable
-            timeSlots={timeSlots}
-            events={events}
-            activeWeek={activeWeek}
-            cycleStartDate={currentFilters.cycleStartDate}
+            scheduleData={{
+              timeSlots: timeSlots,
+              events: events
+            }}
+            filters={{
+              activeWeek: currentFilters.activeWeek, // Передаем activeWeek
+              cycleStartDate: currentFilters.cycleStartDate
+            }}
             onCellClick={handleCellClick}
           />
         </div>
 
-        <NotesPanel 
+        <NotesPanel
           notesState={notesState}
           setNotesState={setNotesState}
+          addNote={addNote}
         />
+
         <EventModal 
           selectedCell={selectedCell} 
-          addEvent={(cell, event) => {
-            setEvents(prev => {
-              const newMap = new Map(prev);
-              newMap.set(cell, { 
-                ...event, 
-                start_date: new Date().toISOString() 
-              });
-              return newMap;
-            });
-          }}
+          addEvent={addEvent}
         />
-        <ExportModal 
-          ref={modalRef}
-          onExport={(format) => {
-            // Логика экспорта
-            console.log('Export to:', format);
-          }}
-        />
+
+        <ExportModal />
       </div>
     </>
   );

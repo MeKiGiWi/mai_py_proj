@@ -18,6 +18,7 @@ export type TCurrentFilters = {
     selectedTeacher: string | null;
     selectedPlace: string | null;
     cycleStartDate: Date;
+    activeWeek: number;
 };
   
 export type TCurrentMetrics = {

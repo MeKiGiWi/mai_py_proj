@@ -1,33 +1,11 @@
 import type { TCell, TEvent } from '../types';
-import { useState } from 'react';
 
 type EventModalProps = {
   selectedCell: TCell | null;
-  addEvent: (cell: TCell, event: Omit<TEvent, 'start_date'>) => void;
+  addEvent: (cell: TCell, event: Omit<TEvent, 'start_date'> & { color: string }) => void;
 };
 
-
 export default function EventModal({ selectedCell, addEvent }: EventModalProps) {
-  
-  const [eventName, setEventName] = useState('');
-  const [selectedColor, setSelectedColor] = useState('');
-
-  const handleSubmit = () => {
-    if (!selectedCell) return;
-    
-    const newEvent: Omit<TEvent, 'start_date'> = {
-      group_name: null,
-      lesson_name: eventName,
-      lesson_type: selectedColor,
-      teacher: null,
-      place: null,
-    };
-
-    addEvent(selectedCell, newEvent);
-    setEventName('');
-    setSelectedColor('');
-  };
-
   return (
     <dialog id='event_modal' className='modal'>
       <div className='modal-box'>
@@ -39,12 +17,7 @@ export default function EventModal({ selectedCell, addEvent }: EventModalProps) 
           <label className='label'>
             <span className='label-text mr-2'>Название</span>
           </label>
-          <input
-            type='text'
-            className='input left-9 mt-2'
-            value={eventName}
-            onChange={(e) => setEventName(e.target.value)}
-          />
+          <input type='text' className='input left-9 mt-2' />
         </div>
 
         {/* Event color selection */}
@@ -56,8 +29,19 @@ export default function EventModal({ selectedCell, addEvent }: EventModalProps) 
             {['badge-primary', 'badge-secondary', 'badge-accent'].map((color) => (
               <button
                 key={color}
-                className={`badge ${color} gap-2 ${selectedColor === color ? 'badge-outline' : ''}`}
-                onClick={() => setSelectedColor(color)}
+                className={`badge ${color} gap-2`}
+                onClick={() => {
+                  if (selectedCell) {
+                    addEvent(selectedCell, {
+                      color,
+                      group_name: null,
+                      lesson_name: null,
+                      lesson_type: null,
+                      teacher: null,
+                      place: null
+                    });
+                  }
+                }}
               >
                 █
               </button>
@@ -68,10 +52,10 @@ export default function EventModal({ selectedCell, addEvent }: EventModalProps) 
         <div className='modal-action'>
           <form method='dialog'>
             <button
-              type='button'
               className='btn btn-primary'
-              onClick={handleSubmit}
-              disabled={!eventName || !selectedColor}
+              onClick={() => {
+                // TODO: Save logic
+              }}
             >
               Сохранить
             </button>
@@ -80,7 +64,9 @@ export default function EventModal({ selectedCell, addEvent }: EventModalProps) 
       </div>
 
       <form method='dialog' className='modal-backdrop'>
-        <button>Закрыть</button>
+        <button onClick={() => (document.getElementById('event_modal') as HTMLDialogElement)?.close()}>
+          Закрыть
+        </button>
       </form>
     </dialog>
   );
