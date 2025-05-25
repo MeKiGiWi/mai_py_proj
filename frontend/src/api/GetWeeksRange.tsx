@@ -7,11 +7,11 @@ export default async function getWeeksRange(): Promise<Date[]> {
     const startDate = parseISO(response.data[0]);
     const endDate = parseISO(response.data[1]);
 
-    // Get Monday dates for both start and end dates
+    // Получение дат понедельника для начальной и конечной дат
     const startMonday = startOfWeek(startDate, { weekStartsOn: 1 });
     const endMonday = startOfWeek(endDate, { weekStartsOn: 1 });
 
-    // Calculate number of weeks between dates
+    // Рассчитать количество недель между датами
     const weeks: Date[] = [];
     let currentDate = startMonday;
 

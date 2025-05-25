@@ -1,11 +1,20 @@
-type NotesPanelProps = {
-  notes: string[];
+// NotesPanel.tsx
+type TNotesState = {
+  list: string[];
   newNote: string;
-  setNewNote: (note: string) => void;
+};
+
+type NotesPanelProps = {
+  notesState: TNotesState;
+  setNotesState: React.Dispatch<React.SetStateAction<TNotesState>>;
   addNote: () => void;
 };
 
-export default function NotesPanel({ notes, newNote, setNewNote, addNote }: NotesPanelProps) {
+export default function NotesPanel({ 
+  notesState: { list, newNote }, 
+  setNotesState, 
+  addNote 
+}: NotesPanelProps) {
   return (
     <div className='w-80 bg-base-100 rounded-box p-4'>
       <h3 className='text-xl font-bold mb-4'>Пометки</h3>
@@ -16,7 +25,10 @@ export default function NotesPanel({ notes, newNote, setNewNote, addNote }: Note
             type='text'
             className='input input-bordered flex-1'
             value={newNote}
-            onChange={(e) => setNewNote(e.target.value)}
+            onChange={(e) => setNotesState(prev => ({
+              ...prev,
+              newNote: e.target.value
+            }))}
             placeholder='Новая пометка...'
           />
           <button className='btn btn-square' onClick={addNote}>
@@ -25,7 +37,7 @@ export default function NotesPanel({ notes, newNote, setNewNote, addNote }: Note
         </div>
       </div>
       <ul className='menu'>
-        {notes.map((note, index) => (
+        {list.map((note, index) => (
           <li key={index} className='hover-bg'>
             <a className='py-2'>{note}</a>
           </li>
