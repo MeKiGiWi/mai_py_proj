@@ -22,9 +22,7 @@ export default function DoubleDropDown({
           >
             {items.map((item) => (
               <li key={item}>
-                <button onClick={() => handleClick(title, item)}>
-                  {item}
-                </button>
+                <button onClick={() => handleClick(title, item)}>{item}</button>
               </li>
             ))}
           </ul>

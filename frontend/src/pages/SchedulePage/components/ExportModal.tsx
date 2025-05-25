@@ -1,6 +1,7 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import GoogleIcon from '@/components/GoogleIcon';
-
+import DoubleDropDown from './DoubledDropDown';
+import { se } from 'date-fns/locale';
 export default function ExportModal({
   open,
   onClose,
@@ -10,7 +11,7 @@ export default function ExportModal({
 }) {
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
-
+  const timeSlots = ['9:00', '10:45', '13:00'];
   const generateDateOptions = () => {
     const options = [];
     const today = new Date();
@@ -23,12 +24,21 @@ export default function ExportModal({
         weekday: 'short',
       });
       options.push(
-        <option key={i} value={date.toISOString()}>
-          {dateString}
-        </option>,
+        // value: date.toISOString(),
+        dateString,
       );
     }
     return options;
+  };
+
+  const handleStartDateSelect = (day: string, time: string) => {
+    const selectedDate = day + ' ' + time;
+    setStartDate(selectedDate);
+  };
+
+  const handleEndDateSelect = (day: string, time: string) => {
+    const selectedDate = day + ' ' + time;
+    setEndDate(selectedDate);
   };
 
   const handleExport = (type: 'calendar' | 'sheets') => {
@@ -38,41 +48,45 @@ export default function ExportModal({
     onClose();
   };
 
+  useEffect(() => {
+    console.log(startDate);
+  }, [startDate]);
+
   if (!open) return null;
 
   return (
     <div className="modal modal-open">
       <div
-        className="modal-box w-2xl max-w-5xl relative"
+        className="modal-box w-2xl max-w-5xl relative h-100"
         onClick={(e) => e.stopPropagation()}
       >
-        <h3 className="font-bold text-lg mb-4">Экспорт расписания</h3>
+        <h3 className="font-bold text-lg mb-6">Экспорт расписания</h3>
 
-        <div className="flex flex-col md:flex-row gap-6">
-          <div className="flex-1 space-y-4">
-            <select
-              className="select select-bordered w-full"
-              value={startDate}
-              onChange={(e) => setStartDate(e.target.value)}
-            >
-              <option disabled value="">
-                Выберите первую пару
-              </option>
-              {generateDateOptions()}
-            </select>
+        <div className="flex flex-row gap-6">
+          <div className="flex flex-col gap-4">
+            <div className="dropdown relative">
+              <div tabIndex={0} role="button" className="btn w-80">
+                <span>{startDate ? startDate : 'Экспортировать с пары'}</span>
+              </div>
 
-            <select
-              className="select select-bordered w-full"
-              value={endDate}
-              onChange={(e) => setEndDate(e.target.value)}
-            >
-              <option disabled value="">
-                Выберите последнюю пару
-              </option>
-              {generateDateOptions()}
-            </select>
+              <DoubleDropDown
+                titles={generateDateOptions()}
+                items={timeSlots}
+                handleClick={handleStartDateSelect}
+              />
+            </div>
+            <div className="dropdown relative">
+              <div tabIndex={0} role="button" className="btn w-80">
+                <span>{endDate ? endDate : 'Экспортировать до пары'}</span>
+              </div>
+
+              <DoubleDropDown
+                titles={generateDateOptions()}
+                items={timeSlots}
+                handleClick={handleEndDateSelect}
+              />
+            </div>
           </div>
-
           <div className="flex flex-col gap-4">
             <button
               className="btn btn-primary gap-2"

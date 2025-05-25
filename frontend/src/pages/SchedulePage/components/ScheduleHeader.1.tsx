@@ -49,7 +49,7 @@ export default function ScheduleHeader({
     if (title === 'Аудитория') {
       setSelectedPlace(item);
     }
-  }
+  };
   const getWeekRange = (weekNumber: number) => {
     const weekStart = addWeeks(cycleStartDate, weekNumber - 1);
     const weekEnd = addDays(weekStart, 6);

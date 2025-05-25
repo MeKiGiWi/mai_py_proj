@@ -11,7 +11,7 @@ export default function FiltersDropdown({
   groups,
   teachers,
   places,
-  handleFilterClick
+  handleFilterClick,
 }: FiltersDropdownProps) {
   return (
     <div className="dropdown relative">
@@ -29,7 +29,7 @@ export default function FiltersDropdown({
       </div>
 
       <DoubleDropDown
-        titles={["Группа", "Преподаватель", "Аудитория"]}
+        titles={['Группа', 'Преподаватель', 'Аудитория']}
         items={groups}
         handleClick={handleFilterClick}
       />
