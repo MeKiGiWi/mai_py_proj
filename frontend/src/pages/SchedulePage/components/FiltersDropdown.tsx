@@ -30,7 +30,7 @@ export default function FiltersDropdown({
 
       <DoubleDropDown
         titles={['Группа', 'Преподаватель', 'Аудитория']}
-        items={groups}
+        items={[groups, teachers, places]}
         handleClick={handleFilterClick}
       />
     </div>
