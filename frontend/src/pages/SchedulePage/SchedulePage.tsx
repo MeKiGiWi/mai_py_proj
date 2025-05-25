@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, useCallback } from 'react';
+import { useState, useEffect} from 'react';
 import NavBar from '../../components/NavBar';
 import getWeeksRange from '../../api/GetWeeksRange';
 import { format, startOfWeek } from 'date-fns';
@@ -48,9 +48,9 @@ export default function SchedulePage() {
       try {
         const [weeksData, teachersData, placesData, groupsData] = await Promise.all([
           getWeeksRange(),
-          api.get('metrics/?type=teacher'),
-          api.get('metrics/?type=place'),
-          api.get('metrics/?type=group'),
+          api.get('metrics/', { params: { type: 'teacher' } }),
+          api.get('metrics/', { params: { type: 'place' } }),
+          api.get('metrics/', { params: { type: 'group' } }),
         ]);
 
         setCurrentMetrics({
@@ -74,30 +74,31 @@ export default function SchedulePage() {
     fetchInitialData();
   }, []);
 
-  const formatTime = useCallback((minutes: number) => {
+  const formatTime = (minutes: number) => {
     const hours = Math.floor(minutes / 60);
     const mins = minutes % 60;
     return `${hours}:${mins.toString().padStart(2, '0')}`;
-  }, []);
+  };
 
-  const timeSlots = useMemo(() => {
+  const getTimeSlots = () => {
     const slots: { start: string; end: string }[] = [];
     let currentStart = WORKDAY_START;
-
+    
     while (currentStart + TIME_SLOT_DURATION <= WORKDAY_END) {
       if (currentStart === 12 * 60 + 30) {
         currentStart += 30;
       }
-
-      const startTime = formatTime(currentStart);
-      const endTime = formatTime(currentStart + TIME_SLOT_DURATION);
-
-      slots.push({ start: startTime, end: endTime });
+      
+      slots.push({
+        start: formatTime(currentStart),
+        end: formatTime(currentStart + TIME_SLOT_DURATION)
+      });
+      
       currentStart += TIME_SLOT_DURATION + BREAK_DURATION;
     }
-
+    
     return slots;
-  }, [formatTime]);
+  };
 
   useEffect(() => {
     const fetchEvents = async () => {
@@ -160,7 +161,7 @@ export default function SchedulePage() {
 
           <ScheduleTable
             scheduleData={{
-              timeSlots: timeSlots,
+              timeSlots: getTimeSlots(),
               events: events
             }}
             filters={{
