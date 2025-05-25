@@ -131,7 +131,7 @@ export default function SchedulePage() {
       ...prev,
       [key]: {
         ...eventData,
-        start_date: new Date().toISOString()
+        start_date: new Date()
       }
     }));
   };

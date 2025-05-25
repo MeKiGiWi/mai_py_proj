@@ -4,7 +4,7 @@ export type TEvent = {
     lesson_type: string | null;
     teacher: string | null;
     place: string | null;
-    start_date: string | null;
+    start_date: Date | null;
 };
 
 export type TCell = {
