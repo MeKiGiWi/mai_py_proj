@@ -2,54 +2,56 @@ import { addWeeks, addDays, format } from 'date-fns';
 import CurrentFilters from './CurrentFilters';
 import FiltersDropdown from './FiltersDropdown';
 import WeeksDropDown from './WeeksDropDown';
-import { title } from 'process';
+import type { TCurrentFilters, TCurrentMetrics } from '../types';
 
 type ScheduleHeaderProps = {
-  activeWeek: number;
-  setActiveWeek: React.Dispatch<React.SetStateAction<number>>;
-  cycleStartDate: Date;
-  setCycleStartDate: React.Dispatch<React.SetStateAction<Date>>;
-  selectedGroup: string | null;
-  selectedTeacher: string | null;
-  selectedPlace: string | null;
-  setSelectedGroup: React.Dispatch<React.SetStateAction<string | null>>;
-  setSelectedTeacher: React.Dispatch<React.SetStateAction<string | null>>;
-  setSelectedPlace: React.Dispatch<React.SetStateAction<string | null>>;
-  weeks: Date[];
+  currentFilters: TCurrentFilters;
+  currentMetrics: TCurrentMetrics;
   isLoading: boolean;
-  groups: string[];
-  teachers: string[];
-  places: string[];
+  setCurrentFilters: React.Dispatch<React.SetStateAction<TCurrentFilters>>;
 };
 
 export default function ScheduleHeader({
-  activeWeek,
-  setActiveWeek,
-  cycleStartDate,
-  setCycleStartDate,
-  selectedGroup,
-  selectedTeacher,
-  selectedPlace,
-  setSelectedGroup,
-  setSelectedTeacher,
-  setSelectedPlace,
-  weeks,
+  currentFilters,
+  currentMetrics,
   isLoading,
-  groups,
-  teachers,
-  places,
+  setCurrentFilters,
 }: ScheduleHeaderProps) {
+  const {
+    activeWeek,
+    cycleStartDate,
+    selectedGroup,
+    selectedTeacher,
+    selectedPlace,
+  } = currentFilters;
+  const { weeks, groups, teachers, places } = currentMetrics;
+  const handleFiltersUpdate = (update: Partial<TCurrentFilters>) => {
+    setCurrentFilters((prev) => ({
+      ...prev,
+      ...update,
+    }));
+  };
   const handleFilterkClick = (title: string, item: string) => {
     if (title === 'Группа') {
-      setSelectedGroup(item);
+      setCurrentFilters({
+        ...currentFilters,
+        selectedGroup: item,
+      });
     }
     if (title === 'Преподаватель') {
-      setSelectedTeacher(item);
+      setCurrentFilters({
+        ...currentFilters,
+        selectedTeacher: item,
+      });
     }
     if (title === 'Аудитория') {
-      setSelectedPlace(item);
+      setCurrentFilters({
+        ...currentFilters,
+        selectedPlace: item,
+      });
     }
   };
+
   const getWeekRange = (weekNumber: number) => {
     const weekStart = addWeeks(cycleStartDate, weekNumber - 1);
     const weekEnd = addDays(weekStart, 6);
@@ -64,7 +66,7 @@ export default function ScheduleHeader({
           <button
             key={week}
             className={`tab tab-lg ${activeWeek === week ? 'tab-active' : ''}`}
-            onClick={() => setActiveWeek(week)}
+            onClick={() => handleFiltersUpdate({ activeWeek: week })}
           >
             Неделя {week} ({getWeekRange(week)})
           </button>
@@ -72,12 +74,15 @@ export default function ScheduleHeader({
       </div>
 
       <WeeksDropDown
-        activeWeek={activeWeek}
-        setActiveWeek={setActiveWeek}
-        cycleStartDate={cycleStartDate}
-        setCycleStartDate={setCycleStartDate}
-        weeks={weeks}
-        isLoading={isLoading}
+        weekData={{
+          weeks: weeks,
+          isLoading: isLoading,
+        }}
+        onWeekChange={{
+          setActiveWeek: (week) => handleFiltersUpdate({ activeWeek: week }),
+          setCycleStartDate: (date) =>
+            handleFiltersUpdate({ cycleStartDate: date }),
+        }}
       />
 
       <FiltersDropdown
@@ -88,12 +93,8 @@ export default function ScheduleHeader({
       />
 
       <CurrentFilters
-        selectedGroup={selectedGroup}
-        selectedTeacher={selectedTeacher}
-        selectedPlace={selectedPlace}
-        setSelectedGroup={setSelectedGroup}
-        setSelectedTeacher={setSelectedTeacher}
-        setSelectedPlace={setSelectedPlace}
+        currentFilters={{ selectedGroup, selectedTeacher, selectedPlace }}
+        setCurrentFilters={handleFiltersUpdate}
       />
     </div>
   );

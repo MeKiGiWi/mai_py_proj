@@ -1,6 +1,17 @@
-type EventModalProps = {};
+import type { TCell, TEvent } from '../types';
 
-export default function EventModal({ selectedCell, addEvent }) {
+type EventModalProps = {
+  selectedCell: TCell | null;
+  addEvent: (
+    cell: TCell,
+    event: Omit<TEvent, 'start_date'> & { color: string },
+  ) => void;
+};
+
+export default function EventModal({
+  selectedCell,
+  addEvent,
+}: EventModalProps) {
   return (
     <dialog id="event_modal" className="modal">
       <div className="modal-box">

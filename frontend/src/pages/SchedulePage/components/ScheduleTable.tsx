@@ -1,20 +1,24 @@
 import { format, addDays, addWeeks } from 'date-fns';
 import { useMemo } from 'react';
-import { TEvent } from '../SchedulePage';
+import { TEvent } from '../types';
+
+type ScheduleTableProps = {
+  scheduleData: {
+    timeSlots: { start: string; end: string }[];
+    events: Record<string, TEvent>;
+  };
+  filters: {
+    activeWeek: number;
+    cycleStartDate: Date;
+  };
+  onCellClick: (day: string, slot: { start: string; end: string }) => void;
+};
 
 export default function ScheduleTable({
-  timeSlots,
-  events,
-  activeWeek,
-  cycleStartDate,
+  scheduleData: { timeSlots, events },
+  filters: { activeWeek, cycleStartDate },
   onCellClick,
-}: {
-  timeSlots: { start: string; end: string }[];
-  events: Record<string, TEvent>;
-  activeWeek: number;
-  cycleStartDate: Date;
-  onCellClick: (day: string, slot: { start: string; end: string }) => void;
-}) {
+}: ScheduleTableProps) {
   const { days } = useMemo(() => {
     return {
       days: ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб'],
@@ -67,7 +71,6 @@ export default function ScheduleTable({
                 // container without elements
                 <div className="min-h-[68px] p-1"></div>
               )}
-              {/* <div className='divider'></div> */}
               {event && (
                 <div className="relative w-full h-2 mt-5">
                   <div className="text-gray-500 btn btn-xs absolute bottom-0 left-0 hover:bg-base-200 hover:border-base-300 cursor-default">

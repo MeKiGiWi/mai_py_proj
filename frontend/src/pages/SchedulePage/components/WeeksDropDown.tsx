@@ -1,21 +1,19 @@
 import { addDays, addWeeks, format } from 'date-fns';
 
 type WeeksDropDownProps = {
-  activeWeek: number;
-  setActiveWeek: React.Dispatch<React.SetStateAction<number>>;
-  cycleStartDate: Date;
-  setCycleStartDate: React.Dispatch<React.SetStateAction<Date>>;
-  weeks: Date[];
-  isLoading: boolean;
+  weekData: {
+    weeks: Date[];
+    isLoading: boolean;
+  };
+  onWeekChange: {
+    setActiveWeek: (week: number) => void;
+    setCycleStartDate: (date: Date) => void;
+  };
 };
 
 export default function WeeksDropDown({
-  activeWeek,
-  setActiveWeek,
-  cycleStartDate,
-  setCycleStartDate,
-  weeks,
-  isLoading,
+  weekData: { weeks, isLoading },
+  onWeekChange: { setActiveWeek, setCycleStartDate },
 }: WeeksDropDownProps) {
   return (
     <div className="dropdown dropdown-hover">
