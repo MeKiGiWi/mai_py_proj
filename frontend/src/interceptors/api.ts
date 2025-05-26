@@ -1,4 +1,8 @@
-import axios, { AxiosInstance, InternalAxiosRequestConfig, AxiosResponse } from 'axios';
+import axios, {
+  AxiosInstance,
+  InternalAxiosRequestConfig,
+  AxiosResponse,
+} from 'axios';
 
 const api: AxiosInstance = axios.create({
   baseURL: import.meta.env.VITE_API_URL,

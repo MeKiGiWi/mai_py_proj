@@ -18,7 +18,7 @@ const App: React.FC = () => {
       <Route index element={<HomePage />} />
 
       <Route
-        path='/about'
+        path="/about"
         element={
           <Suspense fallback={<PageLoader />}>
             <AboutTeamPage />
@@ -27,13 +27,13 @@ const App: React.FC = () => {
       />
 
       <Route element={<RepeatLoginProtectedRoute />}>
-        <Route path='/login' element={<LoginPage />} />
-        <Route path='/registration' element={<RegistrationPage />} />
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/registration" element={<RegistrationPage />} />
       </Route>
 
       <Route element={<ProtectedRoute />}>
         <Route
-          path='/schedule'
+          path="/schedule"
           element={
             <Suspense fallback={<PageLoader />}>
               <SchedulePage />
@@ -42,7 +42,10 @@ const App: React.FC = () => {
         />
       </Route>
 
-      <Route path='*' element={<p className='text-3xl'>There's nothing here: 404!</p>} />
+      <Route
+        path="*"
+        element={<p className="text-3xl">There's nothing here: 404!</p>}
+      />
     </Routes>
   );
 };

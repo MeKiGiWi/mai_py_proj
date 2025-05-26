@@ -17,14 +17,39 @@ export default function ScheduleHeader({
   isLoading,
   setCurrentFilters,
 }: ScheduleHeaderProps) {
-  const { activeWeek, cycleStartDate, selectedGroup, selectedTeacher, selectedPlace } = currentFilters;
+  const {
+    activeWeek,
+    cycleStartDate,
+    selectedGroup,
+    selectedTeacher,
+    selectedPlace,
+  } = currentFilters;
   const { weeks, groups, teachers, places } = currentMetrics;
-
   const handleFiltersUpdate = (update: Partial<TCurrentFilters>) => {
-    setCurrentFilters(prev => ({
+    setCurrentFilters((prev) => ({
       ...prev,
-      ...update
+      ...update,
     }));
+  };
+  const handleFilterkClick = (title: string, item: string) => {
+    if (title === 'Группа') {
+      setCurrentFilters({
+        ...currentFilters,
+        selectedGroup: item,
+      });
+    }
+    if (title === 'Преподаватель') {
+      setCurrentFilters({
+        ...currentFilters,
+        selectedTeacher: item,
+      });
+    }
+    if (title === 'Аудитория') {
+      setCurrentFilters({
+        ...currentFilters,
+        selectedPlace: item,
+      });
+    }
   };
 
   const getWeekRange = (weekNumber: number) => {
@@ -34,8 +59,9 @@ export default function ScheduleHeader({
   };
 
   return (
-    <div className='flex items-center gap-4 mb-4 relative'>
-      <div className='tabs tabs-boxed bg-base-200'>
+    <div className="flex items-center gap-4 mb-4 relative">
+      {/* Week tabs */}
+      <div className="tabs tabs-boxed bg-base-200">
         {[1, 2].map((week) => (
           <button
             key={week}
@@ -50,21 +76,20 @@ export default function ScheduleHeader({
       <WeeksDropDown
         weekData={{
           weeks: weeks,
-          isLoading: isLoading
+          isLoading: isLoading,
         }}
         onWeekChange={{
           setActiveWeek: (week) => handleFiltersUpdate({ activeWeek: week }),
-          setCycleStartDate: (date) => handleFiltersUpdate({ cycleStartDate: date })
+          setCycleStartDate: (date) =>
+            handleFiltersUpdate({ cycleStartDate: date }),
         }}
       />
 
       <FiltersDropdown
-        filters={{ groups, teachers, places }}
-        onSelect={{
-          group: (group) => handleFiltersUpdate({ selectedGroup: group }),
-          teacher: (teacher) => handleFiltersUpdate({ selectedTeacher: teacher }),
-          place: (place) => handleFiltersUpdate({ selectedPlace: place })
-        }}
+        groups={groups}
+        teachers={teachers}
+        places={places}
+        handleFilterClick={handleFilterkClick}
       />
 
       <CurrentFilters

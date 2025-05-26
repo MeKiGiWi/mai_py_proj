@@ -8,9 +8,9 @@ export default function NavBar() {
   const { isAuth, logout } = useContext(AuthContext);
 
   return (
-    <div className='navbar bg-base-100 shadow-lg px-8 h-22'>
-      <div className='flex-1'>
-        <Link to='/'>
+    <div className="navbar bg-base-100 shadow-lg px-8 h-22">
+      <div className="flex-1">
+        <Link to="/">
           <PlanItTag />
         </Link>
       </div>
@@ -19,8 +19,8 @@ export default function NavBar() {
           <Avatar />
         </>
       ) : (
-        <div className='flex-none'>
-          <Link to={'/login'} className='btn btn-neutral'>
+        <div className="flex-none">
+          <Link to={'/login'} className="btn btn-neutral">
             Войти
           </Link>
         </div>
