@@ -101,23 +101,24 @@ export default function ExportModal({
             </div>
           </div>
 
-          <div className="flex flex-col gap-4">
-            <button
-              className="btn btn-primary gap-2"
-              onClick={() => handleExport('calendar')}
-            >
-              <GoogleIcon />
-              Google Календарь
-            </button>
+        </div>
 
-            <button
-              className="btn btn-secondary gap-2"
-              onClick={() => handleExport('sheets')}
-            >
-              <GoogleIcon />
-              Google Таблицы
-            </button>
-          </div>
+        <div className="flex flex-col gap-4 mt-6">
+          <button
+            className="btn btn-primary gap-2 w-54"
+            onClick={() => handleExport('calendar')}
+          >
+            <GoogleIcon />
+            Google Календарь
+          </button>
+
+          <button
+            className="btn btn-secondary gap-2 w-54"
+            onClick={() => handleExport('sheets')}
+          >
+            <GoogleIcon />
+            Google Таблицы
+          </button>
         </div>
       </div>
 
