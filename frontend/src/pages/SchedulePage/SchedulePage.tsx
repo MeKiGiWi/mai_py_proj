@@ -5,12 +5,10 @@ import { format, startOfWeek } from 'date-fns';
 
 import ScheduleHeader from './components/ScheduleHeader.1';
 import ScheduleTable from './components/ScheduleTable';
-import NotesPanel from './components/NotesPanel';
 import EventModal from './components/EventModal';
 import ExportModal from './components/ExportModal';
 import ExportButton from './components/ExportButton';
-import EditEventPanel from './components/EditEventPanel';
-import EditNotePanel from './components/EditNotePanel';
+import RightPanelHandler from './components/RightPanelHandler';
 import type { TEvent, TCell, TCurrentFilters, TCurrentMetrics, TNotesState, TSelectedEvent, TNote } from './types';
 
 import api from '../../interceptors/api';
@@ -193,35 +191,25 @@ export default function SchedulePage() {
           />
         </div>
 
-        {selectedEventInfo ? (
-          <EditEventPanel
-            event={selectedEventInfo.event}
-            onSave={(updatedEvent) => {
-              setEvents((prev) => ({
-                ...prev,
-                [selectedEventInfo.eventKey]: {
-                  ...updatedEvent,
-                  start_date: selectedEventInfo.event.start_date,
-                },
-              }));
-              setSelectedEventInfo(null);
-            }}
-            onCancel={() => setSelectedEventInfo(null)}
-          />
-        ) : selectedNote ? (
-          <EditNotePanel
-            note={selectedNote}
-            onSave={updateNote}
-            onCancel={() => setSelectedNote(null)}
-          />
-        ) : (
-          <NotesPanel
-            notesState={notesState}
-            setNotesState={setNotesState}
-            onNoteSelect={setSelectedNote}
-            onNoteDelete={handleNoteDelete}
-          />
-        )}
+        <RightPanelHandler
+          selectedEventInfo={selectedEventInfo}
+          selectedNote={selectedNote}
+          notesState={notesState}
+          setNotesState={setNotesState}
+          onEventSave={(updatedEvent) => {
+            setEvents(prev => ({
+              ...prev,
+              [selectedEventInfo!.eventKey]: {
+                ...updatedEvent,
+                start_date: selectedEventInfo!.event.start_date,
+              }
+            }));
+          }}
+          onNoteSave={updateNote}
+          onNoteDelete={handleNoteDelete}
+          setSelectedEventInfo={setSelectedEventInfo}
+          setSelectedNote={setSelectedNote}
+        />
 
         <EventModal 
           selectedCell={selectedCell} 
