@@ -1,7 +1,7 @@
 import { Link, useNavigate } from 'react-router';
 import GoogleLoginButton from './components/GoogleLoginButton';
-import { PasswordIcon } from './components/PasswordIcon'
-import { UserIcon } from './components/UserIcon'
+import { PasswordIcon } from './components/PasswordIcon';
+import { UserIcon } from './components/UserIcon';
 import PlanItTag from '../../components/PlanItTag';
 import { LoadingIcon } from '../../components/LoadingIcon';
 import { handleErrorValidator } from './components/ErrorValidator';
@@ -12,12 +12,12 @@ import { AuthContext } from '../../contexts/Auth';
 type formType = {
   username: string;
   password: string;
-}
+};
 
 function LoginPage() {
   const [formData, setFormData] = useState<formType>({
     username: '',
-    password: ''
+    password: '',
   });
 
   const [generalError, setGeneralError] = useState<string>('');
@@ -36,11 +36,14 @@ function LoginPage() {
 
     setIsLoading(true);
     try {
-      const response = await axios.post(`${import.meta.env.VITE_API_URL}token/`, formData);
-      
+      const response = await axios.post(
+        `${import.meta.env.VITE_API_URL}token/`,
+        formData,
+      );
+
       localStorage.setItem('access_token', response.data.access);
       localStorage.setItem('refresh_token', response.data.refresh);
-      
+
       await checkAuth();
       navigate('/schedule');
     } catch (err) {
@@ -52,7 +55,6 @@ function LoginPage() {
 
   return (
     <main className="min-h-screen justify-center items-center flex text-center bg-base-200">
-
       {/* Logo*/}
       <Link to={'/'}>
         <PlanItTag />
@@ -77,7 +79,9 @@ function LoginPage() {
                   title="Латиница, цифры и дефис. Начинается с буквы. 3-15 символов."
                   required
                   value={formData.username}
-                  onChange={(e) => setFormData({...formData, username: e.target.value})}
+                  onChange={(e) =>
+                    setFormData({ ...formData, username: e.target.value })
+                  }
                 />
               </label>
             </div>
@@ -96,41 +100,48 @@ function LoginPage() {
                   title="Минимум 8 символов: одна цифра, строчная и заглавная буква"
                   required
                   value={formData.password}
-                  onChange={(e) => setFormData({...formData, password: e.target.value})}
+                  onChange={(e) =>
+                    setFormData({ ...formData, password: e.target.value })
+                  }
                 />
               </label>
             </div>
 
-            <button 
-              type="submit" 
+            <button
+              type="submit"
               className="btn btn-accent w-full h-12 flex items-center justify-center"
               disabled={isLoading}
             >
-              {isLoading ? (
-                <LoadingIcon />
-              ) : (
-                'Войти'
-              )}
+              {isLoading ? <LoadingIcon /> : 'Войти'}
             </button>
 
             {/* Общие ошибки */}
             {generalError && (
               <div className="alert alert-error mt-4">
-                <svg xmlns="http://www.w3.org/2000/svg" className="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="stroke-current shrink-0 h-6 w-6"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"
+                  />
                 </svg>
                 <span>{generalError}</span>
               </div>
             )}
 
-            <div className='text-center'><span>или </span>
-            <GoogleLoginButton /></div>
+            <div className="text-center">
+              <span>или </span>
+              <GoogleLoginButton />
+            </div>
             <p className="text-sm">
               Нет аккаунта?{' '}
-              <Link 
-                to="/registration" 
-                className="link link-accent"
-              >
+              <Link to="/registration" className="link link-accent">
                 Зарегистрироваться
               </Link>
             </p>

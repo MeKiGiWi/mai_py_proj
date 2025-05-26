@@ -12,13 +12,13 @@ type formType = {
   username: string;
   password: string;
   confirmPassword: string;
-}
+};
 
 function RegistrationPage() {
   const [formData, setFormData] = useState<formType>({
     username: '',
     password: '',
-    confirmPassword: ''
+    confirmPassword: '',
   });
 
   const [generalError, setGeneralError] = useState<string>('');
@@ -31,7 +31,7 @@ function RegistrationPage() {
     e.preventDefault();
 
     const form = e.currentTarget as HTMLFormElement;
-    
+
     if (!form.checkValidity()) {
       form.reportValidity();
       return;
@@ -49,12 +49,15 @@ function RegistrationPage() {
 
     setIsLoading(true);
     try {
-      const response = await axios.post(`${import.meta.env.VITE_API_URL}register/`, {
-        username: formData.username,
-        password: formData.password,
-        confirm_password: formData.confirmPassword,
-        recaptcha_token: captchaToken,
-      });
+      const response = await axios.post(
+        `${import.meta.env.VITE_API_URL}register/`,
+        {
+          username: formData.username,
+          password: formData.password,
+          confirm_password: formData.confirmPassword,
+          recaptcha_token: captchaToken,
+        },
+      );
       console.log('Статус ответа:', response.status); // Должно быть 201
       console.log('Данные ответа:', response.data);
 
@@ -81,7 +84,9 @@ function RegistrationPage() {
           <form onSubmit={handleSubmit} className="space-y-4">
             {/* Поле username */}
             <div>
-              <p className="text-left mx-3 mb-1 font-semibold">Придумайте логин</p>
+              <p className="text-left mx-3 mb-1 font-semibold">
+                Придумайте логин
+              </p>
               <label className="input input-bordered flex w-full items-center gap-2 has-[:autofill]:bg-base-100">
                 <UserIcon />
                 <input
@@ -93,14 +98,18 @@ function RegistrationPage() {
                   title="Латиница, цифры и дефис. Начинается с буквы. 3-15 символов."
                   required
                   value={formData.username}
-                  onChange={(e) => setFormData({...formData, username: e.target.value})}
+                  onChange={(e) =>
+                    setFormData({ ...formData, username: e.target.value })
+                  }
                 />
               </label>
             </div>
 
             {/* Поле password */}
             <div>
-              <p className="text-left mx-3 mb-1 font-semibold">Придумайте пароль</p>
+              <p className="text-left mx-3 mb-1 font-semibold">
+                Придумайте пароль
+              </p>
               <label className="input input-bordered flex w-full items-center gap-2 has-[:autofill]:bg-base-100">
                 <PasswordIcon />
                 <input
@@ -112,14 +121,16 @@ function RegistrationPage() {
                   title="Минимум 8 символов: одна цифра, строчная и заглавная буква"
                   required
                   value={formData.password}
-                  onChange={(e) => setFormData({...formData, password: e.target.value})}
+                  onChange={(e) =>
+                    setFormData({ ...formData, password: e.target.value })
+                  }
                 />
               </label>
             </div>
 
             {/* Подтверждение пароля */}
             <div>
-            <label className="input input-bordered flex w-full items-center gap-2 has-[:autofill]:bg-base-100">
+              <label className="input input-bordered flex w-full items-center gap-2 has-[:autofill]:bg-base-100">
                 <PasswordIcon />
                 <input
                   type="password"
@@ -130,43 +141,54 @@ function RegistrationPage() {
                   title="Пароли должны совпадать"
                   required
                   value={formData.confirmPassword}
-                  onChange={(e) => setFormData({...formData, confirmPassword: e.target.value})}
+                  onChange={(e) =>
+                    setFormData({
+                      ...formData,
+                      confirmPassword: e.target.value,
+                    })
+                  }
                 />
               </label>
             </div>
-            
+
             <div className="w-full flex justify-center my-4">
-            <ReCAPTCHA
-              sitekey="6LehTfUqAAAAACy_psBXjlvWXwCymnjvz26aLW72"
-              onChange={(e) => setCaptchaToken(e || '')}
-            />
+              <ReCAPTCHA
+                sitekey="6LehTfUqAAAAACy_psBXjlvWXwCymnjvz26aLW72"
+                onChange={(e) => setCaptchaToken(e || '')}
+              />
             </div>
 
             {/* Кнопка отправки */}
-            <button 
-              type="submit" 
+            <button
+              type="submit"
               className="btn btn-accent w-full h-12 flex items-center justify-center"
               disabled={isLoading}
             >
-              {isLoading ? (
-                <LoadingIcon />
-              ) : (
-                'Зарегистрироваться'
-              )}
+              {isLoading ? <LoadingIcon /> : 'Зарегистрироваться'}
             </button>
-            
+
             {/* Общие ошибки */}
             {generalError && (
               <div className="alert alert-error mt-4">
-                <svg xmlns="http://www.w3.org/2000/svg" className="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="stroke-current shrink-0 h-6 w-6"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"
+                  />
                 </svg>
                 <span>{generalError}</span>
               </div>
             )}
 
             <p className="text-sm">
-              Уже есть аккаунт? {' '}
+              Уже есть аккаунт?{' '}
               <Link to="/login" className="link link-accent">
                 Войти
               </Link>

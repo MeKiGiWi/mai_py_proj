@@ -24,7 +24,10 @@ export default function NavBarForHP(): React.ReactElement {
       if (currentScrollY > prevScrollY.current && currentScrollY > 50) {
         setTop(-88); // Hide navbar while scrolling down
         lastVisiblePosition.current = currentScrollY;
-      } else if (lastVisiblePosition.current - currentScrollY > scrollThreshold) {
+      } else if (
+        lastVisiblePosition.current - currentScrollY >
+        scrollThreshold
+      ) {
         setTop(0); // Show navbar only after scrolling up more than threshold
         lastVisiblePosition.current = currentScrollY;
       }
@@ -49,12 +52,12 @@ export default function NavBarForHP(): React.ReactElement {
     <>
       {isAuth ? (
         <div
-          className='navbar fixed left-0 right-0 
+          className="navbar fixed left-0 right-0 
             bg-gradient-to-b from-[rgba(15,15,15,0.05)] to-transparent 
-            backdrop-blur-xs shadow-lg px-8 h-22 z-50'
+            backdrop-blur-xs shadow-lg px-8 h-22 z-50"
           style={navbarStyles}
         >
-          <div className='flex-1'>
+          <div className="flex-1">
             <Link to={'/'}>
               <PlanItTag />
             </Link>
@@ -64,18 +67,18 @@ export default function NavBarForHP(): React.ReactElement {
         </div>
       ) : (
         <div
-          className='navbar fixed left-0 right-0 
+          className="navbar fixed left-0 right-0 
             bg-gradient-to-b from-[rgba(15,15,15,0.5)] to-[rgba(15,15,15,0.001)] 
-            backdrop-blur-xs shadow-lg px-8 h-22 z-50'
+            backdrop-blur-xs shadow-lg px-8 h-22 z-50"
           style={navbarStyles}
         >
-          <div className='flex-1'>
-            <Link to='/'>
+          <div className="flex-1">
+            <Link to="/">
               <PlanItTag />
             </Link>
           </div>
-          <div className='flex-none'>
-            <Link to={'/login'} className='btn btn-neutral'>
+          <div className="flex-none">
+            <Link to={'/login'} className="btn btn-neutral">
               Войти
             </Link>
           </div>

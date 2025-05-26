@@ -1,4 +1,4 @@
-import { useState, useEffect} from 'react';
+import { useState, useEffect } from 'react';
 import NavBar from '../../components/NavBar';
 import getWeeksRange from '../../api/GetWeeksRange';
 import { format, startOfWeek } from 'date-fns';
@@ -9,7 +9,13 @@ import NotesPanel from './components/NotesPanel';
 import EventModal from './components/EventModal';
 import ExportModal from './components/ExportModal';
 import ExportButton from './components/ExportButton';
-import type { TEvent, TCell, TCurrentFilters, TCurrentMetrics, TNotesState } from './types';
+import type {
+  TEvent,
+  TCell,
+  TCurrentFilters,
+  TCurrentMetrics,
+  TNotesState,
+} from './types';
 
 import api from '../../interceptors/api';
 
@@ -42,16 +48,18 @@ export default function SchedulePage() {
   const [selectedCell, setSelectedCell] = useState<TCell | null>(null);
   const [events, setEvents] = useState<Record<string, TEvent>>({});
   const [isLoading, setIsLoading] = useState(true);
+  const [isExportModalOpen, setIsExportModalOpen] = useState(false);
 
   useEffect(() => {
     const fetchInitialData = async () => {
       try {
-        const [weeksData, teachersData, placesData, groupsData] = await Promise.all([
-          getWeeksRange(),
-          api.get('metrics/', { params: { type: 'teacher' } }),
-          api.get('metrics/', { params: { type: 'place' } }),
-          api.get('metrics/', { params: { type: 'group' } }),
-        ]);
+        const [weeksData, teachersData, placesData, groupsData] =
+          await Promise.all([
+            getWeeksRange(),
+            api.get('metrics/', { params: { type: 'teacher' } }),
+            api.get('metrics/', { params: { type: 'place' } }),
+            api.get('metrics/', { params: { type: 'group' } }),
+          ]);
 
         setCurrentMetrics({
           weeks: weeksData,
@@ -60,7 +68,7 @@ export default function SchedulePage() {
           groups: groupsData.data,
         });
 
-        setCurrentFilters(prev => ({
+        setCurrentFilters((prev) => ({
           ...prev,
           selectedGroup: groupsData.data[0] || null,
         }));
@@ -83,20 +91,20 @@ export default function SchedulePage() {
   const getTimeSlots = () => {
     const slots: { start: string; end: string }[] = [];
     let currentStart = WORKDAY_START;
-    
+
     while (currentStart + TIME_SLOT_DURATION <= WORKDAY_END) {
       if (currentStart === 12 * 60 + 30) {
         currentStart += 30;
       }
-      
+
       slots.push({
         start: formatTime(currentStart),
-        end: formatTime(currentStart + TIME_SLOT_DURATION)
+        end: formatTime(currentStart + TIME_SLOT_DURATION),
       });
-      
+
       currentStart += TIME_SLOT_DURATION + BREAK_DURATION;
     }
-    
+
     return slots;
   };
 
@@ -120,25 +128,28 @@ export default function SchedulePage() {
     fetchEvents();
   }, [currentFilters]);
 
-  const handleCellClick = (day: string, slot: { start: string; end: string }) => {
+  const handleCellClick = (
+    day: string,
+    slot: { start: string; end: string },
+  ) => {
     setSelectedCell({ day, ...slot });
     (document.getElementById('event_modal') as HTMLDialogElement)?.showModal();
   };
 
-  const addEvent = (cell: TCell, eventData: Omit<TEvent, "start_date">) => {
+  const addEvent = (cell: TCell, eventData: Omit<TEvent, 'start_date'>) => {
     const key = `${currentFilters.activeWeek}-${cell.day}-${cell.start}`;
-    setEvents(prev => ({
+    setEvents((prev) => ({
       ...prev,
       [key]: {
         ...eventData,
-        start_date: new Date()
-      }
+        start_date: new Date(),
+      },
     }));
   };
 
   const addNote = () => {
     if (notesState.newNote.trim()) {
-      setNotesState(prev => ({
+      setNotesState((prev) => ({
         list: [...prev.list, prev.newNote],
         newNote: '',
       }));
@@ -148,8 +159,8 @@ export default function SchedulePage() {
   return (
     <>
       <NavBar />
-      <div className='flex min-h-screen bg-base-200 p-4 gap-4'>
-        <div className='flex-1 bg-base-100 rounded-box p-4'>
+      <div className="flex min-h-screen bg-base-200 p-4 gap-4">
+        <div className="flex-1 bg-base-100 rounded-box p-4">
           <ScheduleHeader
             currentFilters={currentFilters}
             currentMetrics={currentMetrics}
@@ -157,16 +168,20 @@ export default function SchedulePage() {
             setCurrentFilters={setCurrentFilters}
           />
 
-          <ExportButton />
+          <ExportButton onClick={() => setIsExportModalOpen(true)} />
+          <ExportModal
+            open={isExportModalOpen}
+            onClose={() => setIsExportModalOpen(false)}
+          />
 
           <ScheduleTable
             scheduleData={{
               timeSlots: getTimeSlots(),
-              events: events
+              events: events,
             }}
             filters={{
-              activeWeek: currentFilters.activeWeek, // Передаем activeWeek
-              cycleStartDate: currentFilters.cycleStartDate
+              activeWeek: currentFilters.activeWeek,
+              cycleStartDate: currentFilters.cycleStartDate,
             }}
             onCellClick={handleCellClick}
           />
@@ -178,12 +193,7 @@ export default function SchedulePage() {
           addNote={addNote}
         />
 
-        <EventModal 
-          selectedCell={selectedCell} 
-          addEvent={addEvent}
-        />
-
-        <ExportModal />
+        <EventModal selectedCell={selectedCell} addEvent={addEvent} />
       </div>
     </>
   );
