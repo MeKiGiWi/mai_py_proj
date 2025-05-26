@@ -61,11 +61,12 @@ export default function ExportModal({
               <div className="flex gap-2">
                 <input
                   type="date"
-                  className="input input-bordered w-full input-sm"
+                  className="input w-full input-sm focus:outline-none focus:ring-0"
                   onChange={(e) => handleDateSelect(new Date(e.target.value), 'start')}
                 />
+
                 <select
-                  className="select select-bordered w-full select-sm"
+                  className="select w-full select-sm focus:outline-none focus:ring-0"
                   onChange={(e) => handleTimeSelect(e.target.value, 'start')}
                   value={startDate.split(' ')[3] || ''}
                 >
@@ -84,11 +85,12 @@ export default function ExportModal({
               <div className="flex gap-2">
                 <input
                   type="date"
-                  className="input input-bordered w-full input-sm"
+                  className="input w-full input-sm focus:outline-none focus:ring-0"
                   onChange={(e) => handleDateSelect(new Date(e.target.value), 'end')}
                 />
+
                 <select
-                  className="select select-bordered w-full select-sm"
+                  className="select w-full select-sm focus:outline-none focus:ring-0"
                   onChange={(e) => handleTimeSelect(e.target.value, 'end')}
                   value={endDate.split(' ')[3] || ''}
                 >
