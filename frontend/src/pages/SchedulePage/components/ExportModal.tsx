@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
 import GoogleIcon from '@/components/GoogleIcon';
-import DoubleDropDown from './DoubledDropDown';
-import { se } from 'date-fns/locale';
+
 export default function ExportModal({
   open,
   onClose,
@@ -12,44 +11,35 @@ export default function ExportModal({
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
   const timeSlots = ['9:00', '10:45', '13:00'];
-  const generateDateOptions = () => {
-    const options = [];
-    const today = new Date();
-    for (let i = 0; i < 31; i++) {
-      const date = new Date(today);
-      date.setDate(today.getDate() + i);
-      const dateString = date.toLocaleDateString('ru-RU', {
-        day: 'numeric',
-        month: 'long',
-        weekday: 'short',
-      });
-      options.push(
-        // value: date.toISOString(),
-        dateString,
-      );
-    }
-    return options;
+
+  const handleDateSelect = (date: Date, type: 'start' | 'end') => {
+    const formattedDate = date.toLocaleDateString('ru-RU', {
+      day: 'numeric',
+      month: 'long',
+      weekday: 'short',
+    });
+    type === 'start'
+      ? setStartDate(prev => `${formattedDate} ${prev.split(' ')[3] || ''}`.trim())
+      : setEndDate(prev => `${formattedDate} ${prev.split(' ')[3] || ''}`.trim());
   };
 
-  const handleStartDateSelect = (day: string, time: string) => {
-    const selectedDate = day + ' ' + time;
-    setStartDate(selectedDate);
-  };
-
-  const handleEndDateSelect = (day: string, time: string) => {
-    const selectedDate = day + ' ' + time;
-    setEndDate(selectedDate);
+  const handleTimeSelect = (time: string, type: 'start' | 'end') => {
+    type === 'start'
+      ? setStartDate(prev => `${prev.split(' ').slice(0, 3).join(' ')} ${time}`)
+      : setEndDate(prev => `${prev.split(' ').slice(0, 3).join(' ')} ${time}`);
   };
 
   const handleExport = (type: 'calendar' | 'sheets') => {
     console.log(
       `Экспорт в Google ${type === 'calendar' ? 'Календарь' : 'Таблицы'}`,
+      `С: ${startDate}`,
+      `До: ${endDate}`
     );
     onClose();
   };
 
   useEffect(() => {
-    console.log(startDate);
+    console.log('Start date updated:', startDate);
   }, [startDate]);
 
   if (!open) return null;
@@ -64,29 +54,53 @@ export default function ExportModal({
 
         <div className="flex flex-row gap-6">
           <div className="flex flex-col gap-4">
-            <div className="dropdown relative">
-              <div tabIndex={0} role="button" className="btn w-80">
-                <span>{startDate ? startDate : 'Экспортировать с пары'}</span>
+            <div className="form-control">
+              <label className="label">
+                <span className="label-text">Начало</span>
+              </label>
+              <div className="flex gap-2">
+                <input
+                  type="date"
+                  className="input input-bordered w-full"
+                  onChange={(e) => handleDateSelect(new Date(e.target.value), 'start')}
+                />
+                <select
+                  className="select select-bordered w-full"
+                  onChange={(e) => handleTimeSelect(e.target.value, 'start')}
+                  value={startDate.split(' ')[3] || ''}
+                >
+                  <option value="" disabled>Время</option>
+                  {timeSlots.map(time => (
+                    <option key={time} value={time}>{time}</option>
+                  ))}
+                </select>
               </div>
-
-              <DoubleDropDown
-                titles={generateDateOptions()}
-                items={timeSlots}
-                handleClick={handleStartDateSelect}
-              />
             </div>
-            <div className="dropdown relative">
-              <div tabIndex={0} role="button" className="btn w-80">
-                <span>{endDate ? endDate : 'Экспортировать до пары'}</span>
-              </div>
 
-              <DoubleDropDown
-                titles={generateDateOptions()}
-                items={timeSlots}
-                handleClick={handleEndDateSelect}
-              />
+            <div className="form-control">
+              <label className="label">
+                <span className="label-text">Конец</span>
+              </label>
+              <div className="flex gap-2">
+                <input
+                  type="date"
+                  className="input input-bordered w-full"
+                  onChange={(e) => handleDateSelect(new Date(e.target.value), 'end')}
+                />
+                <select
+                  className="select select-bordered w-full"
+                  onChange={(e) => handleTimeSelect(e.target.value, 'end')}
+                  value={endDate.split(' ')[3] || ''}
+                >
+                  <option value="" disabled>Время</option>
+                  {timeSlots.map(time => (
+                    <option key={time} value={time}>{time}</option>
+                  ))}
+                </select>
+              </div>
             </div>
           </div>
+
           <div className="flex flex-col gap-4">
             <button
               className="btn btn-primary gap-2"
