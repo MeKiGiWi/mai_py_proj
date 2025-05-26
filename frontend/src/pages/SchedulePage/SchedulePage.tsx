@@ -5,17 +5,11 @@ import { format, startOfWeek } from 'date-fns';
 
 import ScheduleHeader from './components/ScheduleHeader.1';
 import ScheduleTable from './components/ScheduleTable';
-import NotesPanel from './components/NotesPanel';
 import EventModal from './components/EventModal';
 import ExportModal from './components/ExportModal';
 import ExportButton from './components/ExportButton';
-import type {
-  TEvent,
-  TCell,
-  TCurrentFilters,
-  TCurrentMetrics,
-  TNotesState,
-} from './types';
+import RightPanel from './components/RightPanel';
+import type { TEvent, TCell, TCurrentFilters, TCurrentMetrics, TNotesState, TSelectedEvent, TNote } from './types';
 
 import api from '../../interceptors/api';
 
@@ -49,6 +43,8 @@ export default function SchedulePage() {
   const [events, setEvents] = useState<Record<string, TEvent>>({});
   const [isLoading, setIsLoading] = useState(true);
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
+  const [selectedEventInfo, setSelectedEventInfo] = useState< TSelectedEvent | null>(null);
+  const [selectedNote, setSelectedNote] = useState<TNote | null>(null);
 
   useEffect(() => {
     const fetchInitialData = async () => {
@@ -131,9 +127,15 @@ export default function SchedulePage() {
   const handleCellClick = (
     day: string,
     slot: { start: string; end: string },
+    event?: TEvent,
+    eventKey?: string
   ) => {
-    setSelectedCell({ day, ...slot });
-    (document.getElementById('event_modal') as HTMLDialogElement)?.showModal();
+    if (event && eventKey) {
+      setSelectedEventInfo({ event, eventKey });
+    } else {
+      setSelectedCell({ day, ...slot });
+      (document.getElementById('event_modal') as HTMLDialogElement)?.showModal();
+    }
   };
 
   const addEvent = (cell: TCell, eventData: Omit<TEvent, 'start_date'>) => {
@@ -145,15 +147,6 @@ export default function SchedulePage() {
         start_date: new Date(),
       },
     }));
-  };
-
-  const addNote = () => {
-    if (notesState.newNote.trim()) {
-      setNotesState((prev) => ({
-        list: [...prev.list, prev.newNote],
-        newNote: '',
-      }));
-    }
   };
 
   return (
@@ -181,16 +174,20 @@ export default function SchedulePage() {
             }}
             filters={{
               activeWeek: currentFilters.activeWeek,
-              cycleStartDate: currentFilters.cycleStartDate,
+              cycleStartDate: currentFilters.cycleStartDate
             }}
             onCellClick={handleCellClick}
           />
         </div>
 
-        <NotesPanel
+        <RightPanel
+          selectedEventInfo={selectedEventInfo}
+          selectedNote={selectedNote}
           notesState={notesState}
           setNotesState={setNotesState}
-          addNote={addNote}
+          setEvents={setEvents}
+          setSelectedEventInfo={setSelectedEventInfo}
+          setSelectedNote={setSelectedNote}
         />
 
         <EventModal selectedCell={selectedCell} addEvent={addEvent} />

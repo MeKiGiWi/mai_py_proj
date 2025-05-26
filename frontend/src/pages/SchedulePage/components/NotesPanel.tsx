@@ -1,20 +1,43 @@
-// NotesPanel.tsx
-type TNotesState = {
-  list: string[];
+// types.ts
+export type TNote = {
+  id: string;
+  content: string;
+  createdAt: Date;
+};
+
+export type TNotesState = {
+  list: TNote[];
   newNote: string;
 };
 
 type NotesPanelProps = {
   notesState: TNotesState;
   setNotesState: React.Dispatch<React.SetStateAction<TNotesState>>;
-  addNote: () => void;
+  onNoteSelect: (note: TNote) => void;
+  onNoteDelete: (noteId: string) => void;
 };
 
-export default function NotesPanel({
-  notesState: { list, newNote },
+export default function NotesPanel({ 
+  notesState: { list, newNote }, 
   setNotesState,
-  addNote,
+  onNoteSelect,
+  onNoteDelete,
 }: NotesPanelProps) {
+  const addNote = () => {
+    if (newNote.trim()) {
+      const newNoteObj: TNote = {
+        id: Date.now().toString(),
+        content: newNote.trim(),
+        createdAt: new Date()
+      };
+      
+      setNotesState(prev => ({
+        list: [...prev.list, newNoteObj],
+        newNote: ''
+      }));
+    }
+  };
+
   return (
     <div className="w-80 bg-base-100 rounded-box p-4">
       <h3 className="text-xl font-bold mb-4">Пометки</h3>
@@ -38,10 +61,25 @@ export default function NotesPanel({
           </button>
         </div>
       </div>
-      <ul className="menu">
-        {list.map((note, index) => (
-          <li key={index} className="hover-bg">
-            <a className="py-2">{note}</a>
+      <ul className='menu'>
+        {list.map((note) => (
+          <li key={note.id} className='hover-bg group relative'>
+            <a className='py-2 pr-8 cursor-pointer' onClick={() => onNoteSelect(note)}>
+              {note.content}
+            </a>
+            {/* Кнопка удаления */}
+            <button
+              className='absolute right-2 top-1/2 -translate-y-1/2 opacity-0 
+                      group-hover:opacity-100 transition-[opacity,transform] duration-200 
+                      btn btn-xs btn-circle active:scale-95 active:!translate-y-[-50%]'
+              onClick={(e) => {
+                e.preventDefault();
+                onNoteDelete(note.id);
+              }}
+              aria-label='Удалить пометку'
+            >
+              ✕
+            </button>
           </li>
         ))}
       </ul>

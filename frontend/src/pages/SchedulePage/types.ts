@@ -27,8 +27,19 @@ export type TCurrentMetrics = {
   weeks: Date[];
   groups: string[];
 };
+  
+export type TNote = {
+  id: string;
+  content: string;
+  createdAt: Date;
+};
 
 export type TNotesState = {
-  list: string[];
+  list: TNote[];
   newNote: string;
+};
+
+export type TSelectedEvent = {
+    event: TEvent;
+    eventKey: string;
 };

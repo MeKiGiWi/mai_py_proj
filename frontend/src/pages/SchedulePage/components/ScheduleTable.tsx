@@ -11,7 +11,12 @@ type ScheduleTableProps = {
     activeWeek: number;
     cycleStartDate: Date;
   };
-  onCellClick: (day: string, slot: { start: string; end: string }) => void;
+  onCellClick: (
+    day: string, 
+    slot: { start: string; end: string }, 
+    event?: TEvent, 
+    eventKey?: string
+  ) => void; 
 };
 
 export default function ScheduleTable({
@@ -59,7 +64,7 @@ export default function ScheduleTable({
               className={`${slot.start != '20:00' && 'border border-base-content/15'} border-l-0 border-r-0 
                 cursor-pointer hover:bg-base-300 w-[170px] max-w-[130px] 
                 min-h-21.5 h-21.5 break-words overflow-hidden p-2 align-top`}
-              onClick={() => onCellClick(day, slot)}
+              onClick={() => onCellClick(day, slot, event, eventKey)}
             >
               {event ? (
                 <div className="flex flex-col gap-1 p-1">
