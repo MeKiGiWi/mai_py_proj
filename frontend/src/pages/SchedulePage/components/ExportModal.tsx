@@ -47,25 +47,25 @@ export default function ExportModal({
   return (
     <div className="modal modal-open">
       <div
-        className="modal-box w-2xl max-w-5xl relative h-100"
+        className="modal-box max-w-md relative p-6"
         onClick={(e) => e.stopPropagation()}
       >
-        <h3 className="font-bold text-lg mb-6">Экспорт расписания</h3>
+        <h3 className="font-bold text-lg mb-4 text-center">Экспорт расписания</h3>
 
-        <div className="flex flex-row gap-6">
-          <div className="flex flex-col gap-4">
+        <div className="flex flex-col gap-4">
+          <div className="space-y-4">
             <div className="form-control">
-              <label className="label">
-                <span className="label-text">Начало</span>
+              <label className="label py-1">
+                <span className="label-text">Начальная дата и время</span>
               </label>
               <div className="flex gap-2">
                 <input
                   type="date"
-                  className="input input-bordered w-full"
+                  className="input input-bordered w-full input-sm"
                   onChange={(e) => handleDateSelect(new Date(e.target.value), 'start')}
                 />
                 <select
-                  className="select select-bordered w-full"
+                  className="select select-bordered w-full select-sm"
                   onChange={(e) => handleTimeSelect(e.target.value, 'start')}
                   value={startDate.split(' ')[3] || ''}
                 >
@@ -78,17 +78,17 @@ export default function ExportModal({
             </div>
 
             <div className="form-control">
-              <label className="label">
-                <span className="label-text">Конец</span>
+              <label className="label py-1">
+                <span className="label-text">Конечная дата и время</span>
               </label>
               <div className="flex gap-2">
                 <input
                   type="date"
-                  className="input input-bordered w-full"
+                  className="input input-bordered w-full input-sm"
                   onChange={(e) => handleDateSelect(new Date(e.target.value), 'end')}
                 />
                 <select
-                  className="select select-bordered w-full"
+                  className="select select-bordered w-full select-sm"
                   onChange={(e) => handleTimeSelect(e.target.value, 'end')}
                   value={endDate.split(' ')[3] || ''}
                 >
@@ -101,24 +101,22 @@ export default function ExportModal({
             </div>
           </div>
 
-        </div>
-
-        <div className="flex flex-col gap-4 mt-6">
-          <button
-            className="btn btn-primary gap-2 w-54"
-            onClick={() => handleExport('calendar')}
-          >
-            <GoogleIcon />
-            Google Календарь
-          </button>
-
-          <button
-            className="btn btn-secondary gap-2 w-54"
-            onClick={() => handleExport('sheets')}
-          >
-            <GoogleIcon />
-            Google Таблицы
-          </button>
+          <div className="flex flex-col gap-2 mt-4">
+            <button
+              className="btn btn-primary btn-sm gap-2 w-52"
+              onClick={() => handleExport('calendar')}
+            >
+              <GoogleIcon />
+              Google Календарь
+            </button>
+            <button
+              className="btn btn-secondary btn-sm gap-2 w-52 pr-7"
+              onClick={() => handleExport('sheets')}
+            >
+              <GoogleIcon />
+              Google Таблицы
+            </button>
+          </div>
         </div>
       </div>
 
