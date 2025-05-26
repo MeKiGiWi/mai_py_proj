@@ -9,7 +9,9 @@ import NotesPanel from './components/NotesPanel';
 import EventModal from './components/EventModal';
 import ExportModal from './components/ExportModal';
 import ExportButton from './components/ExportButton';
-import type { TEvent, TCell, TCurrentFilters, TCurrentMetrics, TNotesState } from './types';
+import EditEventPanel from './components/EditEventPanel';
+import EditNotePanel from './components/EditNotePanel';
+import type { TEvent, TCell, TCurrentFilters, TCurrentMetrics, TNotesState, TSelectedEvent, TNote } from './types';
 
 import api from '../../interceptors/api';
 
@@ -42,6 +44,8 @@ export default function SchedulePage() {
   const [selectedCell, setSelectedCell] = useState<TCell | null>(null);
   const [events, setEvents] = useState<Record<string, TEvent>>({});
   const [isLoading, setIsLoading] = useState(true);
+  const [selectedEventInfo, setSelectedEventInfo] = useState< TSelectedEvent | null>(null);
+  const [selectedNote, setSelectedNote] = useState<TNote | null>(null);
 
   useEffect(() => {
     const fetchInitialData = async () => {
@@ -120,9 +124,18 @@ export default function SchedulePage() {
     fetchEvents();
   }, [currentFilters]);
 
-  const handleCellClick = (day: string, slot: { start: string; end: string }) => {
-    setSelectedCell({ day, ...slot });
-    (document.getElementById('event_modal') as HTMLDialogElement)?.showModal();
+  const handleCellClick = (
+    day: string,
+    slot: { start: string; end: string },
+    event?: TEvent,
+    eventKey?: string
+  ) => {
+    if (event && eventKey) {
+      setSelectedEventInfo({ event, eventKey });
+    } else {
+      setSelectedCell({ day, ...slot });
+      (document.getElementById('event_modal') as HTMLDialogElement)?.showModal();
+    }
   };
 
   const addEvent = (cell: TCell, eventData: Omit<TEvent, "start_date">) => {
@@ -136,13 +149,21 @@ export default function SchedulePage() {
     }));
   };
 
-  const addNote = () => {
-    if (notesState.newNote.trim()) {
-      setNotesState(prev => ({
-        list: [...prev.list, prev.newNote],
-        newNote: '',
-      }));
-    }
+  const updateNote = (updatedNote: TNote) => {
+    setNotesState(prev => ({
+      ...prev,
+      list: prev.list.map(note => 
+        note.id === updatedNote.id ? updatedNote : note
+      )
+    }));
+    setSelectedNote(null);
+  };
+
+  const handleNoteDelete = (noteId: string) => {
+    setNotesState(prev => ({
+      ...prev,
+      list: prev.list.filter(note => note.id !== noteId)
+    }));
   };
 
   return (
@@ -172,11 +193,35 @@ export default function SchedulePage() {
           />
         </div>
 
-        <NotesPanel
-          notesState={notesState}
-          setNotesState={setNotesState}
-          addNote={addNote}
-        />
+        {selectedEventInfo ? (
+          <EditEventPanel
+            event={selectedEventInfo.event}
+            onSave={(updatedEvent) => {
+              setEvents((prev) => ({
+                ...prev,
+                [selectedEventInfo.eventKey]: {
+                  ...updatedEvent,
+                  start_date: selectedEventInfo.event.start_date,
+                },
+              }));
+              setSelectedEventInfo(null);
+            }}
+            onCancel={() => setSelectedEventInfo(null)}
+          />
+        ) : selectedNote ? (
+          <EditNotePanel
+            note={selectedNote}
+            onSave={updateNote}
+            onCancel={() => setSelectedNote(null)}
+          />
+        ) : (
+          <NotesPanel
+            notesState={notesState}
+            setNotesState={setNotesState}
+            onNoteSelect={setSelectedNote}
+            onNoteDelete={handleNoteDelete}
+          />
+        )}
 
         <EventModal 
           selectedCell={selectedCell} 
