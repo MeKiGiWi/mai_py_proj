@@ -25,6 +25,14 @@ export default function EditEventPanel({
     onSave(formData);
   };
 
+  const LESSON_TYPE_OPTIONS = [
+    { value: "", label: "Выберите тип" },
+    { value: "ЛК", label: "Лекция" },
+    { value: "ПЗ", label: "Практическое занятие" },
+    { value: "ЛР", label: "Лабораторная работа" },
+    { value: "ЭКЗ", label: "Экзамен" }
+  ];
+
   return (
     <div className="w-80 bg-base-100 rounded-box p-4 flex flex-col">
       <h2 className="text-xl font-bold mb-4">Панель редактирования</h2>
@@ -65,10 +73,14 @@ export default function EditEventPanel({
             onChange={handleChange}
             className="select select-bordered"
           >
-            <option value="">Выберите тип</option>
-            <option value="ЛК">Лекция</option>
-            <option value="ПЗ">Практическое занятие</option>
-            <option value="ЛР">Лабораторная работа</option>
+            {LESSON_TYPE_OPTIONS.map((option) => (
+              <option 
+                key={option.value} 
+                value={option.value}
+              >
+                {option.label}
+              </option>
+            ))}
           </select>
         </div>
 
