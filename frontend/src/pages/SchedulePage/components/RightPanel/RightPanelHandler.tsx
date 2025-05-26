@@ -1,9 +1,8 @@
-// components/RightPanelHandler.tsx
 import { FC } from 'react';
-import NotesPanel from './NotesPanel';
-import EditEventPanel from './EditEventPanel';
-import EditNotePanel from './EditNotePanel';
-import { TEvent, TNote, TNotesState } from '../types';
+import NotesPanel from '../NotesPanel';
+import EditEventPanel from '../EditEventPanel';
+import EditNotePanel from '../EditNotePanel';
+import { TEvent, TNote, TNotesState } from '../../types';
 
 type TSelectedEvent = {
   event: TEvent;

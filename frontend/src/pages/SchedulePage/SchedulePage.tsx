@@ -8,7 +8,7 @@ import ScheduleTable from './components/ScheduleTable';
 import EventModal from './components/EventModal';
 import ExportModal from './components/ExportModal';
 import ExportButton from './components/ExportButton';
-import RightPanelHandler from './components/RightPanelHandler';
+import RightPanel from './components/RightPanel';
 import type { TEvent, TCell, TCurrentFilters, TCurrentMetrics, TNotesState, TSelectedEvent, TNote } from './types';
 
 import api from '../../interceptors/api';
@@ -147,23 +147,6 @@ export default function SchedulePage() {
     }));
   };
 
-  const updateNote = (updatedNote: TNote) => {
-    setNotesState(prev => ({
-      ...prev,
-      list: prev.list.map(note => 
-        note.id === updatedNote.id ? updatedNote : note
-      )
-    }));
-    setSelectedNote(null);
-  };
-
-  const handleNoteDelete = (noteId: string) => {
-    setNotesState(prev => ({
-      ...prev,
-      list: prev.list.filter(note => note.id !== noteId)
-    }));
-  };
-
   return (
     <>
       <NavBar />
@@ -184,29 +167,19 @@ export default function SchedulePage() {
               events: events
             }}
             filters={{
-              activeWeek: currentFilters.activeWeek, // Передаем activeWeek
+              activeWeek: currentFilters.activeWeek,
               cycleStartDate: currentFilters.cycleStartDate
             }}
             onCellClick={handleCellClick}
           />
         </div>
 
-        <RightPanelHandler
+        <RightPanel
           selectedEventInfo={selectedEventInfo}
           selectedNote={selectedNote}
           notesState={notesState}
           setNotesState={setNotesState}
-          onEventSave={(updatedEvent) => {
-            setEvents(prev => ({
-              ...prev,
-              [selectedEventInfo!.eventKey]: {
-                ...updatedEvent,
-                start_date: selectedEventInfo!.event.start_date,
-              }
-            }));
-          }}
-          onNoteSave={updateNote}
-          onNoteDelete={handleNoteDelete}
+          setEvents={setEvents}
           setSelectedEventInfo={setSelectedEventInfo}
           setSelectedNote={setSelectedNote}
         />
