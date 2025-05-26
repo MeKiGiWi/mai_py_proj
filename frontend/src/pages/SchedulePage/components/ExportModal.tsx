@@ -10,7 +10,7 @@ export default function ExportModal({
 }) {
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
-  const timeSlots = ['9:00', '10:45', '13:00'];
+  const timeSlots = ['9:00', '10:45', '13:00', '14:45', '16:30', '18:15', '20:00'];
 
   const handleDateSelect = (date: Date, type: 'start' | 'end') => {
     const formattedDate = date.toLocaleDateString('ru-RU', {
