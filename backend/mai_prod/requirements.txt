@@ -36,3 +36,4 @@ websocket-client==1.8.0
 wsproto==1.2.0
 google-auth==2.40.2
 google-auth-oauthlib==1.2.2
+transliterate==1.10.2
