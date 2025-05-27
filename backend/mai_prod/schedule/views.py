@@ -274,6 +274,10 @@ class MetricsAPIView(APIView):
             metrics = sorted(list(metrics) + list(custom_metrics))
         elif type == "teacher":
             metrics = Schedule.objects.values_list("teacher", flat=True).distinct()
+            custom_metrics = UserSchedule.objects.filter(
+                user=request.user,
+            )
+            custom_metrics.values_list("teacher", flat=True).distinct()
             metrics = sorted(
                 list(
                     {
@@ -281,6 +285,11 @@ class MetricsAPIView(APIView):
                         for x in metrics
                         if x is not None and not any(char.isdigit() for char in x)
                     }
+                )
+                + list(
+                    normalize_fullname(x)
+                    for x in custom_metrics
+                    if x is not None and not any(char.isdigit() for char in x)
                 )
             )
         elif type == "place":
