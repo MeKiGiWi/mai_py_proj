@@ -14,33 +14,70 @@ from rest_framework.decorators import (
     permission_classes,
 )
 from .serializers import UserRegisterSerializer
+from requests.exceptions import RequestException
 
 
 class RegisterView(APIView):
     def post(self, request):
-        serializer_data = request.data
-        recaptcha_token = serializer_data.pop("recaptcha_token")
-        print(serializer_data)
-        serializer = UserRegisterSerializer(data=serializer_data)
+        try:
+            serializer_data = request.data.copy()
+            recaptcha_token = serializer_data.pop("recaptcha_token", None)
 
-        load_dotenv()
-        verification_url = "https://www.google.com/recaptcha/api/siteverify"
-        response = requests.post(verification_url, {
-            "secret": os.getenv("RECAPTCHA_SECRET_KEY"),
-            "response": recaptcha_token,
-        }, timeout=60000)
+            if not recaptcha_token:
+                return Response(
+                    {"error": "Необходим токен reCAPTCHA"},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
 
-        result = response.json()
-        print(result)
-        if not result.get('success'):
-            return Response(result, status=status.HTTP_403_FORBIDDEN)
-        if serializer.is_valid():
+            load_dotenv()
+            secret_key = os.getenv("RECAPTCHA_SECRET_KEY")
+            if not secret_key:
+                return Response(
+                    {"error": "Ключ reCAPTCHA не настроен"},
+                    status=status.HTTP_500_INTERNAL_SERVER_ERROR
+                )
+            
+            try:
+                response = requests.post(
+                    "https://www.google.com/recaptcha/api/siteverify",
+                    data={
+                        "secret": secret_key,
+                        "response": recaptcha_token,
+                    },
+                    timeout=10 
+                )
+                result = response.json()
+            except RequestException as e:
+                return Response(
+                    {"error": f"reCAPTCHA не подтвержден: {str(e)}"},
+                    status=status.HTTP_503_SERVICE_UNAVAILABLE
+                )
+
+            if not result.get("success", False):
+                return Response(
+                    {"error": "Неправильный reCAPTCHA"},
+                    status=status.HTTP_403_FORBIDDEN
+                )
+
+            serializer = UserRegisterSerializer(data=serializer_data)
+            if not serializer.is_valid():
+                return Response(
+                    serializer.errors,
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+
             serializer.save()
             return Response(
-                {'message': 'Пользователь успешно создан'}, 
+                {"message": "Пользователь успешно создан"},
                 status=status.HTTP_201_CREATED
             )
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+        except Exception as e:
+            print(f"Server error: {str(e)}")
+            return Response(
+                {"error": "Ошибка сервера"},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
         
 
 class LoginView(TokenObtainPairView):

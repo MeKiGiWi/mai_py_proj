@@ -119,3 +119,8 @@ class UserSchedule(AbstractSchedule):
         on_delete=models.CASCADE,
         related_name='schedules',
     )
+
+    deleted = models.BooleanField (
+        'deleted',
+        default=False,
+    )

@@ -19,6 +19,7 @@ from rest_framework.decorators import (
 
 # Create your views here.
 
+
 class ScheduleAPIView(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -31,53 +32,59 @@ class ScheduleAPIView(APIView):
                 {"error": "Параметр 'date' не передан"},
                 status=status.HTTP_400_BAD_REQUEST,
             )
-        
+
         try:
-            input_date = datetime.strptime(date_str, '%Y-%m-%d').date()
+            input_date = datetime.strptime(date_str, "%Y-%m-%d").date()
         except ValueError:
             return Response(
                 {"error": "Неверный формат 'date', требуется 'YYYY-MM-DD'"},
                 status=status.HTTP_400_BAD_REQUEST,
             )
-        
-        required_params = {'group_name', 'teacher', 'place'}
+
+        required_params = {"group_name", "teacher", "place"}
         if not any(param in params for param in required_params):
             return Response(
                 {"error": "Должен быть передан хотя бы один параметр помимо 'date'"},
-                status=status.HTTP_400_BAD_REQUEST
+                status=status.HTTP_400_BAD_REQUEST,
             )
-        
+
         start_date = input_date
         end_date = start_date + timedelta(days=14)
-        
+
         query = Q(start_date__range=(start_date, end_date))
 
         # query filter
-        if 'group_name' in params:
-            group_id = get_object_or_404(GroupLink, group_name=params['group_name'])
+        if "group_name" in params:
+            group_id = get_object_or_404(GroupLink, group_name=params["group_name"])
             query &= Q(group_name_id__exact=group_id)
 
-        if 'teacher' in params:
-            query &= Q(teacher__iexact=params['teacher'])
-        
-        if 'place' in params:
-            query &= Q(place__iexact=params['place'])
-        
+        if "teacher" in params:
+            query &= Q(teacher__iexact=params["teacher"])
+
+        if "place" in params:
+            query &= Q(place__iexact=params["place"])
+
         grouped_data = defaultdict(dict)
 
-        schedule = Schedule.objects.filter(query).order_by('start_date') # get schedule_data by filter
+        schedule = Schedule.objects.filter(query).order_by(
+            "start_date"
+        )  # get schedule_data by filter
         serializer = ScheduleSerializer(schedule, many=True)
         for event in serializer.data:
-            event_date = event['start_date']
+            event_date = event["start_date"]
             grouped_data[event_date] = event
 
-        user_schedule = UserSchedule.objects.filter(query & Q(user_id=request.user.id)).order_by('start_date') # get userschedule_data by filter
+        user_schedule = UserSchedule.objects.filter(
+            query & Q(user_id=request.user.id)
+        ).order_by(
+            "start_date"
+        )  # get userschedule_data by filter
         if user_schedule.exists():
             serializer = ScheduleSerializer(user_schedule, many=True)
             for event in serializer.data:
-                event_date = event['start_date']
-                grouped_data[event_date] = event # if we need to rewrite data
-                # grouped_data[key].update( 
+                event_date = event["start_date"]
+                grouped_data[event_date] = event  # if we need to rewrite data
+                # grouped_data[key].update(
                 #     {key: value for key, value in item.items() if value is not None}
                 # )  # if we need to update data
 
@@ -85,10 +92,171 @@ class ScheduleAPIView(APIView):
 
         return Response(grouped_data)
 
+    def patch(self, request: Request):
+        """Принимает json {date: yyyy-mm-ddThh:mm:ssZ, group_name: string, teacher: string, place: string, lesson_type: string, week: int, lesson_name: stirng,}
+        и записывает такую строку в UserSchedule с флагом deleted=false"""
+        params = request.query_params
+        required_params = {
+            "date",
+            "group_name",
+            "teacher",
+            "place",
+            "lesson_type",
+            "week",
+            "lesson_name",
+        }
+
+        if not all(param in params for param in required_params):
+            return Response(
+                {
+                    "error": "Необходимы все параметры: date, group_name, teacher, place, lesson_type, week, lesson_name"
+                },
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        # Валидация даты
+        try:
+            date_str_utc = params.get("date").replace("Z", "+0000")
+            input_date = datetime.strptime(date_str_utc, "%Y-%m-%dT%H:%M:%S%z")
+        except ValueError:
+            return Response(
+                {"error": "Неверный формат даты"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        # Поиск группы
+        try:
+            group = GroupLink.objects.get(group_name=params["group_name"])
+        except GroupLink.DoesNotExist:
+            return Response(
+                {"error": "Группа не найдена"},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+        params = {param: None if x == "" else x for param, x in params.items()}
+        query = (
+            Q(start_date=input_date)
+            & Q(teacher__iexact=params["teacher"])
+            & Q(group_name=group)
+            & Q(place__iexact=params["place"])
+            & Q(lesson_type__iexact=params["lesson_type"])
+            & Q(lesson_name__iexact=params["lesson_name"])
+            & Q(week=params["week"])
+        )
+
+        schedule = Schedule.objects.filter(query)
+
+        if not schedule:
+            user_schedule, created = UserSchedule.objects.update_or_create(
+                user=request.user,
+                group_name=group,
+                start_date=input_date,  # Уникальный ключ
+                defaults={
+                    "teacher": params["teacher"],
+                    "place": params["place"],
+                    "week": params["week"],
+                    "lesson_type": params["lesson_type"],
+                    "lesson_name": params["lesson_name"],
+                    "deleted": False,  # Сбрасываем флаг удаления
+                },
+            )
+        return Response(
+            {"status": "Запись добавлена/обновлена"}, status=status.HTTP_200_OK
+        )
+
+    def delete(self, request: Request):
+        """Принимает json {date: yyyy-mm-ddThh:mm:ssZ, group_name: string, teacher: string, place: string, lesson_type: string, week: int, lesson_name: stirng,}
+        и записывает такую строку в UserSchedule с флагом deleted=true"""
+        params = request.query_params  # или request.data для тела запроса
+        required_params = {
+            "date",
+            "group_name",
+            "teacher",
+            "place",
+            "lesson_type",
+            "week",
+            "lesson_name",
+        }
+
+        # Проверка параметров
+        if not all(param in params for param in required_params):
+            return Response(
+                {
+                    "error": "Необходимы все параметры: date, group_name, teacher, place, lesson_type, week, lesson_name"
+                },
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        # Валидация даты
+        try:
+            date_str_utc = params.get("date").replace("Z", "+0000")
+            input_date = datetime.strptime(date_str_utc, "%Y-%m-%dT%H:%M:%S%z")
+        except ValueError:
+            return Response(
+                {"error": "Неверный формат даты"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        # Поиск группы
+        try:
+            group = GroupLink.objects.get(group_name=params["group_name"])
+        except GroupLink.DoesNotExist:
+            return Response(
+                {"error": "Группа не найдена"},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+        params = {param: None if x == "" else x for param, x in params.items()}
+
+        query = (
+            Q(start_date=input_date)
+            & Q(teacher__iexact=params["teacher"])
+            & Q(group_name=group)
+            & Q(place__iexact=params["place"])
+            & Q(lesson_type__iexact=params["lesson_type"])
+            & Q(lesson_name__iexact=params["lesson_name"])
+            & Q(week=params["week"])
+        )
+
+        schedule = Schedule.objects.filter(query)
+
+        if schedule:
+
+            user_schedule, created = UserSchedule.objects.update_or_create(
+                user=request.user,
+                group_name=group,
+                teacher=params["teacher"],
+                place=params["place"],
+                start_date=input_date,
+                week=params["week"],
+                lesson_type=params["lesson_type"],
+                lesson_name=params["lesson_name"],
+                defaults={"deleted": True},
+            )
+
+            return Response(
+                {"status": "Запись помечена как удаленная"}, status=status.HTTP_200_OK
+            )
+
+        user_schedule_object = get_object_or_404(
+            UserSchedule,
+            user=request.user,
+            group_name=group,
+            teacher=params["teacher"],
+            place=params["place"],
+            start_date=input_date,
+            week=params["week"],
+            lesson_type=params["lesson_type"],
+            lesson_name=params["lesson_name"],
+        )
+        user_schedule_object.delete()
+        return Response(
+            {"status": "Запись не удалена, её нет в Schedule"},
+            status=status.HTTP_200_OK,
+        )
+
 
 class MetricsAPIView(APIView):
     permission_classes = [IsAuthenticated]
-    
+
     def get(self, request: Request):
         type = request.query_params.get("type")
         if not type:
@@ -96,20 +264,64 @@ class MetricsAPIView(APIView):
                 {"error": "Параметр 'type' не передан"},
                 status=status.HTTP_400_BAD_REQUEST,
             )
-        
-        if type == "group":
-            metrics = GroupLink.objects.values_list('group_name', flat=True).distinct()
-            metrics = sorted(list(metrics))
-        elif type == "teacher":
-            metrics = Schedule.objects.values_list('teacher', flat=True).distinct()
-            metrics = sorted(list({normalize_fullname(x) for x in metrics if x is not None and not any(char.isdigit() for char in x)}))
-        elif type == "place":
-            metrics = Schedule.objects.values_list('place', flat=True).distinct()
-            metrics = sorted(list({x for x in metrics if x is not None and (any(char == '-' for char in x) or x[0] == '-')}))
-        elif type == "week-range":
-            metrics = Schedule.objects.values_list('start_date', flat=True).distinct()
-            metrics = [min(metrics), max(metrics)]
 
+        if type == "group":
+            metrics = GroupLink.objects.values_list("group_name", flat=True).distinct()
+            custom_metrics = UserSchedule.objects.filter(
+                user=request.user,
+            )
+            custom_metrics.values_list("group_name", flat=True).distinct()
+            metrics = sorted(
+                list(
+                    set(
+                        list(metrics)
+                        + list(x.group_name.group_name for x in custom_metrics)
+                    )
+                )
+            )
+        elif type == "teacher":
+            metrics = Schedule.objects.values_list("teacher", flat=True).distinct()
+            custom_metrics = UserSchedule.objects.filter(
+                user=request.user,
+            )
+            custom_metrics.values_list("teacher", flat=True).distinct()
+            metrics = sorted(
+                list(
+                    set(
+                        list(
+                            {
+                                normalize_fullname(x)
+                                for x in metrics
+                                if x is not None
+                                and not any(char.isdigit() for char in x)
+                            }
+                        )
+                        + list(x.teacher for x in custom_metrics)
+                    )
+                )
+            )
+        elif type == "place":
+            metrics = Schedule.objects.values_list("place", flat=True).distinct()
+            custom_metrics = UserSchedule.objects.filter(
+                user=request.user,
+            )
+            custom_metrics.values_list("place", flat=True).distinct()
+            metrics = sorted(
+                list(
+                    set(
+                        [
+                            x
+                            for x in metrics
+                            if x is not None
+                            and (any(char == "-" for char in x) or x[0] == "-")
+                        ]
+                        + list(x.place for x in custom_metrics)
+                    )
+                )
+            )
+        elif type == "week-range":
+            metrics = Schedule.objects.values_list("start_date", flat=True).distinct()
+            metrics = [min(metrics), max(metrics)]
 
         return Response(metrics)
 
@@ -117,8 +329,8 @@ class MetricsAPIView(APIView):
 class NotesAPIView(APIView):
     permission_classes = [IsAuthenticated]
 
-    def get(self, request: Request): # get notes by date and user
-        date_str = request.query_params.get('date')
+    def get(self, request: Request):  # get notes by date and user
+        date_str = request.query_params.get("date")
 
         # date validation
         if not date_str:
@@ -126,9 +338,9 @@ class NotesAPIView(APIView):
                 {"error": "Параметр 'date' не передан"},
                 status=status.HTTP_400_BAD_REQUEST,
             )
-        
+
         try:
-            start_date = datetime.strptime(date_str, '%Y-%m-%d').date()
+            start_date = datetime.strptime(date_str, "%Y-%m-%d").date()
         except ValueError:
             return Response(
                 {"error": "Неверный формат 'date', требуется 'YYYY-MM-DD'"},
@@ -141,23 +353,21 @@ class NotesAPIView(APIView):
         grouped_data = defaultdict(dict)
 
         notes = Notes.objects.filter(
-            note_date__range=(start_date, end_date), 
-            user_id=request.user.id
-        ).order_by('note_date') 
+            note_date__range=(start_date, end_date), user_id=request.user.id
+        ).order_by("note_date")
 
         # get notes in our time period
         if notes.exists():
             serializer = NoteSerializer(notes, many=True)
             for note in serializer.data:
-                note_date = note['note_date']
-                note_content = note['note_content']
+                note_date = note["note_date"]
+                note_content = note["note_content"]
                 grouped_data[note_date] = note_content
 
         return Response(grouped_data)
 
-
-    def delete(self, request: Request): # delete note by exact time and user, if exists
-        date_str = request.query_params.get('date')
+    def delete(self, request: Request):  # delete note by exact time and user, if exists
+        date_str = request.query_params.get("date")
 
         # date validation
         if not date_str:
@@ -165,9 +375,9 @@ class NotesAPIView(APIView):
                 {"error": "Параметр 'date' не передан"},
                 status=status.HTTP_400_BAD_REQUEST,
             )
-        
+
         try:
-            start_date = datetime.strptime(date_str, '%Y-%m-%dT%H:%M:%SZ')
+            start_date = datetime.strptime(date_str, "%Y-%m-%dT%H:%M:%SZ")
         except ValueError:
             return Response(
                 {"error": "Неверный формат 'date', требуется 'yyyy-mm-ddThh:mm:ssZ'"},
@@ -183,9 +393,8 @@ class NotesAPIView(APIView):
             status=status.HTTP_200_OK,
         )
 
-
-    def put(self, request: Request): # create new note or change old note on exact time
-        date_str = request.data.get('date')
+    def put(self, request: Request):  # create new note or change old note on exact time
+        date_str = request.data.get("date")
 
         # date validation
         if not date_str:
@@ -193,16 +402,16 @@ class NotesAPIView(APIView):
                 {"error": "Параметр 'date' не передан"},
                 status=status.HTTP_400_BAD_REQUEST,
             )
-        
+
         try:
-            note_date = datetime.strptime(date_str, '%Y-%m-%dT%H:%M:%SZ')
+            note_date = datetime.strptime(date_str, "%Y-%m-%dT%H:%M:%SZ")
         except ValueError:
             return Response(
                 {"error": "Неверный формат 'date', требуется 'yyyy-mm-ddThh:mm:ssZ'"},
                 status=status.HTTP_400_BAD_REQUEST,
             )
-        
-        note_content = request.data.get('note_content')
+
+        note_content = request.data.get("note_content")
 
         # note_content validation
         if not note_content:
@@ -211,8 +420,7 @@ class NotesAPIView(APIView):
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
-
-        try: # check if note on this date exists
+        try:  # check if note on this date exists
             note = Notes.objects.get(user=request.user, note_date=note_date)
             note.note_content = note_content
             note.save()
@@ -221,7 +429,7 @@ class NotesAPIView(APIView):
                 {"message": f"Заметка на {date_str} успешно обновлена"},
                 status=status.HTTP_200_OK,
             )
-        except Notes.DoesNotExist: 
+        except Notes.DoesNotExist:
             # create new note on this date
             note = Notes.objects.create(
                 user=request.user,
