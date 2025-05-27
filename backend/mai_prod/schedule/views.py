@@ -271,14 +271,20 @@ class MetricsAPIView(APIView):
                 user=request.user,
             )
             custom_metrics.values_list("group_name", flat=True).distinct()
-            metrics = sorted(list(metrics) + list(custom_metrics))
+            metrics = sorted(
+                list(
+                    set(
+                        list(metrics)
+                        + list(x.group_name.group_name for x in custom_metrics)
+                    )
+                )
+            )
         elif type == "teacher":
             metrics = Schedule.objects.values_list("teacher", flat=True).distinct()
             custom_metrics = UserSchedule.objects.filter(
                 user=request.user,
             )
             custom_metrics.values_list("teacher", flat=True).distinct()
-            print(custom_metrics)
             metrics = sorted(
                 list(
                     set(
@@ -302,17 +308,15 @@ class MetricsAPIView(APIView):
             custom_metrics.values_list("place", flat=True).distinct()
             metrics = sorted(
                 list(
-                    {
-                        x
-                        for x in metrics
-                        if x is not None
-                        and (any(char == "-" for char in x) or x[0] == "-")
-                    }
-                )
-                + list(
-                    normalize_fullname(x)
-                    for x in custom_metrics
-                    if x is not None and not any(char.isdigit() for char in x)
+                    set(
+                        [
+                            x
+                            for x in metrics
+                            if x is not None
+                            and (any(char == "-" for char in x) or x[0] == "-")
+                        ]
+                        + list(x.place for x in custom_metrics)
+                    )
                 )
             )
         elif type == "week-range":
