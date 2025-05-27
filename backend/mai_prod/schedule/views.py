@@ -206,6 +206,7 @@ class ScheduleAPIView(APIView):
                 {"error": "Группа не найдена"},
                 status=status.HTTP_404_NOT_FOUND,
             )
+        params = {param: None if x == "" else x for param, x in params.items()}
 
         query = (
             Q(start_date=input_date)
