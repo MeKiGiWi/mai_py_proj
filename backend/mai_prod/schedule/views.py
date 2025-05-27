@@ -267,7 +267,11 @@ class MetricsAPIView(APIView):
 
         if type == "group":
             metrics = GroupLink.objects.values_list("group_name", flat=True).distinct()
-            metrics = sorted(list(metrics))
+            custom_metrics = UserSchedule.objects.filter(
+                user=request.user,
+            )
+            custom_metrics.values_list("group_name", flat=True).distinct()
+            metrics = sorted(list(metrics) + list(custom_metrics))
         elif type == "teacher":
             metrics = Schedule.objects.values_list("teacher", flat=True).distinct()
             metrics = sorted(
