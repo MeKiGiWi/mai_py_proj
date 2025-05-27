@@ -83,9 +83,7 @@ class ScheduleAPIView(APIView):
             serializer = ScheduleSerializer(user_schedule, many=True)
             for event in serializer.data:
                 event_date = event["start_date"]
-                grouped_data[event_date] = event
-                if event_date["deleted"]:
-                    grouped_data.pop(event_date)
+                grouped_data[event_date] = event  # if we need to rewrite data
                 # grouped_data[key].update(
                 #     {key: value for key, value in item.items() if value is not None}
                 # )  # if we need to update data
