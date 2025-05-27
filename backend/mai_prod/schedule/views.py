@@ -278,18 +278,20 @@ class MetricsAPIView(APIView):
                 user=request.user,
             )
             custom_metrics.values_list("teacher", flat=True).distinct()
+            print(custom_metrics)
             metrics = sorted(
                 list(
-                    {
-                        normalize_fullname(x)
-                        for x in metrics
-                        if x is not None and not any(char.isdigit() for char in x)
-                    }
-                )
-                + list(
-                    normalize_fullname(x)
-                    for x in custom_metrics
-                    if x is not None and not any(char.isdigit() for char in x)
+                    set(
+                        list(
+                            {
+                                normalize_fullname(x)
+                                for x in metrics
+                                if x is not None
+                                and not any(char.isdigit() for char in x)
+                            }
+                        )
+                        + list(x.teacher for x in custom_metrics)
+                    )
                 )
             )
         elif type == "place":
@@ -297,7 +299,7 @@ class MetricsAPIView(APIView):
             custom_metrics = UserSchedule.objects.filter(
                 user=request.user,
             )
-            custom_metrics.values_list("teacher", flat=True).distinct()
+            custom_metrics.values_list("place", flat=True).distinct()
             metrics = sorted(
                 list(
                     {
