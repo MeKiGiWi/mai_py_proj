@@ -9,7 +9,9 @@ type RightPanelProps = {
   notesState: TNotesState;
   setNotesState: React.Dispatch<React.SetStateAction<TNotesState>>;
   setEvents: React.Dispatch<React.SetStateAction<Record<string, TEvent>>>;
-  setSelectedEventInfo: (value: { event: TEvent; eventKey: string } | null) => void;
+  setSelectedEventInfo: (
+    value: { event: TEvent; eventKey: string } | null,
+  ) => void;
   setSelectedNote: (value: TNote | null) => void;
   isCreating: boolean;
   onEventCancel: () => void;
@@ -24,36 +26,38 @@ const RightPanel: FC<RightPanelProps> = ({
   setSelectedEventInfo,
   setSelectedNote,
   isCreating,
-  onEventCancel
+  onEventCancel,
 }) => {
   const handleNoteDelete = (noteId: string) => {
-    setNotesState(prev => ({
+    setNotesState((prev) => ({
       ...prev,
-      list: prev.list.filter(note => note.id !== noteId)
+      list: prev.list.filter((note) => note.id !== noteId),
     }));
   };
 
   const handleNoteUpdate = (updatedNote: TNote) => {
-    setNotesState(prev => ({
+    setNotesState((prev) => ({
       ...prev,
-      list: prev.list.map(note => 
-        note.id === updatedNote.id ? updatedNote : note
-      )
+      list: prev.list.map((note) =>
+        note.id === updatedNote.id ? updatedNote : note,
+      ),
     }));
     setSelectedNote(null);
   };
 
   const handleEventUpdate = (updatedEvent: TEvent) => {
     if (!selectedEventInfo) return;
-    
-    const finalEvent = isCreating
-      ? { ...updatedEvent, start_date: new Date() }
-      : updatedEvent;
 
-    setEvents(prev => ({
-      ...prev,
-      [selectedEventInfo.eventKey]: finalEvent
-    }));
+    const finalEvent = isCreating
+      ? { ...updatedEvent, start_date: selectedEventInfo.event.start_date }
+      : updatedEvent;
+    setEvents((prev) => {
+      console.log(prev);
+      return {
+        ...prev,
+        [selectedEventInfo.eventKey]: finalEvent,
+      };
+    });
     setSelectedEventInfo(null);
   };
 
