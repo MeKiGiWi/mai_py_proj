@@ -167,6 +167,14 @@ export default function SchedulePage() {
     setIsCreatingEvent(false);
   };
 
+  const handleEventDelete = (eventKey: string) => {
+    setEvents(prev => {
+      const newEvents = { ...prev };
+      delete newEvents[eventKey];
+      return newEvents;
+    });
+  };
+
   return (
     <>
       <NavBar />
@@ -195,6 +203,7 @@ export default function SchedulePage() {
               cycleStartDate: currentFilters.cycleStartDate
             }}
             onCellClick={handleCellClick}
+            onEventDelete={handleEventDelete}
           />
         </div>
 
