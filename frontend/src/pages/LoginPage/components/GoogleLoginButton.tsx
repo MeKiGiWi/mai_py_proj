@@ -1,5 +1,7 @@
+import axios from 'axios';
 import { useEffect } from 'react';
 import GoogleIcon from '@/components/GoogleIcon';
+
 export default function GoogleLoginButton() {
   useEffect(() => {
     // Загрузка Google Identity Services
@@ -17,12 +19,20 @@ export default function GoogleLoginButton() {
     try {
       // Инициализация Google Auth
       const client = google.accounts.oauth2.initTokenClient({
-        client_id: 'YOUR_GOOGLE_CLIENT_ID',
+        client_id: `${import.meta.env.VITE_GOOGLE_OAUTH_CLIENT_ID}`,
         scope: 'profile email',
-        callback: (response) => {
+        callback: async (response) => {
           if (response.access_token) {
             // Отправка токена на сервер
-            console.log('Access Token:', response.access_token);
+            try {
+              const { data } = await axios.post(
+                'http://localhost:8000/api/google/auth/',
+                { access_token: response.access_token },
+              );
+              localStorage.setItem('google_access_token', data.access_token);
+            } catch (error) {
+              console.error('Auth failed:', error);
+            }
             // Здесь можно добавить логику авторизации
           }
         },
