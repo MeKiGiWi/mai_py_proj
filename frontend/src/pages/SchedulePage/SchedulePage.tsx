@@ -151,7 +151,10 @@ export default function SchedulePage() {
       const minutes = slot.start.split(':')[1];
       currentDate.setHours(Number(hours));
       currentDate.setMinutes(Number(minutes));
-      const newEventKey = currentDate.toISOString().slice(0, 19) + 'Z';
+      const newEventKey = format(currentDate, "yyyy-MM-dd") +
+        "T" +
+        (slot.start === '9:00' ? '09:00' : slot.start) +
+        ":00Z";
 
       setSelectedEventInfo({
         event: {
@@ -208,10 +211,8 @@ export default function SchedulePage() {
           />
 
           <ScheduleTable
-            scheduleData={{
-              timeSlots: getTimeSlots(),
-              events: events,
-            }}
+            timeSlots={getTimeSlots()}
+            events={events}
             filters={{
               activeWeek: currentFilters.activeWeek,
               cycleStartDate: currentFilters.cycleStartDate,

@@ -3,10 +3,8 @@ import { useMemo } from 'react';
 import { TEvent } from '../types';
 
 type ScheduleTableProps = {
-  scheduleData: {
-    timeSlots: { start: string; end: string }[];
-    events: Record<string, TEvent>;
-  };
+  timeSlots: { start: string; end: string }[];
+  events: Record<string, TEvent>;
   filters: {
     activeWeek: number;
     cycleStartDate: Date;
@@ -21,7 +19,8 @@ type ScheduleTableProps = {
 };
 
 export default function ScheduleTable({
-  scheduleData: { timeSlots, events },
+  timeSlots,
+  events,
   filters: { activeWeek, cycleStartDate },
   onCellClick,
   onEventDelete,
