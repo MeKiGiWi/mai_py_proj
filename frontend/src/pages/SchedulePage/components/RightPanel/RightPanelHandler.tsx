@@ -1,3 +1,4 @@
+// components/RightPanel/RightPanelHandler.tsx
 import { FC } from 'react';
 import NotesPanel from '../NotesPanel';
 import EditEventPanel from '../EditEventPanel';
@@ -19,6 +20,8 @@ type RightPanelHandlerProps = {
   onNoteDelete: (noteId: string) => void;
   setSelectedEventInfo: (value: TSelectedEvent | null) => void;
   setSelectedNote: (value: TNote | null) => void;
+  isCreating: boolean;
+  onEventCancel: () => void;
 };
 
 const RightPanelHandler: FC<RightPanelHandlerProps> = ({
@@ -31,18 +34,16 @@ const RightPanelHandler: FC<RightPanelHandlerProps> = ({
   onNoteDelete,
   setSelectedEventInfo,
   setSelectedNote,
+  isCreating,
+  onEventCancel
 }) => {
-  // Обработчик сохранения события с проверкой на null
-  const handleEventSave = (updatedEvent: TEvent) => {
-    if (!selectedEventInfo) return;
+  const handleEventSaveWithValidation = (updatedEvent: TEvent) => {
+    if (!selectedEventInfo) {
+      console.error('Попытка сохранить несуществующее событие');
+      return;
+    }
     onEventSave(updatedEvent);
     setSelectedEventInfo(null);
-  };
-
-  // Обработчик сохранения заметки
-  const handleNoteSave = (updatedNote: TNote) => {
-    onNoteSave(updatedNote);
-    setSelectedNote(null);
   };
 
   return (
@@ -50,13 +51,15 @@ const RightPanelHandler: FC<RightPanelHandlerProps> = ({
       {selectedEventInfo ? (
         <EditEventPanel
           event={selectedEventInfo.event}
-          onSave={handleEventSave}
-          onCancel={() => setSelectedEventInfo(null)}
+          onSave={handleEventSaveWithValidation}
+          onCancel={onEventCancel}
+          isCreating={isCreating}
+          onCancel={onEventCancel}
         />
       ) : selectedNote ? (
         <EditNotePanel
           note={selectedNote}
-          onSave={handleNoteSave}
+          onSave={onNoteSave}
           onCancel={() => setSelectedNote(null)}
         />
       ) : (
