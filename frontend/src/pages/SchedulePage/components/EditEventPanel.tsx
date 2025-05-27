@@ -94,6 +94,7 @@ export default function EditEventPanel({
             value={formData.teacher || ''}
             onChange={handleChange}
             className="input input-bordered"
+            required
           />
         </div>
 
@@ -107,6 +108,7 @@ export default function EditEventPanel({
             value={formData.place || ''}
             onChange={handleChange}
             className="input input-bordered"
+            required
           />
         </div>
 
