@@ -237,11 +237,22 @@ class ScheduleAPIView(APIView):
                 {"status": "Запись помечена как удаленная"}, status=status.HTTP_200_OK
             )
 
-        else:
-            return Response(
-                {"status": "Запись не удалена, её нет в Schedule"},
-                status=status.HTTP_200_OK,
-            )
+        user_schedule_object = get_object_or_404(
+            UserSchedule,
+            user=request.user,
+            group_name=group,
+            teacher=params["teacher"],
+            place=params["place"],
+            start_date=input_date,
+            week=params["week"],
+            lesson_type=params["lesson_type"],
+            lesson_name=params["lesson_name"],
+        )
+        user_schedule_object.delete()
+        return Response(
+            {"status": "Запись не удалена, её нет в Schedule"},
+            status=status.HTTP_200_OK,
+        )
 
 
 class MetricsAPIView(APIView):
