@@ -93,7 +93,7 @@ class ScheduleAPIView(APIView):
         return Response(grouped_data)
 
     def patch(self, request: Request):
-        """Принимает json {date: yyyy-mm-ddThh:mm:ssZ, group_name: string, teacher: string, place: string, lesson_type: string, week: int, lesson_name: stirng,}
+        """Принимает json {date: yyyy-mm-ddThh:mm:ssZ, group_name: string, teacher: string, place: string, lesson_type: string, lesson_name: stirng,}
         и записывает такую строку в UserSchedule с флагом deleted=false"""
         params = request.query_params
         required_params = {
@@ -102,14 +102,13 @@ class ScheduleAPIView(APIView):
             "teacher",
             "place",
             "lesson_type",
-            "week",
             "lesson_name",
         }
 
         if not all(param in params for param in required_params):
             return Response(
                 {
-                    "error": "Необходимы все параметры: date, group_name, teacher, place, lesson_type, week, lesson_name"
+                    "error": "Необходимы все параметры: date, group_name, teacher, place, lesson_type, lesson_name"
                 },
                 status=status.HTTP_400_BAD_REQUEST,
             )
@@ -140,7 +139,6 @@ class ScheduleAPIView(APIView):
             & Q(place__iexact=params["place"])
             & Q(lesson_type__iexact=params["lesson_type"])
             & Q(lesson_name__iexact=params["lesson_name"])
-            & Q(week=params["week"])
         )
 
         schedule = Schedule.objects.filter(query)
@@ -148,12 +146,12 @@ class ScheduleAPIView(APIView):
         if not schedule:
             user_schedule, created = UserSchedule.objects.update_or_create(
                 user=request.user,
+                week=0,
                 group_name=group,
                 start_date=input_date,  # Уникальный ключ
                 defaults={
                     "teacher": params["teacher"],
                     "place": params["place"],
-                    "week": params["week"],
                     "lesson_type": params["lesson_type"],
                     "lesson_name": params["lesson_name"],
                     "deleted": False,  # Сбрасываем флаг удаления
@@ -164,7 +162,7 @@ class ScheduleAPIView(APIView):
         )
 
     def delete(self, request: Request):
-        """Принимает json {date: yyyy-mm-ddThh:mm:ssZ, group_name: string, teacher: string, place: string, lesson_type: string, week: int, lesson_name: stirng,}
+        """Принимает json {date: yyyy-mm-ddThh:mm:ssZ, group_name: string, teacher: string, place: string, lesson_type: string, lesson_name: stirng,}
         и записывает такую строку в UserSchedule с флагом deleted=true"""
         params = request.query_params  # или request.data для тела запроса
         required_params = {
@@ -173,7 +171,6 @@ class ScheduleAPIView(APIView):
             "teacher",
             "place",
             "lesson_type",
-            "week",
             "lesson_name",
         }
 
@@ -181,7 +178,7 @@ class ScheduleAPIView(APIView):
         if not all(param in params for param in required_params):
             return Response(
                 {
-                    "error": "Необходимы все параметры: date, group_name, teacher, place, lesson_type, week, lesson_name"
+                    "error": "Необходимы все параметры: date, group_name, teacher, place, lesson_type, lesson_name"
                 },
                 status=status.HTTP_400_BAD_REQUEST,
             )
@@ -213,7 +210,6 @@ class ScheduleAPIView(APIView):
             & Q(place__iexact=params["place"])
             & Q(lesson_type__iexact=params["lesson_type"])
             & Q(lesson_name__iexact=params["lesson_name"])
-            & Q(week=params["week"])
         )
 
         schedule = Schedule.objects.filter(query)
@@ -223,10 +219,10 @@ class ScheduleAPIView(APIView):
             user_schedule, created = UserSchedule.objects.update_or_create(
                 user=request.user,
                 group_name=group,
+                week=0,
                 teacher=params["teacher"],
                 place=params["place"],
                 start_date=input_date,
-                week=params["week"],
                 lesson_type=params["lesson_type"],
                 lesson_name=params["lesson_name"],
                 defaults={"deleted": True},
@@ -243,7 +239,6 @@ class ScheduleAPIView(APIView):
             teacher=params["teacher"],
             place=params["place"],
             start_date=input_date,
-            week=params["week"],
             lesson_type=params["lesson_type"],
             lesson_name=params["lesson_name"],
         )
