@@ -8,9 +8,16 @@ import ScheduleTable from './components/ScheduleTable';
 import ExportModal from './components/ExportModal';
 import ExportButton from './components/ExportButton';
 import RightPanel from './components/RightPanel';
-import type { TEvent, TCurrentFilters, TCurrentMetrics, TNotesState, TSelectedEvent, TNote } from './types';
+import type {
+  TEvent,
+  TCurrentFilters,
+  TCurrentMetrics,
+  TNotesState,
+  TSelectedEvent,
+  TNote,
+} from './types';
 
-import api from '../../interceptors/api';
+import api from '@/interceptors/api';
 
 const DAYS = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб'];
 
@@ -43,19 +50,21 @@ export default function SchedulePage() {
   const [events, setEvents] = useState<Record<string, TEvent>>({});
   const [isLoading, setIsLoading] = useState(true);
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
-  const [selectedEventInfo, setSelectedEventInfo] = useState<TSelectedEvent | null>(null);
+  const [selectedEventInfo, setSelectedEventInfo] =
+    useState<TSelectedEvent | null>(null);
   const [selectedNote, setSelectedNote] = useState<TNote | null>(null);
   const [isCreatingEvent, setIsCreatingEvent] = useState(false);
 
   useEffect(() => {
     const fetchInitialData = async () => {
       try {
-        const [weeksData, teachersData, placesData, groupsData] = await Promise.all([
-          getWeeksRange(),
-          api.get('metrics/', { params: { type: 'teacher' } }),
-          api.get('metrics/', { params: { type: 'place' } }),
-          api.get('metrics/', { params: { type: 'group' } }),
-        ]);
+        const [weeksData, teachersData, placesData, groupsData] =
+          await Promise.all([
+            getWeeksRange(),
+            api.get('metrics/', { params: { type: 'teacher' } }),
+            api.get('metrics/', { params: { type: 'place' } }),
+            api.get('metrics/', { params: { type: 'group' } }),
+          ]);
 
         setCurrentMetrics({
           weeks: weeksData,
@@ -64,7 +73,7 @@ export default function SchedulePage() {
           groups: groupsData.data,
         });
 
-        setCurrentFilters(prev => ({
+        setCurrentFilters((prev) => ({
           ...prev,
           selectedGroup: groupsData.data[0] || null,
         }));
@@ -87,20 +96,20 @@ export default function SchedulePage() {
   const getTimeSlots = () => {
     const slots: { start: string; end: string }[] = [];
     let currentStart = WORKDAY_START;
-    
+
     while (currentStart + TIME_SLOT_DURATION <= WORKDAY_END) {
       if (currentStart === 12 * 60 + 30) {
         currentStart += 30;
       }
-      
+
       slots.push({
         start: formatTime(currentStart),
-        end: formatTime(currentStart + TIME_SLOT_DURATION)
+        end: formatTime(currentStart + TIME_SLOT_DURATION),
       });
-      
+
       currentStart += TIME_SLOT_DURATION + BREAK_DURATION;
     }
-    
+
     return slots;
   };
 
@@ -128,7 +137,7 @@ export default function SchedulePage() {
     day: string,
     slot: { start: string; end: string },
     event?: TEvent,
-    eventKey?: string
+    eventKey?: string,
   ) => {
     if (event && eventKey) {
       setSelectedEventInfo({ event, eventKey });
@@ -136,10 +145,17 @@ export default function SchedulePage() {
     } else {
       const currentDate = addDays(
         addWeeks(currentFilters.cycleStartDate, currentFilters.activeWeek - 1),
-        DAYS.indexOf(day)
+        DAYS.indexOf(day),
       );
-      const newEventKey = `${format(currentDate, 'yyyy-MM-dd')}T${slot.start.replace(':', '')}`;
-      
+      const hours = slot.start.split(':')[0];
+      const minutes = slot.start.split(':')[1];
+      currentDate.setHours(Number(hours));
+      currentDate.setMinutes(Number(minutes));
+      const newEventKey = format(currentDate, "yyyy-MM-dd") +
+        "T" +
+        (slot.start === '9:00' ? '09:00' : slot.start) +
+        ":00Z";
+
       setSelectedEventInfo({
         event: {
           group_name: currentFilters.selectedGroup || '',
@@ -147,9 +163,9 @@ export default function SchedulePage() {
           lesson_type: 'ЛК',
           teacher: '',
           place: '',
-          start_date: currentDate
+          start_date: currentDate,
         },
-        eventKey: newEventKey
+        eventKey: newEventKey,
       });
       setIsCreatingEvent(true);
     }
@@ -157,7 +173,7 @@ export default function SchedulePage() {
 
   const handleEventCancel = () => {
     if (isCreatingEvent && selectedEventInfo) {
-      setEvents(prev => {
+      setEvents((prev) => {
         const newEvents = { ...prev };
         delete newEvents[selectedEventInfo.eventKey];
         return newEvents;
@@ -168,8 +184,19 @@ export default function SchedulePage() {
   };
 
   const handleEventDelete = (eventKey: string) => {
-    setEvents(prev => {
+    setEvents((prev) => {
       const newEvents = { ...prev };
+      const deletedEvent = events[eventKey];
+      api.delete("schedule/", {
+        data: {
+          date: deletedEvent.start_date?.toISOString(),
+          place: deletedEvent.place,
+          group_name: deletedEvent.group_name,
+          teacher: deletedEvent.teacher,
+          lesson_name: deletedEvent.lesson_name,
+          lesson_type: deletedEvent.lesson_type,
+        }
+      })
       delete newEvents[eventKey];
       return newEvents;
     });
@@ -194,13 +221,11 @@ export default function SchedulePage() {
           />
 
           <ScheduleTable
-            scheduleData={{
-              timeSlots: getTimeSlots(),
-              events: events,
-            }}
+            timeSlots={getTimeSlots()}
+            events={events}
             filters={{
               activeWeek: currentFilters.activeWeek,
-              cycleStartDate: currentFilters.cycleStartDate
+              cycleStartDate: currentFilters.cycleStartDate,
             }}
             onCellClick={handleCellClick}
             onEventDelete={handleEventDelete}

@@ -3,25 +3,24 @@ import { useMemo } from 'react';
 import { TEvent } from '../types';
 
 type ScheduleTableProps = {
-  scheduleData: {
-    timeSlots: { start: string; end: string }[];
-    events: Record<string, TEvent>;
-  };
+  timeSlots: { start: string; end: string }[];
+  events: Record<string, TEvent>;
   filters: {
     activeWeek: number;
     cycleStartDate: Date;
   };
   onCellClick: (
-    day: string, 
-    slot: { start: string; end: string }, 
-    event?: TEvent, 
-    eventKey?: string
-  ) => void; 
+    day: string,
+    slot: { start: string; end: string },
+    event?: TEvent,
+    eventKey?: string,
+  ) => void;
   onEventDelete: (eventKey: string) => void;
 };
 
 export default function ScheduleTable({
-  scheduleData: { timeSlots, events },
+  timeSlots,
+  events,
   filters: { activeWeek, cycleStartDate },
   onCellClick,
   onEventDelete,
@@ -65,7 +64,7 @@ export default function ScheduleTable({
               key={day}
               className={`${slot.start != '20:00' && 'border border-base-content/15'} border-l-0 border-r-0 
                 cursor-pointer hover:bg-base-300 w-[170px] max-w-[130px] 
-                min-h-21.5 h-21.5 break-words overflow-hidden p-2 align-top relative group`} 
+                min-h-21.5 h-21.5 break-words overflow-hidden p-2 align-top relative group`}
               onClick={() => onCellClick(day, slot, event, eventKey)}
             >
               {event ? (
@@ -80,10 +79,27 @@ export default function ScheduleTable({
                     }}
                     aria-label="Удалить событие"
                   >
-                    <svg width="100" height="100" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                    <svg
+                      width="100"
+                      height="100"
+                      viewBox="0 0 100 100"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
                       <g transform="rotate(45, 50, 50)">
-                        <rect x="45" y="20" width="10" height="60" fill="white" />
-                        <rect x="20" y="45" width="60" height="10" fill="white" />
+                        <rect
+                          x="45"
+                          y="20"
+                          width="10"
+                          height="60"
+                          fill="white"
+                        />
+                        <rect
+                          x="20"
+                          y="45"
+                          width="60"
+                          height="10"
+                          fill="white"
+                        />
                       </g>
                     </svg>
                   </button>

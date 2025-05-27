@@ -35,7 +35,7 @@ const RightPanelHandler: FC<RightPanelHandlerProps> = ({
   setSelectedEventInfo,
   setSelectedNote,
   isCreating,
-  onEventCancel
+  onEventCancel,
 }) => {
   const handleEventSaveWithValidation = (updatedEvent: TEvent) => {
     if (!selectedEventInfo) {

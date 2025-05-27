@@ -17,8 +17,8 @@ type NotesPanelProps = {
   onNoteDelete: (noteId: string) => void;
 };
 
-export default function NotesPanel({ 
-  notesState: { list, newNote }, 
+export default function NotesPanel({
+  notesState: { list, newNote },
   setNotesState,
   onNoteSelect,
   onNoteDelete,
@@ -28,12 +28,12 @@ export default function NotesPanel({
       const newNoteObj: TNote = {
         id: Date.now().toString(),
         content: newNote.trim(),
-        createdAt: new Date()
+        createdAt: new Date(),
       };
-      
-      setNotesState(prev => ({
+
+      setNotesState((prev) => ({
         list: [...prev.list, newNoteObj],
-        newNote: ''
+        newNote: '',
       }));
     }
   };
@@ -61,22 +61,25 @@ export default function NotesPanel({
           </button>
         </div>
       </div>
-      <ul className='menu'>
+      <ul className="menu">
         {list.map((note) => (
-          <li key={note.id} className='hover-bg group relative'>
-            <a className='py-2 pr-8 cursor-pointer' onClick={() => onNoteSelect(note)}>
+          <li key={note.id} className="hover-bg group relative">
+            <a
+              className="py-2 pr-8 cursor-pointer"
+              onClick={() => onNoteSelect(note)}
+            >
               {note.content}
             </a>
             {/* Кнопка удаления */}
             <button
-              className='absolute right-2 top-1/2 -translate-y-1/2 opacity-0 
+              className="absolute right-2 top-1/2 -translate-y-1/2 opacity-0 
                       group-hover:opacity-100 transition-[opacity,transform] duration-200 
-                      btn btn-xs btn-circle active:scale-95 active:!translate-y-[-50%]'
+                      btn btn-xs btn-circle active:scale-95 active:!translate-y-[-50%]"
               onClick={(e) => {
                 e.preventDefault();
                 onNoteDelete(note.id);
               }}
-              aria-label='Удалить пометку'
+              aria-label="Удалить пометку"
             >
               ✕
             </button>

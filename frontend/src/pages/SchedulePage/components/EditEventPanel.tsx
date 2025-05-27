@@ -8,22 +8,24 @@ type EditEventPanelProps = {
   isCreating: boolean;
 };
 
-export default function EditEventPanel({ 
-  event, 
-  onSave, 
+export default function EditEventPanel({
+  event,
+  onSave,
   onCancel,
-  isCreating 
+  isCreating,
 }: EditEventPanelProps) {
-  const [formData, setFormData] = useState<TEvent>({ 
+  const [formData, setFormData] = useState<TEvent>({
     ...event,
-    lesson_name: event.lesson_name || 'Новое занятие'
+    lesson_name: event.lesson_name || 'Новое занятие',
   });
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
+  ) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [name]: value
+      [name]: value,
     }));
   };
 
@@ -31,15 +33,15 @@ export default function EditEventPanel({
     e.preventDefault();
     onSave({
       ...formData,
-      start_date: event.start_date // Сохраняем оригинальную дату
+      start_date: event.start_date, // Сохраняем оригинальную дату
     });
   };
 
   const LESSON_TYPE_OPTIONS = [
-    { value: "ЛК", label: "Лекция" },
-    { value: "ПЗ", label: "Практическое занятие" },
-    { value: "ЛР", label: "Лабораторная работа" },
-    { value: "ЭКЗ", label: "Экзамен" }
+    { value: 'ЛК', label: 'Лекция' },
+    { value: 'ПЗ', label: 'Практическое занятие' },
+    { value: 'ЛР', label: 'Лабораторная работа' },
+    { value: 'ЭКЗ', label: 'Экзамен' },
   ];
 
   return (
@@ -47,7 +49,7 @@ export default function EditEventPanel({
       <h2 className="text-xl font-bold mb-4">
         {isCreating ? 'Новое занятие' : 'Редактирование занятия'}
       </h2>
-      
+
       <form onSubmit={handleSubmit} className="space-y-4 flex-1">
         <div className="form-control">
           <label className="label">
@@ -109,17 +111,14 @@ export default function EditEventPanel({
         </div>
 
         <div className="flex gap-2 mt-6">
-          <button 
-            type="button" 
-            onClick={onCancel} 
+          <button
+            type="button"
+            onClick={onCancel}
             className="btn btn-ghost flex-1"
           >
             Отмена
           </button>
-          <button 
-            type="submit" 
-            className="btn btn-primary flex-1"
-          >
+          <button type="submit" className="btn btn-primary flex-1">
             {isCreating ? 'Создать' : 'Сохранить'}
           </button>
         </div>
