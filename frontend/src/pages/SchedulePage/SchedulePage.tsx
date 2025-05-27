@@ -17,7 +17,7 @@ import type {
   TNote,
 } from './types';
 
-import api from '../../interceptors/api';
+import api from '@/interceptors/api';
 
 const DAYS = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб'];
 
@@ -167,7 +167,6 @@ export default function SchedulePage() {
         },
         eventKey: newEventKey,
       });
-      console.log(selectedEventInfo);
       setIsCreatingEvent(true);
     }
   };
@@ -187,6 +186,18 @@ export default function SchedulePage() {
   const handleEventDelete = (eventKey: string) => {
     setEvents((prev) => {
       const newEvents = { ...prev };
+      console.log(eventKey);
+      const deletedEvent = events[eventKey];
+      api.delete("schedule/", {
+        params: {
+          date: deletedEvent.start_date,
+          place: deletedEvent.place,
+          group_name: deletedEvent.group_name,
+          teacher: deletedEvent.teacher,
+          lesson_name: deletedEvent.lesson_name,
+          lesson_type: deletedEvent.lesson_type,
+        }
+      })
       delete newEvents[eventKey];
       return newEvents;
     });

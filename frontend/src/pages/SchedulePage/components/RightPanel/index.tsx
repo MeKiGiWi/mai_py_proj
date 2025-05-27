@@ -2,6 +2,7 @@
 import { FC } from 'react';
 import RightPanelHandler from './RightPanelHandler';
 import { TEvent, TNote, TNotesState } from '../../types';
+import api from '@/interceptors/api';
 
 type RightPanelProps = {
   selectedEventInfo: { event: TEvent; eventKey: string } | null;
@@ -51,12 +52,23 @@ const RightPanel: FC<RightPanelProps> = ({
     const finalEvent = isCreating
       ? { ...updatedEvent, start_date: selectedEventInfo.event.start_date }
       : updatedEvent;
+    const newDate = updatedEvent.start_date?.toISOString()
+    api.patch("schedule/", {
+      data: {
+        date: newDate,
+        place: updatedEvent.place,
+        group_name: updatedEvent.group_name,
+        teacher: updatedEvent.teacher,
+        lesson_name: updatedEvent.lesson_name,
+        lesson_type: updatedEvent.lesson_type,
+      }
+    }
+    )
     setEvents((prev) => {
-      console.log(prev);
       return {
         ...prev,
         [selectedEventInfo.eventKey]: finalEvent,
-      };
+      }
     });
     setSelectedEventInfo(null);
   };

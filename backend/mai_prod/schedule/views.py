@@ -95,7 +95,7 @@ class ScheduleAPIView(APIView):
     def patch(self, request: Request):
         """Принимает json {date: yyyy-mm-ddThh:mm:ssZ, group_name: string, teacher: string, place: string, lesson_type: string, lesson_name: stirng,}
         и записывает такую строку в UserSchedule с флагом deleted=false"""
-        params = request.query_params
+        params = request.data["data"]
         required_params = {
             "date",
             "group_name",
@@ -105,7 +105,8 @@ class ScheduleAPIView(APIView):
             "lesson_name",
         }
 
-        if not all(param in params for param in required_params):
+        if not all(param in params.keys() for param in required_params):
+            print(params.keys(), "НЕ ПУСКАЕТ")
             return Response(
                 {
                     "error": "Необходимы все параметры: date, group_name, teacher, place, lesson_type, lesson_name"
@@ -115,7 +116,8 @@ class ScheduleAPIView(APIView):
 
         # Валидация даты
         try:
-            date_str_utc = params.get("date").replace("Z", "+0000")
+            date_str_utc = params.get("date")
+            date_str_utc = date_str_utc.replace(".000Z", "Z", 1).replace("Z", "+0001")
             input_date = datetime.strptime(date_str_utc, "%Y-%m-%dT%H:%M:%S%z")
         except ValueError:
             return Response(
