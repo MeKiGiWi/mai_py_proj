@@ -22,6 +22,7 @@ from rest_framework_simplejwt.views import (
     TokenObtainPairView,
 )
 from schedule.views import ScheduleAPIView, MetricsAPIView, NotesAPIView
+from google_services.views import GoogleAuthAPIView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -32,4 +33,5 @@ urlpatterns = [
     path('api/metrics/', MetricsAPIView.as_view(), name='metrics'),
     path('api/schedule/', ScheduleAPIView.as_view(), name='schedule'),
     path('api/notes/', NotesAPIView.as_view(), name='notes'),
+    path('api/google/auth/', GoogleAuthAPIView.as_view(), name='google_auth'),
 ]
