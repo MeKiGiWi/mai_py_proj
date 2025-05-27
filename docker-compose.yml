@@ -8,6 +8,9 @@ services:
       - /app/frontend/node_modules
     environment:
       VITE_API_URL: http://localhost:8000/api/
+      VITE_GOOGLE_OAUTH_CLIENT_ID: ${GOOGLE_OAUTH_CLIENT_ID}
+      VITE_GOOGLE_OAUTH_CLIENT_SECRET: ${GOOGLE_OAUTH_CLIENT_SECRET}
+      VITE_GOOGLE_OAUTH_REDIRECT_URL: ${GOOGLE_OAUTH_REDIRECT_URL}
     depends_on:
       - backend
     networks:
