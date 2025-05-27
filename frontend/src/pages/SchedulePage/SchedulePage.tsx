@@ -186,11 +186,10 @@ export default function SchedulePage() {
   const handleEventDelete = (eventKey: string) => {
     setEvents((prev) => {
       const newEvents = { ...prev };
-      console.log(eventKey);
       const deletedEvent = events[eventKey];
       api.delete("schedule/", {
-        params: {
-          date: deletedEvent.start_date,
+        data: {
+          date: deletedEvent.start_date?.toISOString(),
           place: deletedEvent.place,
           group_name: deletedEvent.group_name,
           teacher: deletedEvent.teacher,
