@@ -46,7 +46,7 @@ export default function NotesPanel({
         <div className="input-group">
           <input
             type="text"
-            className="input input-bordered flex-1"
+            className="input input-bordered flex-1 mb-2"
             value={newNote}
             onChange={(e) =>
               setNotesState((prev) => ({

@@ -54,7 +54,6 @@ const RightPanelHandler: FC<RightPanelHandlerProps> = ({
           onSave={handleEventSaveWithValidation}
           onCancel={onEventCancel}
           isCreating={isCreating}
-          onCancel={onEventCancel}
         />
       ) : selectedNote ? (
         <EditNotePanel

@@ -51,7 +51,7 @@ export default function EditEventPanel({
       <form onSubmit={handleSubmit} className="space-y-4 flex-1">
         <div className="form-control">
           <label className="label">
-            <span className="label-text">Название занятия</span>
+            <span className="label-text mb-1">Название занятия</span>
           </label>
           <input
             type="text"
@@ -65,7 +65,7 @@ export default function EditEventPanel({
 
         <div className="form-control">
           <label className="label">
-            <span className="label-text">Тип занятия</span>
+            <span className="label-text mb-1">Тип занятия</span>
           </label>
           <select
             name="lesson_type"
@@ -84,7 +84,7 @@ export default function EditEventPanel({
 
         <div className="form-control">
           <label className="label">
-            <span className="label-text">Преподаватель</span>
+            <span className="label-text mb-1">Преподаватель</span>
           </label>
           <input
             type="text"
@@ -97,7 +97,7 @@ export default function EditEventPanel({
 
         <div className="form-control">
           <label className="label">
-            <span className="label-text">Аудитория</span>
+            <span className="label-text mb-1">Аудитория</span>
           </label>
           <input
             type="text"
