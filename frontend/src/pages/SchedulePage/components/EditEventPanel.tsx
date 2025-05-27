@@ -1,16 +1,23 @@
 import { useState } from 'react';
 import type { TEvent } from '../types';
 
-export default function EditEventPanel({ 
-  event, 
-  onSave, 
-  onCancel 
-}: { 
+type EditEventPanelProps = {
   event: TEvent;
   onSave: (updatedEvent: TEvent) => void;
   onCancel: () => void;
-}) {
-  const [formData, setFormData] = useState<TEvent>({ ...event });
+  isCreating: boolean;
+};
+
+export default function EditEventPanel({ 
+  event, 
+  onSave, 
+  onCancel,
+  isCreating 
+}: EditEventPanelProps) {
+  const [formData, setFormData] = useState<TEvent>({ 
+    ...event,
+    lesson_name: event.lesson_name || 'Новое занятие'
+  });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -22,11 +29,13 @@ export default function EditEventPanel({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onSave(formData);
+    onSave({
+      ...formData,
+      start_date: event.start_date // Сохраняем оригинальную дату
+    });
   };
 
   const LESSON_TYPE_OPTIONS = [
-    { value: "", label: "Выберите тип" },
     { value: "ЛК", label: "Лекция" },
     { value: "ПЗ", label: "Практическое занятие" },
     { value: "ЛР", label: "Лабораторная работа" },
@@ -35,24 +44,14 @@ export default function EditEventPanel({
 
   return (
     <div className="w-80 bg-base-100 rounded-box p-4 flex flex-col">
-      <h2 className="text-xl font-bold mb-4">Панель редактирования</h2>
+      <h2 className="text-xl font-bold mb-4">
+        {isCreating ? 'Новое занятие' : 'Редактирование занятия'}
+      </h2>
+      
       <form onSubmit={handleSubmit} className="space-y-4 flex-1">
         <div className="form-control">
           <label className="label">
-            <span className="label-text">Группа</span>
-          </label>
-          <input
-            type="text"
-            name="group_name"
-            value={formData.group_name || ''}
-            onChange={handleChange}
-            className="input input-bordered"
-          />
-        </div>
-
-        <div className="form-control">
-          <label className="label">
-            <span className="label-text">Название занятия</span>
+            <span className="label-text mb-1">Название занятия</span>
           </label>
           <input
             type="text"
@@ -60,24 +59,23 @@ export default function EditEventPanel({
             value={formData.lesson_name || ''}
             onChange={handleChange}
             className="input input-bordered"
+            required
           />
         </div>
 
         <div className="form-control">
           <label className="label">
-            <span className="label-text">Тип занятия</span>
+            <span className="label-text mb-1">Тип занятия</span>
           </label>
           <select
             name="lesson_type"
             value={formData.lesson_type || ''}
             onChange={handleChange}
             className="select select-bordered"
+            required
           >
             {LESSON_TYPE_OPTIONS.map((option) => (
-              <option 
-                key={option.value} 
-                value={option.value}
-              >
+              <option key={option.value} value={option.value}>
                 {option.label}
               </option>
             ))}
@@ -86,7 +84,7 @@ export default function EditEventPanel({
 
         <div className="form-control">
           <label className="label">
-            <span className="label-text">Преподаватель</span>
+            <span className="label-text mb-1">Преподаватель</span>
           </label>
           <input
             type="text"
@@ -99,7 +97,7 @@ export default function EditEventPanel({
 
         <div className="form-control">
           <label className="label">
-            <span className="label-text">Место</span>
+            <span className="label-text mb-1">Аудитория</span>
           </label>
           <input
             type="text"
@@ -122,7 +120,7 @@ export default function EditEventPanel({
             type="submit" 
             className="btn btn-primary flex-1"
           >
-            Сохранить
+            {isCreating ? 'Создать' : 'Сохранить'}
           </button>
         </div>
       </form>

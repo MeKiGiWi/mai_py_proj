@@ -1,3 +1,4 @@
+// components/RightPanel/index.tsx
 import { FC } from 'react';
 import RightPanelHandler from './RightPanelHandler';
 import { TEvent, TNote, TNotesState } from '../../types';
@@ -10,6 +11,8 @@ type RightPanelProps = {
   setEvents: React.Dispatch<React.SetStateAction<Record<string, TEvent>>>;
   setSelectedEventInfo: (value: { event: TEvent; eventKey: string } | null) => void;
   setSelectedNote: (value: TNote | null) => void;
+  isCreating: boolean;
+  onEventCancel: () => void;
 };
 
 const RightPanel: FC<RightPanelProps> = ({
@@ -20,6 +23,8 @@ const RightPanel: FC<RightPanelProps> = ({
   setEvents,
   setSelectedEventInfo,
   setSelectedNote,
+  isCreating,
+  onEventCancel
 }) => {
   const handleNoteDelete = (noteId: string) => {
     setNotesState(prev => ({
@@ -41,12 +46,13 @@ const RightPanel: FC<RightPanelProps> = ({
   const handleEventUpdate = (updatedEvent: TEvent) => {
     if (!selectedEventInfo) return;
     
+    const finalEvent = isCreating
+      ? { ...updatedEvent, start_date: new Date() }
+      : updatedEvent;
+
     setEvents(prev => ({
       ...prev,
-      [selectedEventInfo.eventKey]: {
-        ...updatedEvent,
-        start_date: selectedEventInfo.event.start_date,
-      }
+      [selectedEventInfo.eventKey]: finalEvent
     }));
     setSelectedEventInfo(null);
   };
@@ -62,6 +68,8 @@ const RightPanel: FC<RightPanelProps> = ({
       onNoteDelete={handleNoteDelete}
       setSelectedEventInfo={setSelectedEventInfo}
       setSelectedNote={setSelectedNote}
+      isCreating={isCreating}
+      onEventCancel={onEventCancel}
     />
   );
 };

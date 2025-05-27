@@ -1,17 +1,18 @@
 import { useState, useEffect } from 'react';
 import NavBar from '../../components/NavBar';
 import getWeeksRange from '../../api/GetWeeksRange';
-import { format, startOfWeek } from 'date-fns';
+import { format, startOfWeek, addDays, addWeeks } from 'date-fns';
 
 import ScheduleHeader from './components/ScheduleHeader.1';
 import ScheduleTable from './components/ScheduleTable';
-import EventModal from './components/EventModal';
 import ExportModal from './components/ExportModal';
 import ExportButton from './components/ExportButton';
 import RightPanel from './components/RightPanel';
-import type { TEvent, TCell, TCurrentFilters, TCurrentMetrics, TNotesState, TSelectedEvent, TNote } from './types';
+import type { TEvent, TCurrentFilters, TCurrentMetrics, TNotesState, TSelectedEvent, TNote } from './types';
 
 import api from '../../interceptors/api';
+
+const DAYS = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб'];
 
 const WORKDAY_START = 9 * 60; // 9:00 в минутах
 const WORKDAY_END = 22 * 60; // 22:00 в минутах
@@ -39,23 +40,22 @@ export default function SchedulePage() {
     newNote: '',
   });
 
-  const [selectedCell, setSelectedCell] = useState<TCell | null>(null);
   const [events, setEvents] = useState<Record<string, TEvent>>({});
   const [isLoading, setIsLoading] = useState(true);
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
-  const [selectedEventInfo, setSelectedEventInfo] = useState< TSelectedEvent | null>(null);
+  const [selectedEventInfo, setSelectedEventInfo] = useState<TSelectedEvent | null>(null);
   const [selectedNote, setSelectedNote] = useState<TNote | null>(null);
+  const [isCreatingEvent, setIsCreatingEvent] = useState(false);
 
   useEffect(() => {
     const fetchInitialData = async () => {
       try {
-        const [weeksData, teachersData, placesData, groupsData] =
-          await Promise.all([
-            getWeeksRange(),
-            api.get('metrics/', { params: { type: 'teacher' } }),
-            api.get('metrics/', { params: { type: 'place' } }),
-            api.get('metrics/', { params: { type: 'group' } }),
-          ]);
+        const [weeksData, teachersData, placesData, groupsData] = await Promise.all([
+          getWeeksRange(),
+          api.get('metrics/', { params: { type: 'teacher' } }),
+          api.get('metrics/', { params: { type: 'place' } }),
+          api.get('metrics/', { params: { type: 'group' } }),
+        ]);
 
         setCurrentMetrics({
           weeks: weeksData,
@@ -64,7 +64,7 @@ export default function SchedulePage() {
           groups: groupsData.data,
         });
 
-        setCurrentFilters((prev) => ({
+        setCurrentFilters(prev => ({
           ...prev,
           selectedGroup: groupsData.data[0] || null,
         }));
@@ -87,20 +87,20 @@ export default function SchedulePage() {
   const getTimeSlots = () => {
     const slots: { start: string; end: string }[] = [];
     let currentStart = WORKDAY_START;
-
+    
     while (currentStart + TIME_SLOT_DURATION <= WORKDAY_END) {
       if (currentStart === 12 * 60 + 30) {
         currentStart += 30;
       }
-
+      
       slots.push({
         start: formatTime(currentStart),
-        end: formatTime(currentStart + TIME_SLOT_DURATION),
+        end: formatTime(currentStart + TIME_SLOT_DURATION)
       });
-
+      
       currentStart += TIME_SLOT_DURATION + BREAK_DURATION;
     }
-
+    
     return slots;
   };
 
@@ -132,21 +132,47 @@ export default function SchedulePage() {
   ) => {
     if (event && eventKey) {
       setSelectedEventInfo({ event, eventKey });
+      setIsCreatingEvent(false);
     } else {
-      setSelectedCell({ day, ...slot });
-      (document.getElementById('event_modal') as HTMLDialogElement)?.showModal();
+      const currentDate = addDays(
+        addWeeks(currentFilters.cycleStartDate, currentFilters.activeWeek - 1),
+        DAYS.indexOf(day)
+      );
+      const newEventKey = `${format(currentDate, 'yyyy-MM-dd')}T${slot.start.replace(':', '')}`;
+      
+      setSelectedEventInfo({
+        event: {
+          group_name: currentFilters.selectedGroup || '',
+          lesson_name: 'Новое занятие',
+          lesson_type: 'ЛК',
+          teacher: '',
+          place: '',
+          start_date: currentDate
+        },
+        eventKey: newEventKey
+      });
+      setIsCreatingEvent(true);
     }
   };
 
-  const addEvent = (cell: TCell, eventData: Omit<TEvent, 'start_date'>) => {
-    const key = `${currentFilters.activeWeek}-${cell.day}-${cell.start}`;
-    setEvents((prev) => ({
-      ...prev,
-      [key]: {
-        ...eventData,
-        start_date: new Date(),
-      },
-    }));
+  const handleEventCancel = () => {
+    if (isCreatingEvent && selectedEventInfo) {
+      setEvents(prev => {
+        const newEvents = { ...prev };
+        delete newEvents[selectedEventInfo.eventKey];
+        return newEvents;
+      });
+    }
+    setSelectedEventInfo(null);
+    setIsCreatingEvent(false);
+  };
+
+  const handleEventDelete = (eventKey: string) => {
+    setEvents(prev => {
+      const newEvents = { ...prev };
+      delete newEvents[eventKey];
+      return newEvents;
+    });
   };
 
   return (
@@ -177,6 +203,7 @@ export default function SchedulePage() {
               cycleStartDate: currentFilters.cycleStartDate
             }}
             onCellClick={handleCellClick}
+            onEventDelete={handleEventDelete}
           />
         </div>
 
@@ -188,9 +215,9 @@ export default function SchedulePage() {
           setEvents={setEvents}
           setSelectedEventInfo={setSelectedEventInfo}
           setSelectedNote={setSelectedNote}
+          isCreating={isCreatingEvent}
+          onEventCancel={handleEventCancel}
         />
-
-        <EventModal selectedCell={selectedCell} addEvent={addEvent} />
       </div>
     </>
   );

@@ -17,12 +17,14 @@ type ScheduleTableProps = {
     event?: TEvent, 
     eventKey?: string
   ) => void; 
+  onEventDelete: (eventKey: string) => void;
 };
 
 export default function ScheduleTable({
   scheduleData: { timeSlots, events },
   filters: { activeWeek, cycleStartDate },
   onCellClick,
+  onEventDelete,
 }: ScheduleTableProps) {
   const { days } = useMemo(() => {
     return {
@@ -63,17 +65,34 @@ export default function ScheduleTable({
               key={day}
               className={`${slot.start != '20:00' && 'border border-base-content/15'} border-l-0 border-r-0 
                 cursor-pointer hover:bg-base-300 w-[170px] max-w-[130px] 
-                min-h-21.5 h-21.5 break-words overflow-hidden p-2 align-top`}
+                min-h-21.5 h-21.5 break-words overflow-hidden p-2 align-top relative group`} 
               onClick={() => onCellClick(day, slot, event, eventKey)}
             >
               {event ? (
                 <div className="flex flex-col gap-1 p-1">
-                  <div className="text-balance text-gray-600 line-clamp-3  min-h-[60px] font-stretch-50% font-medium">
+                  {/* Кнопка удаления */}
+                  <button
+                    className="absolute top-1 right-1 btn btn-error btn-xs btn-circle 
+                              opacity-0 group-hover:opacity-100 transition-opacity"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onEventDelete(eventKey);
+                    }}
+                    aria-label="Удалить событие"
+                  >
+                    <svg width="100" height="100" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                      <g transform="rotate(45, 50, 50)">
+                        <rect x="45" y="20" width="10" height="60" fill="white" />
+                        <rect x="20" y="45" width="60" height="10" fill="white" />
+                      </g>
+                    </svg>
+                  </button>
+
+                  <div className="text-balance text-gray-600 line-clamp-3 min-h-[60px] font-stretch-50% font-medium">
                     {event.lesson_name}
                   </div>
                 </div>
               ) : (
-                // container without elements
                 <div className="min-h-[68px] p-1"></div>
               )}
               {event && (
