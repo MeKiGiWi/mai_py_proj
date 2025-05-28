@@ -46,7 +46,7 @@ class GoogleAuthAPIView(APIView):
         ).json()
         
         # create new user
-        user, created = User.objects.get_or_create(
+        user, created = User.objects.update_or_create(
             email=user_data['email'],
             defaults={
                 'first_name': translit(user_data.get('given_name', ''), language_code='ru', reversed=True).replace('ë', 'e'),
@@ -56,7 +56,7 @@ class GoogleAuthAPIView(APIView):
         )
 
         # create user_profile for new user
-        profile, created = UserProfile.objects.get_or_create(
+        profile, created = UserProfile.objects.update_or_create(
             user_id=user.id,
             defaults={
                 'user_id': user.id,
