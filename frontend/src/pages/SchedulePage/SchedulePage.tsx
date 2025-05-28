@@ -124,7 +124,7 @@ export default function SchedulePage() {
             place: currentFilters.selectedPlace,
           },
         });
-        console.log("DATA!", data);
+        console.log('DATA!', data);
         setEvents(data);
       } catch (error) {
         setEvents({});
@@ -152,10 +152,11 @@ export default function SchedulePage() {
       const minutes = slot.start.split(':')[1];
       currentDate.setHours(Number(hours));
       currentDate.setMinutes(Number(minutes));
-      const newEventKey = format(currentDate, "yyyy-MM-dd") +
-        "T" +
+      const newEventKey =
+        format(currentDate, 'yyyy-MM-dd') +
+        'T' +
         (slot.start === '9:00' ? '09:00' : slot.start) +
-        ":00Z";
+        ':00Z';
 
       setSelectedEventInfo({
         event: {
@@ -190,16 +191,16 @@ export default function SchedulePage() {
     setEvents((prev) => {
       const newEvents = { ...prev };
       const deletedEvent = events[eventKey];
-      api.delete("schedule/", {
+      api.delete('schedule/', {
         data: {
-          date: deletedEvent.start_date?.toISOString(),
+          date: deletedEvent.start_date,
           place: deletedEvent.place,
           group_name: deletedEvent.group_name,
           teacher: deletedEvent.teacher,
           lesson_name: deletedEvent.lesson_name,
           lesson_type: deletedEvent.lesson_type,
-        }
-      })
+        },
+      });
       delete newEvents[eventKey];
       return newEvents;
     });
