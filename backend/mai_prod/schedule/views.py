@@ -136,7 +136,7 @@ class ScheduleAPIView(APIView):
             "lesson_type",
             "lesson_name",
         }
-        print("PRISHLO", params)
+
         if not all(param in params.keys() for param in required_params):
             print(params.keys(), "НЕ ПУСКАЕТ")
             return Response(

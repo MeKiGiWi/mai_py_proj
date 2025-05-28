@@ -118,7 +118,7 @@ export default function EditEventPanel({
           />
         </div>
 
-        {/* <div className="form-control">
+        <div className="form-control">
           <label className="label">
             <span className="label-text mb-1">Повторение</span>
           </label>
@@ -135,7 +135,7 @@ export default function EditEventPanel({
               </option>
             ))}
           </select>
-        </div> */}
+        </div>
 
         <div className="flex gap-2 mt-6">
           <button
