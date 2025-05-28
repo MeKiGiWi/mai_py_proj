@@ -80,6 +80,7 @@ class ScheduleAPIView(APIView):
             "start_date"
         )  # get userschedule_data by filter
         if user_schedule.exists():
+            print("EXIST")
             serializer = ScheduleSerializer(user_schedule, many=True)
             for event in serializer.data:
                 event_date = event["start_date"]
@@ -89,36 +90,37 @@ class ScheduleAPIView(APIView):
                 # )  # if we need to update data
 
             grouped_data = dict(sorted(grouped_data.items()))
+            print(grouped_data, "DATA")
 
         # Обработка циклических событий
-        for event in CycledEvents.objects.filter(query & Q(user_id=request.user.id)):
-            interval = timedelta(weeks=1) if event.every_week else timedelta(weeks=2)
-            current_date = event.start_date
+        # for event in CycledEvents.objects.filter(query & Q(user_id=request.user.id)):
+        #     interval = timedelta(weeks=1) if event.every_week else timedelta(weeks=2)
+        #     current_date = event.start_date
 
-            # Пропускаем события вне диапазона
-            if current_date > end_date:
-                continue
+        #     # Пропускаем события вне диапазона
+        #     if current_date > end_date:
+        #         continue
 
-            # Находим первое вхождение в диапазоне
-            if current_date < start_date:
-                delta = start_date - current_date
-                intervals = delta // interval
-                if delta % interval != timedelta(0):
-                    intervals += 1
-                current_date += interval * intervals
+        #     # Находим первое вхождение в диапазоне
+        #     if current_date < start_date:
+        #         delta = start_date - current_date
+        #         intervals = delta // interval
+        #         if delta % interval != timedelta(0):
+        #             intervals += 1
+        #         current_date += interval * intervals
 
-            # Генерируем все вхождения в диапазоне
-            while current_date <= end_date:
-                event_data = {
-                    "start_date": current_date,
-                    "teacher": event.teacher,
-                    "place": event.place,
-                    "lesson_name": event.lesson_name,
-                    "lesson_type": event.lesson_type,
-                    "group_name": event.group_name.group_name,
-                }
-                grouped_data[current_date] = event_data
-                current_date += interval
+        #     # Генерируем все вхождения в диапазоне
+        #     while current_date <= end_date:
+        #         event_data = {
+        #             "start_date": current_date,
+        #             "teacher": event.teacher,
+        #             "place": event.place,
+        #             "lesson_name": event.lesson_name,
+        #             "lesson_type": event.lesson_type,
+        #             "group_name": event.group_name.group_name,
+        #         }
+        #         grouped_data[current_date] = event_data
+        #         current_date += interval
 
         return Response(grouped_data)
 
@@ -147,7 +149,7 @@ class ScheduleAPIView(APIView):
         # Валидация даты
         try:
             date_str_utc = params.get("date")
-            date_str_utc = date_str_utc.replace(".000Z", "Z", 1).replace("Z", "+0001")
+            date_str_utc = date_str_utc.replace(".000Z", "Z", 1).replace("Z", "+0000")
             input_date = datetime.strptime(date_str_utc, "%Y-%m-%dT%H:%M:%S%z")
         except ValueError:
             return Response(

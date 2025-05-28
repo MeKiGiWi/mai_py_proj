@@ -17,6 +17,16 @@ type RightPanelProps = {
   isCreating: boolean;
   onEventCancel: () => void;
 };
+function toLocalISOString(date: Date) {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0'); // Месяцы начинаются с 0
+  const day = String(date.getDate()).padStart(2, '0');
+  const hours = String(date.getHours()).padStart(2, '0');
+  const minutes = String(date.getMinutes()).padStart(2, '0');
+  const seconds = String(date.getSeconds()).padStart(2, '0');
+
+  return `${year}-${month}-${day}T${hours}:${minutes}:${seconds}Z`;
+}
 
 const RightPanel: FC<RightPanelProps> = ({
   selectedEventInfo,
@@ -52,7 +62,8 @@ const RightPanel: FC<RightPanelProps> = ({
     const finalEvent = isCreating
       ? { ...updatedEvent, start_date: selectedEventInfo.event.start_date }
       : updatedEvent;
-    const newDate = updatedEvent.start_date?.toISOString()
+    const newDate = toLocalISOString(updatedEvent.start_date)
+    console.log(newDate, "NEW");
     const every_week = selectedEventInfo.event.repeat_type == 'alternate_week' ? true : false;
 
     if (selectedEventInfo.event.repeat_type == 'none')
@@ -67,19 +78,19 @@ const RightPanel: FC<RightPanelProps> = ({
         }
       }
       )
-    else
-      api.put("cycled/", {
-        data: {
-          date: newDate,
-          place: updatedEvent.place,
-          group_name: updatedEvent.group_name,
-          teacher: updatedEvent.teacher,
-          lesson_name: updatedEvent.lesson_name,
-          lesson_type: updatedEvent.lesson_type,
-          every_week: every_week,
-        }
-      }
-      )
+    // else
+    //   api.put("cycled/", {
+    //     data: {
+    //       date: newDate,
+    //       place: updatedEvent.place,
+    //       group_name: updatedEvent.group_name,
+    //       teacher: updatedEvent.teacher,
+    //       lesson_name: updatedEvent.lesson_name,
+    //       lesson_type: updatedEvent.lesson_type,
+    //       every_week: every_week,
+    //     }
+    //   }
+    // )
     setEvents((prev) => {
       return {
         ...prev,

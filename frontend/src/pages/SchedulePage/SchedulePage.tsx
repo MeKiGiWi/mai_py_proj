@@ -124,7 +124,8 @@ export default function SchedulePage() {
             place: currentFilters.selectedPlace,
           },
         });
-        setEvents((prev) => ({ ...prev, ...data }));
+        console.log("DATA!", data);
+        setEvents(data);
       } catch (error) {
         setEvents({});
       }
@@ -168,6 +169,7 @@ export default function SchedulePage() {
         },
         eventKey: newEventKey,
       });
+      console.log(currentDate, newEventKey);
       setIsCreatingEvent(true);
     }
   };
