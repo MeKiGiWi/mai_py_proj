@@ -1,7 +1,22 @@
 from django.db import models
-from django.contrib.auth.models import AbstractUser
+from django.contrib.auth.models import User, AbstractUser
 
 # Create your models here.
+
+class UserProfile(models.Model):
+    class Meta:
+        ordering = ['user']
+
+    user = models.OneToOneField(
+        User,
+        on_delete=models.CASCADE
+    )
+
+    credentials = models.JSONField(
+        'credentials',
+        null=True,
+    )
+
 
 class CustomUser(AbstractUser):
 
