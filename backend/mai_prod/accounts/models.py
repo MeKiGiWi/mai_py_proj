@@ -1,29 +1,19 @@
 from django.db import models
-from django.contrib.auth.models import AbstractUser
+from django.contrib.auth.models import User, AbstractUser
 
 # Create your models here.
 
-class CustomUser(AbstractUser):
+class UserProfile(models.Model):
 
     class Meta:
-        verbose_name = 'Custom user'
-        verbose_name_plural = 'Custom users'
+        verbose_name = 'User profile'
+        verbose_name_plural = 'User profiles'
+        ordering = ['user']
 
-    groups = models.ManyToManyField(
-        'auth.Group',
-        verbose_name='groups',
-        blank=True,
-        related_name="customuser_set",
-        related_query_name="customuser",
+    user = models.OneToOneField(
+        User,
+        on_delete=models.CASCADE
     )
-
-    user_permissions = models.ManyToManyField(
-        'auth.Permission',
-        verbose_name='user permissions',
-        blank=True,
-        related_name="customuser_set",
-        related_query_name="customuser",
-    )    
 
     credentials = models.JSONField(
         'credentials',

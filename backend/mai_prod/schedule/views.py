@@ -136,7 +136,7 @@ class ScheduleAPIView(APIView):
             "lesson_type",
             "lesson_name",
         }
-
+        print("PRISHLO", params)
         if not all(param in params.keys() for param in required_params):
             print(params.keys(), "НЕ ПУСКАЕТ")
             return Response(
@@ -221,8 +221,9 @@ class ScheduleAPIView(APIView):
         # Валидация даты
         try:
             date_str_utc = params.get("date")
-            date_str_utc = date_str_utc.replace(".000Z", "Z", 1).replace("Z", "+0001")
-            input_date = datetime.strptime(date_str_utc, "%Y-%m-%dT%H:%M:%S%z")
+            date_str_utc = date_str_utc.replace(".000Z", "+0000", 1)
+            input_date = datetime.strptime(date_str_utc, "%Y-%m-%dT%H:%M:%SZ")
+            # input_date = datetime.strptime(date_str_utc, "%Y-%m-%dT%H:%M:%S%z")
         except ValueError:
             return Response(
                 {"error": "Неверный формат даты"},
