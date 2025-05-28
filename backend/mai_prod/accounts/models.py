@@ -4,7 +4,10 @@ from django.contrib.auth.models import User, AbstractUser
 # Create your models here.
 
 class UserProfile(models.Model):
+
     class Meta:
+        verbose_name = 'User profile'
+        verbose_name_plural = 'User profiles'
         ordering = ['user']
 
     user = models.OneToOneField(
