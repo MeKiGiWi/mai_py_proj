@@ -9,8 +9,8 @@ from rest_framework.response import Response
 from django.core.exceptions import ValidationError
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
-from schedule.models import GroupLink, Schedule, UserSchedule, Notes
-from .serializers import ScheduleSerializer, NoteSerializer
+from schedule.models import GroupLink, Schedule, UserSchedule, Notes, CycledEvents
+from .serializers import ScheduleSerializer, NoteSerializer, CycledEventsSerializer
 from .utils.normalize_fullname import normalize_fullname
 from rest_framework.decorators import (
     api_view,
@@ -89,6 +89,36 @@ class ScheduleAPIView(APIView):
                 # )  # if we need to update data
 
             grouped_data = dict(sorted(grouped_data.items()))
+
+        # Обработка циклических событий
+        for event in CycledEvents.objects.filter(query & Q(user_id=request.user.id)):
+            interval = timedelta(weeks=1) if event.every_week else timedelta(weeks=2)
+            current_date = event.start_date
+
+            # Пропускаем события вне диапазона
+            if current_date > end_date:
+                continue
+
+            # Находим первое вхождение в диапазоне
+            if current_date < start_date:
+                delta = start_date - current_date
+                intervals = delta // interval
+                if delta % interval != timedelta(0):
+                    intervals += 1
+                current_date += interval * intervals
+
+            # Генерируем все вхождения в диапазоне
+            while current_date <= end_date:
+                event_data = {
+                    "start_date": current_date,
+                    "teacher": event.teacher,
+                    "place": event.place,
+                    "lesson_name": event.lesson_name,
+                    "lesson_type": event.lesson_type,
+                    "group_name": event.group_name.group_name,
+                }
+                grouped_data[current_date] = event_data
+                current_date += interval
 
         return Response(grouped_data)
 
@@ -436,3 +466,74 @@ class NotesAPIView(APIView):
                 {"message": f"Заметка на {date_str} успешно создана"},
                 status=status.HTTP_201_CREATED,
             )
+
+
+class CycledEventsAPIView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def put(self, request: Request):
+        # Получаем данные из тела запроса
+        data = request.query_params
+
+        # Добавляем текущего пользователя в данные
+        data["user"] = request.user.id
+
+        # Валидация обязательных полей
+        required_fields = [
+            "group_name",
+            "teacher",
+            "place",
+            "lesson_name",
+            "lesson_type",
+            "start_date",
+            "every_week",
+        ]
+
+        missing_fields = [field for field in required_fields if field not in data]
+        if missing_fields:
+            return Response(
+                {
+                    "error": f"Отсутствуют обязательные поля: {', '.join(missing_fields)}"
+                },
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        try:
+            date_str_utc = data["date"].replace("Z", "+0000")
+            input_date = datetime.strptime(date_str_utc, "%Y-%m-%dT%H:%M:%S%z")
+        except ValueError:
+            return Response(
+                {"error": "Неверный формат даты"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        # Проверка существования группы
+        try:
+            group = GroupLink.objects.get(id=data["group"])
+        except (GroupLink.DoesNotExist, ValueError):
+            return Response(
+                {"error": "Указанная группа не найдена"},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
+        # Создание циклического события
+        try:
+            event = CycledEvents.objects.create(
+                user=request.user,
+                group_name_id=group,
+                teacher=data["teacher"],
+                place=data["place"],
+                lesson_name=data["lesson_name"],
+                lesson_type=data["lesson_type"],
+                start_date=input_date,
+                every_week=data["every_week"],
+            )
+        except Exception as e:
+            return Response(
+                {"error": f"Ошибка создания события: {str(e)}"},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            )
+
+        # Сериализация результата
+        serializer = CycledEventsSerializer(event)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
