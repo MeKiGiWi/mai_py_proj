@@ -5,6 +5,7 @@ export type TEvent = {
   teacher: string | null;
   place: string | null;
   start_date: Date | null;
+  repeat_type: 'none' | 'every_week' | 'alternate_week';
 };
 
 export type TCell = {

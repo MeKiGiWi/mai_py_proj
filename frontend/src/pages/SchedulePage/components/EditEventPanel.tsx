@@ -44,6 +44,12 @@ export default function EditEventPanel({
     { value: 'ЭКЗ', label: 'Экзамен' },
   ];
 
+  const REPEAT_OPTIONS = [
+    { value: 'none', label: 'Без повторения' },
+    { value: 'every_week', label: 'Каждую неделю' },
+    { value: 'alternate_week', label: 'Через неделю' },
+  ];
+
   return (
     <div className="w-80 bg-base-100 rounded-box p-4 flex flex-col">
       <h2 className="text-xl font-bold mb-4">
@@ -94,6 +100,7 @@ export default function EditEventPanel({
             value={formData.teacher || ''}
             onChange={handleChange}
             className="input input-bordered"
+            required
           />
         </div>
 
@@ -107,7 +114,27 @@ export default function EditEventPanel({
             value={formData.place || ''}
             onChange={handleChange}
             className="input input-bordered"
+            required
           />
+        </div>
+
+        <div className="form-control">
+          <label className="label">
+            <span className="label-text mb-1">Повторение</span>
+          </label>
+          <select
+            name="repeat_type"
+            value={formData.repeat_type || 'none'}
+            onChange={handleChange}
+            className="select select-bordered"
+            required
+          >
+            {REPEAT_OPTIONS.map((option) => (
+              <option key={option.value} value={option.value}>
+                {option.label}
+              </option>
+            ))}
+          </select>
         </div>
 
         <div className="flex gap-2 mt-6">

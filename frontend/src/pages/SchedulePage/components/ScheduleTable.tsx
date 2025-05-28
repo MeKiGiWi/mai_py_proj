@@ -71,8 +71,7 @@ export default function ScheduleTable({
                 <div className="flex flex-col gap-1 p-1">
                   {/* Кнопка удаления */}
                   <button
-                    className="absolute top-1 right-1 btn btn-error btn-xs btn-circle 
-                              opacity-0 group-hover:opacity-100 transition-opacity"
+                    className="absolute top-1 right-1 btn btn-error btn-xs btn-circle opacity-0 group-hover:opacity-100 transition-opacity w-4 h-4 min-h-0 p-0"
                     onClick={(e) => {
                       e.stopPropagation();
                       onEventDelete(eventKey);
@@ -80,8 +79,8 @@ export default function ScheduleTable({
                     aria-label="Удалить событие"
                   >
                     <svg
-                      width="100"
-                      height="100"
+                      width="12"
+                      height="12"
                       viewBox="0 0 100 100"
                       xmlns="http://www.w3.org/2000/svg"
                     >

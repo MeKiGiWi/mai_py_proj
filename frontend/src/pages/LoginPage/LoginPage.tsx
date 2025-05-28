@@ -109,7 +109,7 @@ function LoginPage() {
 
             <button
               type="submit"
-              className="btn btn-accent w-full h-12 flex items-center justify-center"
+              className="btn btn-accent w-full h-10 flex items-center justify-center"
               disabled={isLoading}
             >
               {isLoading ? <LoadingIcon /> : 'Войти'}
@@ -135,11 +135,15 @@ function LoginPage() {
               </div>
             )}
 
-            <div className="text-center">
-              <span>или </span>
-              <GoogleLoginButton />
+            <div className="flex items-center gap-2 my-3">
+              <div className="flex-1 h-px"></div>
+              <span className="text-gray-500 text-sm px-2">или</span>
+              <div className="flex-1 h-px"></div>
             </div>
-            <p className="text-sm">
+
+            <GoogleLoginButton />
+
+            <p className="text-sm text-center mt-2">
               Нет аккаунта?{' '}
               <Link to="/registration" className="link link-accent">
                 Зарегистрироваться
