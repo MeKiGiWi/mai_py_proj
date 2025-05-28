@@ -28,15 +28,17 @@ from schedule.views import (
     NotesAPIView,
     CycledEventsAPIView,
 )
+from google_services.views import GoogleAuthAPIView
 
 urlpatterns = [
-    path("admin/", admin.site.urls),
-    path("api/register/", RegisterView.as_view(), name="register"),
-    path("api/token/", TokenObtainPairView.as_view(), name="token_obtain_pair"),
-    path("api/token/refresh/", TokenRefreshView.as_view(), name="token_refresh"),
-    path("api/auth/me/", get_current_user, name="current_user"),
-    path("api/metrics/", MetricsAPIView.as_view(), name="metrics"),
-    path("api/schedule/", ScheduleAPIView.as_view(), name="schedule"),
-    path("api/notes/", NotesAPIView.as_view(), name="notes"),
+    path('admin/', admin.site.urls),
+    path('api/register/', RegisterView.as_view(), name='register'),
+    path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
+    path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+    path('api/auth/me/', get_current_user, name='current_user'),
+    path('api/metrics/', MetricsAPIView.as_view(), name='metrics'),
+    path('api/schedule/', ScheduleAPIView.as_view(), name='schedule'),
+    path('api/notes/', NotesAPIView.as_view(), name='notes'),
     path("api/cycled/", CycledEventsAPIView.as_view(), name="cycled"),
+    path('api/google/auth/', GoogleAuthAPIView.as_view(), name='google_auth'),
 ]
