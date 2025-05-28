@@ -12,6 +12,7 @@ import requests
 from jwt import encode
 from django.conf import settings
 from django.contrib.auth.models import User
+from accounts.models import UserProfile
 from transliterate import translit
 import os
 
@@ -44,13 +45,25 @@ class GoogleAuthAPIView(APIView):
             headers={'Authorization': f'Bearer {access_token}'}
         ).json()
         
-        # create new custom user
+        # create new user
         user, created = User.objects.get_or_create(
             email=user_data['email'],
             defaults={
                 'first_name': translit(user_data.get('given_name', ''), language_code='ru', reversed=True).replace('ë', 'e'),
                 'last_name': translit(user_data.get('family_name', ''), language_code='ru', reversed=True).replace('ë', 'e'),
                 'username': translit(user_data.get('given_name', ''), language_code='ru', reversed=True).replace('ë', 'e'),
+            }
+        )
+
+        # create user_profile for new user
+        profile, created = UserProfile.objects.get_or_create(
+            user_id=user.id,
+            defaults={
+                'user_id': user.id,
+                'credentials': {
+                    'google_access_token': access_token,
+                    'google_refresh_token': 'POKA CHTO NET',
+                }
             }
         )
 
