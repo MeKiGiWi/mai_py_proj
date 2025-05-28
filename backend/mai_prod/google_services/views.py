@@ -55,7 +55,12 @@ class GoogleAuthAPIView(APIView):
         )
 
         # getting jwt token
+        refresh = RefreshToken.for_user(user)
 
 
-
-        return Response({'google_access_token':  " aksjdfhjk"}, status=status.HTTP_201_CREATED)
+        return Response({
+                'access_token': str(refresh.access_token),
+                'refresh_token': str(refresh),
+                'user_id': user.id,
+                'username': user.username
+            }, status=status.HTTP_200_OK)
