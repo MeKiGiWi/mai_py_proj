@@ -109,7 +109,7 @@ function LoginPage() {
 
             <button
               type="submit"
-              className="btn btn-accent w-full h-12 flex items-center justify-center"
+              className="btn btn-accent w-full h-10 flex items-center justify-center"
               disabled={isLoading}
             >
               {isLoading ? <LoadingIcon /> : 'Войти'}
