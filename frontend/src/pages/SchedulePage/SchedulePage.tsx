@@ -124,7 +124,7 @@ export default function SchedulePage() {
             place: currentFilters.selectedPlace,
           },
         });
-        setEvents(data);
+        setEvents((prev) => ({ ...prev, ...data }));
       } catch (error) {
         setEvents({});
       }

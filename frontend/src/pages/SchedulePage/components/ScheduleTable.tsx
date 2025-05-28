@@ -59,6 +59,8 @@ export default function ScheduleTable({
           );
           const eventKey = `${format(current_day, 'yyyy-MM-dd')}T${slot.start === '9:00' ? '09:00' : slot.start}:00Z`;
           const event = events[eventKey];
+          console.log(eventKey, events[eventKey], "key value");
+          console.log
           return (
             <td
               key={day}
