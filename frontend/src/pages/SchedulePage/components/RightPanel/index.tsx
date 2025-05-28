@@ -53,17 +53,33 @@ const RightPanel: FC<RightPanelProps> = ({
       ? { ...updatedEvent, start_date: selectedEventInfo.event.start_date }
       : updatedEvent;
     const newDate = updatedEvent.start_date?.toISOString()
-    api.patch("schedule/", {
-      data: {
-        date: newDate,
-        place: updatedEvent.place,
-        group_name: updatedEvent.group_name,
-        teacher: updatedEvent.teacher,
-        lesson_name: updatedEvent.lesson_name,
-        lesson_type: updatedEvent.lesson_type,
+    const every_week = selectedEventInfo.event.repeat_type == 'alternate_week' ? true : false;
+
+    if (selectedEventInfo.event.repeat_type == 'none')
+      api.patch("schedule/", {
+        data: {
+          date: newDate,
+          place: updatedEvent.place,
+          group_name: updatedEvent.group_name,
+          teacher: updatedEvent.teacher,
+          lesson_name: updatedEvent.lesson_name,
+          lesson_type: updatedEvent.lesson_type,
+        }
       }
-    }
-    )
+      )
+    else
+      api.put("cycled/", {
+        data: {
+          date: newDate,
+          place: updatedEvent.place,
+          group_name: updatedEvent.group_name,
+          teacher: updatedEvent.teacher,
+          lesson_name: updatedEvent.lesson_name,
+          lesson_type: updatedEvent.lesson_type,
+          every_week: every_week,
+        }
+      }
+      )
     setEvents((prev) => {
       return {
         ...prev,

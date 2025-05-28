@@ -164,6 +164,7 @@ export default function SchedulePage() {
           teacher: '',
           place: '',
           start_date: currentDate,
+          repeat_type: 'none',
         },
         eventKey: newEventKey,
       });
