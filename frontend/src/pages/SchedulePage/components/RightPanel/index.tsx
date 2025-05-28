@@ -62,12 +62,13 @@ const RightPanel: FC<RightPanelProps> = ({
     const finalEvent = isCreating
       ? { ...updatedEvent, start_date: selectedEventInfo.event.start_date }
       : updatedEvent;
-    const newDate = toLocalISOString(updatedEvent.start_date)
-    console.log(newDate, "NEW");
-    const every_week = selectedEventInfo.event.repeat_type == 'alternate_week' ? true : false;
+    const newDate = toLocalISOString(updatedEvent?.start_date);
+    console.log(newDate, 'NEW');
+    const every_week =
+      selectedEventInfo.event.repeat_type == 'alternate_week' ? true : false;
 
     if (selectedEventInfo.event.repeat_type == 'none')
-      api.patch("schedule/", {
+      api.patch('schedule/', {
         data: {
           date: newDate,
           place: updatedEvent.place,
@@ -75,9 +76,8 @@ const RightPanel: FC<RightPanelProps> = ({
           teacher: updatedEvent.teacher,
           lesson_name: updatedEvent.lesson_name,
           lesson_type: updatedEvent.lesson_type,
-        }
-      }
-      )
+        },
+      });
     // else
     //   api.put("cycled/", {
     //     data: {
@@ -95,7 +95,7 @@ const RightPanel: FC<RightPanelProps> = ({
       return {
         ...prev,
         [selectedEventInfo.eventKey]: finalEvent,
-      }
+      };
     });
     setSelectedEventInfo(null);
   };

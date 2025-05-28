@@ -220,9 +220,9 @@ class ScheduleAPIView(APIView):
 
         # Валидация даты
         try:
-            input_date = datetime.strptime(params['date'], "%Y-%m-%dT%H:%M:%SZ")
-            # date_str_utc = params.get("date")
-            # date_str_utc = date_str_utc.replace(".000Z", "Z", 1).replace("Z", "+0001")
+            date_str_utc = params.get("date")
+            date_str_utc = date_str_utc.replace(".000Z", "+0000", 1)
+            input_date = datetime.strptime(date_str_utc, "%Y-%m-%dT%H:%M:%SZ")
             # input_date = datetime.strptime(date_str_utc, "%Y-%m-%dT%H:%M:%S%z")
         except ValueError:
             return Response(
