@@ -136,7 +136,7 @@ class ScheduleAPIView(APIView):
             "lesson_type",
             "lesson_name",
         }
-        print("PRISHLO", params)
+
         if not all(param in params.keys() for param in required_params):
             print(params.keys(), "НЕ ПУСКАЕТ")
             return Response(
@@ -145,6 +145,7 @@ class ScheduleAPIView(APIView):
                 },
                 status=status.HTTP_400_BAD_REQUEST,
             )
+        print(params, "PRISHLO")
 
         # Валидация даты
         try:
@@ -328,7 +329,7 @@ class MetricsAPIView(APIView):
                                 and not any(char.isdigit() for char in x)
                             }
                         )
-                        + list(x.teacher for x in custom_metrics)
+                        + list(x.teacher for x in custom_metrics if x is not None)
                     )
                 )
             )

@@ -62,12 +62,11 @@ const RightPanel: FC<RightPanelProps> = ({
     const finalEvent = isCreating
       ? { ...updatedEvent, start_date: selectedEventInfo.event.start_date }
       : updatedEvent;
-    const newDate = updatedEvent?.start_date;
-    console.log(newDate, 'NEW');
+    console.log(updatedEvent.start_date);
+    const newDate = updatedEvent.start_date;
     const every_week =
       selectedEventInfo.event.repeat_type == 'alternate_week' ? true : false;
 
-    // if (selectedEventInfo.event.repeat_type == 'none')
     api.patch('schedule/', {
       data: {
         date: newDate,
